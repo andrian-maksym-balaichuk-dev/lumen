@@ -51,40 +51,93 @@ Roles not listed use the Material 3 defaults.
 Material 3 has no slots for these, so they live in `LumoraColors` (`Lumora.colors`). They stay
 the same when wallpaper colors are turned on.
 
-| Token | Light | | Dark | | Used for |
-|---|---|---|---|---|---|
-| success | `#1E8E3E` | ![](https://placehold.co/16x16/1E8E3E/1E8E3E.png) | `#6DD58C` | ![](https://placehold.co/16x16/6DD58C/6DD58C.png) | Correct answer border and icon |
-| successContainer | `#D3F5DC` | ![](https://placehold.co/16x16/D3F5DC/D3F5DC.png) | `#0F3D1E` | ![](https://placehold.co/16x16/0F3D1E/0F3D1E.png) | Correct answer fill |
-| onSuccessContainer | `#062E14` | ![](https://placehold.co/16x16/062E14/062E14.png) | `#C8F5D2` | ![](https://placehold.co/16x16/C8F5D2/C8F5D2.png) | Text on the correct fill |
-| warning | `#B26A00` | ![](https://placehold.co/16x16/B26A00/B26A00.png) | `#FFB95C` | ![](https://placehold.co/16x16/FFB95C/FFB95C.png) | Timer at 5 s or less, timeout chip |
-| streakFlame | `#F2610D` | ![](https://placehold.co/16x16/F2610D/F2610D.png) | `#FF8A3D` | ![](https://placehold.co/16x16/FF8A3D/FF8A3D.png) | Streak dots and flame icon |
+| Token | Light | | Dark | |
+|---|---|---|---|---|
+| success | `#1E8E3E` | ![](https://placehold.co/16x16/1E8E3E/1E8E3E.png) | `#6DD58C` | ![](https://placehold.co/16x16/6DD58C/6DD58C.png) |
+| successContainer | `#D3F5DC` | ![](https://placehold.co/16x16/D3F5DC/D3F5DC.png) | `#0F3D1E` | ![](https://placehold.co/16x16/0F3D1E/0F3D1E.png) |
+| onSuccessContainer | `#062E14` | ![](https://placehold.co/16x16/062E14/062E14.png) | `#C8F5D2` | ![](https://placehold.co/16x16/C8F5D2/C8F5D2.png) |
+| warning | `#B26A00` | ![](https://placehold.co/16x16/B26A00/B26A00.png) | `#FFB95C` | ![](https://placehold.co/16x16/FFB95C/FFB95C.png) |
+| streakFlame | `#F2610D` | ![](https://placehold.co/16x16/F2610D/F2610D.png) | `#FF8A3D` | ![](https://placehold.co/16x16/FF8A3D/FF8A3D.png) |
 
 ## Typography
 
 Font: [Inter](https://rsms.me/inter/) (variable font, SIL Open Font License), bundled as
 `res/font/inter_variable.ttf`.
 
-| Style | Size / line height (sp) | Weight | Used for |
-|---|---|---|---|
-| displayLarge | 64 / 68 | 800 | Results score |
-| displayMedium | 48 / 52 | 700 | Marathon counter |
-| displaySmall | 36 / 44 | 700 | Timer number |
-| headlineLarge | 34 / 41 | 700 | Large screen title |
-| headlineMedium | 28 / 34 | 700 | Section hero |
-| headlineSmall | 24 / 30 | 600 | Question text |
-| titleLarge | 20 / 26 | 600 | Collapsed title, card titles |
-| titleMedium | 17 / 22 | 600 | Answer option text |
-| titleSmall | 15 / 20 | 600 | List item headline |
-| bodyLarge / Medium / Small | 17/24, 15/20, 13/18 | 400 | Text |
-| labelLarge / Medium / Small | 15/20, 13/16, 11/14 | 600 | Buttons, chips, badges |
+| Style | Size / line height (sp) | Weight |
+|---|---|---|
+| displayLarge | 64 / 68 | 800 |
+| displayMedium | 48 / 52 | 700 |
+| displaySmall | 36 / 44 | 700 |
+| headlineLarge | 34 / 41 | 700 |
+| headlineMedium | 28 / 34 | 700 |
+| headlineSmall | 24 / 30 | 600 |
+| titleLarge | 20 / 26 | 600 |
+| titleMedium | 17 / 22 | 600 |
+| titleSmall | 15 / 20 | 600 |
+| bodyLarge / Medium / Small | 17/24, 15/20, 13/18 | 400 |
+| labelLarge / Medium / Small | 15/20, 13/16, 11/14 | 600 |
 
 ## Shapes
 
-| Token | Radius | Material 3 slot | Used for |
+| Token | Radius | Material 3 slot |
+|---|---|---|
+| xs | 8 dp | extraSmall |
+| sm | 12 dp | small |
+| md | 20 dp | medium |
+| lg | 28 dp | large |
+| xl | 36 dp | extraLarge |
+| pill | 50 % | `CircleShape` |
+
+## Spacing
+
+Base unit 4 dp, read with `Lumora.spacing`.
+
+| Token | Value | | Token | Value |
+|---|---|---|---|---|
+| xxs | 2 dp | | xl | 20 dp |
+| xs | 4 dp | | xxl | 24 dp |
+| sm | 8 dp | | xxxl | 32 dp |
+| md | 12 dp | | huge | 48 dp |
+| lg | 16 dp | | | |
+
+Layout values: screen gutter 20 dp (compact) / 24 dp (medium), content max width 640 dp, card
+padding 16 dp, list gap 12 dp, section gap 32 dp, minimum touch target 48 dp.
+
+## Glass
+
+Read with `Lumora.glass`. Text on every tint stays at 4.5:1 or better even without blur.
+
+| Material | Blur | Light tint | Dark tint |
 |---|---|---|---|
-| xs | 8 dp | extraSmall | Badges |
-| sm | 12 dp | small | Chips, text fields |
-| md | 20 dp | medium | Answer cards, stat tiles |
-| lg | 28 dp | large | Hero cards, sheet corners |
-| xl | 36 dp | extraLarge | Dialogs, onboarding card |
-| pill | 50 % | `CircleShape` | Dock, buttons, segmented rows |
+| Frost | 0 | white α 0.72 | `#1A1B23` α 0.70 |
+| Thin | 16 dp | white α 0.55 | `#15161D` α 0.62 |
+| Regular | 24 dp | white α 0.68 | `#15161D` α 0.72 |
+| Thick | 0 | white α 0.94 | `#15161D` α 0.94 |
+| Fallback | 0 | surfaceContainerHigh α 0.96 | surfaceContainerHigh α 0.96 |
+
+Glass is off when "Reduce transparency" is on and in Android Studio previews. Glass surfaces have
+a 1 dp top-lit highlight border, a shadow 8 dp below with 24 dp blur, and no tonal elevation.
+
+## Motion
+
+Read with `Lumora.motion`. All springs become instant (`snap`) and color changes a 150 ms fade
+when the system animator scale is 0 or reduced motion is turned on.
+
+| Spec | Damping / stiffness |
+|---|---|
+| press | 0.7 / 1400 |
+| selection | 0.8 / 800 |
+| dockResize | 0.85 / 500 |
+| screen | 0.8 / 380 |
+| colorChange | 1.0 / 1600 |
+| questionChange | 0.85 / 500 |
+| optionEnter | 0.75 / 600 |
+| correctPop | 0.45 / 600 |
+| badgePop | 0.4 / 500 |
+| streakDot | 0.5 / 700 |
+
+## Previews
+
+`@LumoraPreviews` renders a composable in light and dark, at several font scales and screen
+sizes.

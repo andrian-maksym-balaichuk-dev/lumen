@@ -17,13 +17,23 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import sk.mpage.lumen.core.designsystem.tokens.GlassTokens
+import sk.mpage.lumen.core.designsystem.tokens.LocalGlass
+import sk.mpage.lumen.core.designsystem.tokens.LocalMotion
+import sk.mpage.lumen.core.designsystem.tokens.LocalSpacing
+import sk.mpage.lumen.core.designsystem.tokens.LumoraGlass
+import sk.mpage.lumen.core.designsystem.tokens.LumoraMotion
+import sk.mpage.lumen.core.designsystem.tokens.LumoraSpacing
 
 @Composable
 public fun LumoraTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
+    reduceTransparency: Boolean = false,
+    reduceMotion: Boolean = rememberSystemReduceMotion(),
     content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
@@ -33,8 +43,12 @@ public fun LumoraTheme(
             darkTheme -> LumoraDarkColors
             else -> LumoraLightColors
         }
+    val glassEnabled = !reduceTransparency && !LocalInspectionMode.current
     CompositionLocalProvider(
         LocalLumoraColors provides if (darkTheme) DarkSemanticColors else LightSemanticColors,
+        LocalGlass provides GlassTokens.of(darkTheme, glassEnabled, colorScheme.surfaceContainerHigh),
+        LocalSpacing provides LumoraSpacing(),
+        LocalMotion provides if (reduceMotion) LumoraMotion.Reduced else LumoraMotion.Default,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
@@ -50,6 +64,21 @@ public object Lumora {
         @Composable
         @ReadOnlyComposable
         get() = LocalLumoraColors.current
+
+    public val glass: LumoraGlass
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalGlass.current
+
+    public val spacing: LumoraSpacing
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalSpacing.current
+
+    public val motion: LumoraMotion
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalMotion.current
 }
 
 @Composable
