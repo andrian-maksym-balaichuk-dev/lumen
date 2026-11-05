@@ -1,0 +1,45 @@
+name: Main CI
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: main-ci
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Stable versions only
+        shell: bash
+        run: |
+          if grep -nEi '= "[^"]*-(alpha|beta|rc|dev|eap)[0-9.]*"' gradle/libs.versions.toml; then
+            echo "Pre-release dependency found"
+            exit 1
+          fi
+      - name: Check, test, build
+        run: ./gradlew spotlessCheck lintDebug test testDebugUnitTest assembleDebug --stacktrace
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reports-${{ github.sha }}
+          path: "**/build/reports/**"
+          if-no-files-found: warn
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: lumen-debug-apk-${{ github.sha }}
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
