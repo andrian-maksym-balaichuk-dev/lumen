@@ -28,4 +28,5 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "Lumen"
 include(":app")
 include(":core:common")
+include(":core:designsystem")
 include(":core:model")

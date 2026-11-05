@@ -57,6 +57,7 @@ flowchart TB
 
 - [Architecture](documentation/architecture.md): layers and their responsibilities
 - [Database](documentation/database.md): Room ER diagram and tables
+- [Design system](documentation/design.md): Lumora colors with their sources, typography, shapes
 - [Development](documentation/development.md): requirements, adding a module, code style, tests
 
 ## Attribution
@@ -66,4 +67,8 @@ Questions come from [Open Trivia DB](https://opentdb.com), licensed under
 
 ## License
 
-Lumen is released under the [MIT License](LICENSE).
+Lumen is released under the [MIT License](LICENSE). Third-party components keep their own
+licenses: the Inter font under the [SIL Open Font License 1.1](https://openfontlicense.org),
+the question data under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), and the
+libraries under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). The full
+list with links is at the end of [LICENSE](LICENSE).
