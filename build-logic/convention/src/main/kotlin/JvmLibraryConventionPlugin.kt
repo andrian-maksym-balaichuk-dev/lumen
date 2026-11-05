@@ -13,6 +13,8 @@ class JvmLibraryConventionPlugin : Plugin<Project> {
 
             extensions.configure<KotlinJvmProjectExtension> {
                 jvmToolchain(JVM_VERSION)
+                // Only core:common, core:model and core:domain use this plugin; their public API is deliberate.
+                explicitApi()
             }
             dependencies {
                 "testImplementation"(libs.findLibrary("junit").get())
