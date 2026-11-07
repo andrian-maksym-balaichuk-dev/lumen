@@ -1,0 +1,16 @@
+package sk.mpage.lumen.ui.navigation
+
+import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
+
+@Serializable
+internal data object LobbyKey : NavKey
+
+@Serializable
+internal data object HistoryKey : NavKey
+
+@Serializable
+internal data object AwardsKey : NavKey
+
+@Serializable
+internal data object ProfileKey : NavKey

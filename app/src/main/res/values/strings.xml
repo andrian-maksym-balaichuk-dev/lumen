@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Lumen</string>
+    <string name="app_name" translatable="false">Lumen</string>
+    <string name="tab_play">Play</string>
+    <string name="tab_history">History</string>
+    <string name="tab_awards">Awards</string>
+    <string name="tab_profile">Profile</string>
 </resources>
