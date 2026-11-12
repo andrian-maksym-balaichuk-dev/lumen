@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.lumen.android.application)
     alias(libs.plugins.lumen.android.application.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.lumen.hilt)
 }
 
 android {

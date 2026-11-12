@@ -37,6 +37,47 @@ flowchart TB
     Repo --> Room & Store & Api
 ```
 
+## Modules
+
+`app` is the composition root for Hilt and navigation. Feature modules never depend on each other;
+cross-feature navigation goes through lambdas wired in `app`. Pure Kotlin modules are green. [Link to diagram](https://mermaid.live/edit#pako:eNqdVMuOmzAU_RXkkboiERAeiReVqok0s-hIs-iqQxYGLolnMEY27kwa5d_rB4GEaTdlw7n3nPu07BMqeQUIo70g3cH7sc1bT3-k67zF4qtXPwte0wZeaiC9EoA7Z-9msu-8KI6jqDHWXPJA2JRmr4254JHKnospy8HZc9m3dyIqOaqINWeiivTkpeSaNmhGvnPx5kiDNOnoy6jel2EcA0zT5j_0ZqCrbzMp6vIouvvvHBVnhLZDsxaPHSnqFHJgQdJ9K4-yB7a7UTB9hI0TWXjLlpwxPlRweKxgtnPVxdxZTDssiLwc2Mi30DuBBsMqb3gzLkwprDmWNgGfSo9O1-fYppVMo37yXuTWXcyFtvC_ndfBepK_1C8bIuUWau_1F_P0-Tb4DtZ1Ahtf9oK_Ab6LIKtW0ZXalfJdj75LZ8KRr28arRDuhQIfMRBaoE10MsE56g_AIEdYQwGV-liUvOEiR3l71qEdaX9yzi7Rgqv9AeGaNFJbqtNbhi0l-ipPEmgrEPdctT3C4WpjcyB8Qh_ajNfLOFinaRJEUZZkaeKjI8JJvEyiON0E6ToL4yw7--i3LRoss1UWBmGYROEqiDdh5iOoqF7kk3tD7FNy_gNdwWLm)
+
+```mermaid
+graph TD
+    app --> fProfile[feature:profile]
+    app --> fLobby[feature:lobby]
+    app --> fGame[feature:game]
+    app --> fHistory[feature:history]
+    app --> fAwards[feature:awards]
+    app --> data[core:data]
+    app --> work[core:work]
+
+    fProfile & fLobby & fGame & fHistory & fAwards --> ui[core:ui]
+    fProfile & fLobby & fGame & fHistory & fAwards --> domain[core:domain]
+
+    ui --> ds[core:designsystem]
+    ui --> model[core:model]
+    ui --> common[core:common]
+
+    data --> domain
+    data --> db[core:database]
+    data --> net[core:network]
+    data --> store[core:datastore]
+
+    work --> domain
+    work --> common
+
+    domain --> model
+    domain --> common
+    db --> model
+    store --> model
+    store --> common
+    net --> common
+
+    classDef jvm fill:#e8f5e9,stroke:#2e7d32
+    class model,domain,common jvm
+```
+
 ## Tech stack
 
 | Area | Technology |
@@ -52,6 +93,19 @@ flowchart TB
 | Tests | [JUnit 4](https://junit.org/junit4/), [kotlin.test](https://kotlinlang.org/api/core/kotlin-test/), [coroutines-test](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/), [Turbine](https://github.com/cashapp/turbine), [Robolectric](https://robolectric.org), [MockWebServer](https://github.com/square/okhttp/tree/master/mockwebserver) |
 | Quality | [Spotless](https://github.com/diffplug/spotless) + [ktlint](https://pinterest.github.io/ktlint/), [Android Lint](https://developer.android.com/studio/write/lint), [GitHub Actions](https://docs.github.com/actions) |
 | Build | [AGP](https://developer.android.com/build) 9.4, [Gradle](https://gradle.org) 9.6, JDK 17, minSdk 33, target/compile SDK 37 |
+
+## Build
+
+Requirements: Android Studio (latest stable) or JDK 17+ and the Android SDK with platform 37.
+Gradle downloads the JDK 17 toolchain automatically.
+
+```sh
+./gradlew assembleDebug      # APK in app/build/outputs/apk/debug/
+./gradlew installDebug       # install sk.mpage.lumen.dev on a connected device
+./gradlew spotlessCheck lintDebug test testDebugUnitTest assembleDebug   # full check, same as CI
+```
+
+Every push to `main` runs the same check on GitHub Actions and uploads the debug APK as an artifact.
 
 ## Documentation
 

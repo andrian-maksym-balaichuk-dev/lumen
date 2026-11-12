@@ -10,6 +10,8 @@ composeBom = "2026.09.00"
 kotlinxCoroutines = "1.11.0"
 kotlinxSerialization = "1.12.0"
 navigation3 = "1.2.1"
+ksp = "2.3.13"
+hilt = "2.60.1"
 haze = "2.1.0"
 spotless = "8.9.0"
 ktlint = "1.8.0"
@@ -17,6 +19,9 @@ ktlint = "1.8.0"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-core = { group = "com.google.dagger", name = "hilt-core", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
@@ -50,6 +55,8 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 # Plugins defined by build-logic
 lumen-android-application = { id = "lumen.android.application" }
@@ -57,3 +64,4 @@ lumen-android-application-compose = { id = "lumen.android.application.compose" }
 lumen-android-library = { id = "lumen.android.library" }
 lumen-android-library-compose = { id = "lumen.android.library.compose" }
 lumen-jvm-library = { id = "lumen.jvm.library" }
+lumen-hilt = { id = "lumen.hilt" }
