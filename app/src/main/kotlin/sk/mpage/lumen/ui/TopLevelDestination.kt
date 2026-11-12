@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.navigation3.runtime.NavKey
 import sk.mpage.lumen.R
+import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
 import sk.mpage.lumen.ui.navigation.AwardsKey
 import sk.mpage.lumen.ui.navigation.HistoryKey
 import sk.mpage.lumen.ui.navigation.LobbyKey
@@ -14,8 +15,8 @@ internal enum class TopLevelDestination(
     @param:StringRes val labelRes: Int,
     @param:DrawableRes val iconRes: Int,
 ) {
-    PLAY(LobbyKey, R.string.tab_play, R.drawable.ic_tab_play),
-    HISTORY(HistoryKey, R.string.tab_history, R.drawable.ic_tab_history),
-    AWARDS(AwardsKey, R.string.tab_awards, R.drawable.ic_tab_awards),
-    PROFILE(ProfileKey, R.string.tab_profile, R.drawable.ic_tab_profile),
+    PLAY(LobbyKey, R.string.tab_play, LumoraIcons.Play),
+    HISTORY(HistoryKey, R.string.tab_history, LumoraIcons.History),
+    AWARDS(AwardsKey, R.string.tab_awards, LumoraIcons.Awards),
+    PROFILE(ProfileKey, R.string.tab_profile, LumoraIcons.Profile),
 }
