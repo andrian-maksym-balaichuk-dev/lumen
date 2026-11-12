@@ -26,6 +26,11 @@ class EnumCodeTest {
     }
 
     @Test
+    fun `every theme mode code round-trips`() {
+        ThemeMode.entries.forEach { assertEquals(it, ThemeMode.fromCode(it.code)) }
+    }
+
+    @Test
     fun `codes match the open trivia db query values`() {
         assertEquals(listOf("easy", "medium", "hard"), Difficulty.entries.drop(1).map { it.code })
         assertEquals(listOf("multiple", "boolean"), QuestionType.entries.map { it.code })
@@ -37,5 +42,6 @@ class EnumCodeTest {
         assertFailsWith<IllegalArgumentException> { QuestionType.fromCode("") }
         assertFailsWith<IllegalArgumentException> { GameMode.fromCode("CLASSIC") }
         assertFailsWith<IllegalArgumentException> { EndReason.fromCode("quit") }
+        assertFailsWith<IllegalArgumentException> { ThemeMode.fromCode("auto") }
     }
 }
