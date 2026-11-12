@@ -46,7 +46,10 @@ public fun LumoraTheme(
     val glassEnabled = !reduceTransparency && !LocalInspectionMode.current
     CompositionLocalProvider(
         LocalLumoraColors provides if (darkTheme) DarkSemanticColors else LightSemanticColors,
-        LocalGlass provides GlassTokens.of(darkTheme, glassEnabled, colorScheme.surfaceContainerHigh),
+        LocalGlass provides
+            GlassTokens
+                .of(darkTheme, glassEnabled, colorScheme.surfaceContainerHigh)
+                .copy(showAura = !reduceTransparency),
         LocalSpacing provides LumoraSpacing(),
         LocalMotion provides if (reduceMotion) LumoraMotion.Reduced else LumoraMotion.Default,
     ) {

@@ -35,6 +35,7 @@ public data class LumoraGlass(
     val thick: GlassMaterial,
     val highlight: Brush,
     val shadow: Color,
+    val showAura: Boolean = true,
 )
 
 internal object GlassTokens {
