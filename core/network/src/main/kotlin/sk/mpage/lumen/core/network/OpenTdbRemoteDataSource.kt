@@ -13,9 +13,10 @@ public class OpenTdbRemoteDataSource
     @Inject
     internal constructor(
         private val api: OpenTdbApi,
+        private val rateLimiter: OpenTdbRateLimiter,
     ) {
         public suspend fun categories(): AppResult<List<RemoteCategory>> =
-            when (val result = safeCall { api.categories() }) {
+            when (val result = rateLimiter.throttle { safeCall { api.categories() } }) {
                 is AppResult.Success -> AppResult.Success(result.value.categories.map(CategoryDto::toRemote))
                 is AppResult.Failure -> result
             }
@@ -27,7 +28,20 @@ public class OpenTdbRemoteDataSource
             type: String,
             token: String?,
         ): AppResult<List<RemoteQuestion>> =
-            when (val result = safeCall { api.questions(amount, category, difficulty, type, token) }) {
+            when (
+                val result =
+                    rateLimiter.throttle {
+                        safeCall {
+                            api.questions(
+                                amount,
+                                category,
+                                difficulty,
+                                type,
+                                token,
+                            )
+                        }
+                    }
+            ) {
                 is AppResult.Success -> {
                     val error = OpenTdbResponseCode.toDataError(result.value.responseCode)
                     if (error != null) {

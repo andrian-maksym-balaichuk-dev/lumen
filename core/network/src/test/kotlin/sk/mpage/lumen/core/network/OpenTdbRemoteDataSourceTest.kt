@@ -1,5 +1,6 @@
 package sk.mpage.lumen.core.network
 
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
@@ -11,10 +12,12 @@ import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.network.di.openTdbApi
 import sk.mpage.lumen.core.network.di.openTdbJson
 import sk.mpage.lumen.core.network.model.RemoteCategory
+import sk.mpage.lumen.core.testing.TestMonotonicClock
 import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class OpenTdbRemoteDataSourceTest {
     private val server = MockWebServer()
@@ -59,10 +62,11 @@ class OpenTdbRemoteDataSourceTest {
                     5 to DataError.RateLimited,
                     42 to DataError.Unknown,
                 )
+            val dataSource = dataSource()
             expected.forEach { (code, error) ->
                 server.enqueue(MockResponse(body = questionsBody(responseCode = code)))
 
-                assertEquals(AppResult.Failure(error), questions(), "response_code $code")
+                assertEquals(AppResult.Failure(error), questions(dataSource), "response_code $code")
             }
         }
 
@@ -72,8 +76,10 @@ class OpenTdbRemoteDataSourceTest {
             server.enqueue(MockResponse(code = 429))
             server.enqueue(MockResponse(code = 503))
 
-            assertEquals(AppResult.Failure(DataError.RateLimited), dataSource().categories())
-            assertEquals(AppResult.Failure(DataError.Http(503)), dataSource().categories())
+            val dataSource = dataSource()
+
+            assertEquals(AppResult.Failure(DataError.RateLimited), dataSource.categories())
+            assertEquals(AppResult.Failure(DataError.Http(503)), dataSource.categories())
         }
 
     @Test
@@ -113,9 +119,24 @@ class OpenTdbRemoteDataSourceTest {
             val url = closed.url("/")
             closed.close()
 
-            val dataSource = OpenTdbRemoteDataSource(openTdbApi(url, OkHttpClient(), openTdbJson()))
+            val dataSource = OpenTdbRemoteDataSource(openTdbApi(url, OkHttpClient(), openTdbJson()), limiter())
 
             assertEquals(AppResult.Failure(DataError.NoInternet), dataSource.categories())
+        }
+
+    @Test
+    fun `consecutive calls are spaced by the rate limiter`() =
+        runTest {
+            server.enqueue(MockResponse(body = """{"trivia_categories":[]}"""))
+            server.enqueue(MockResponse(body = questionsBody(responseCode = 0)))
+            val dataSource = dataSource()
+
+            dataSource.categories()
+            val firstEnded = testScheduler.currentTime
+            questions(dataSource)
+
+            assertTrue(testScheduler.currentTime - firstEnded >= OpenTdbRateLimiter.MIN_INTERVAL_MS)
+            assertEquals(2, server.requestCount)
         }
 
     @Test
@@ -126,11 +147,15 @@ class OpenTdbRemoteDataSourceTest {
             assertEquals(AppResult.Failure(DataError.Serialization), dataSource().categories())
         }
 
-    private fun dataSource(client: OkHttpClient = OkHttpClient()) =
-        OpenTdbRemoteDataSource(openTdbApi(server.url("/"), client, openTdbJson()))
+    private fun TestScope.limiter() = OpenTdbRateLimiter(TestMonotonicClock(testScheduler))
 
-    private suspend fun questions() =
-        dataSource().questions(amount = 10, category = null, difficulty = null, type = "multiple", token = null)
+    private fun TestScope.dataSource(client: OkHttpClient = OkHttpClient()) =
+        OpenTdbRemoteDataSource(openTdbApi(server.url("/"), client, openTdbJson()), limiter())
+
+    private suspend fun TestScope.questions() = questions(dataSource())
+
+    private suspend fun questions(dataSource: OpenTdbRemoteDataSource) =
+        dataSource.questions(amount = 10, category = null, difficulty = null, type = "multiple", token = null)
 
     private fun questionsBody(responseCode: Int): String =
         """
