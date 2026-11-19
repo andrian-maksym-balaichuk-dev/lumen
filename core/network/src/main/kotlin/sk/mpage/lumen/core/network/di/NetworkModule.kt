@@ -23,8 +23,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal object NetworkModule {
-    private val OPEN_TDB_BASE_URL = "https://opentdb.com/".toHttpUrl()
-
     @Provides
     @Singleton
     fun json(): Json = openTdbJson()
@@ -47,9 +45,10 @@ internal object NetworkModule {
     @Provides
     @Singleton
     fun api(
+        @OpenTdbBaseUrl baseUrl: String,
         client: Lazy<OkHttpClient>,
         json: Json,
-    ): OpenTdbApi = openTdbApi(OPEN_TDB_BASE_URL, { request -> client.get().newCall(request) }, json)
+    ): OpenTdbApi = openTdbApi(baseUrl.toHttpUrl(), { request -> client.get().newCall(request) }, json)
 }
 
 internal fun openTdbJson(): Json =

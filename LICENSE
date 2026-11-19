@@ -32,6 +32,11 @@ Inter font
   SIL Open Font License 1.1 - https://openfontlicense.org
   https://github.com/rsms/inter
 
+HTML named character reference table (core/common, html-entities.tsv)
+  Copyright WHATWG (Apple, Google, Mozilla, Microsoft)
+  Creative Commons Attribution 4.0 - https://creativecommons.org/licenses/by/4.0/
+  https://html.spec.whatwg.org/multipage/named-characters.html
+
 Open Trivia DB questions (downloaded at runtime)
   Creative Commons Attribution-ShareAlike 4.0 - https://creativecommons.org/licenses/by-sa/4.0/
   https://opentdb.com
