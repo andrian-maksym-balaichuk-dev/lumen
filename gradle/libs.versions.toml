@@ -14,6 +14,9 @@ ksp = "2.3.13"
 hilt = "2.60.1"
 retrofit = "3.0.0"
 okhttp = "5.5.1"
+room = "2.8.5"
+robolectric = "4.18.1"
+androidxTestCore = "1.7.0"
 haze = "2.1.0"
 spotless = "8.9.0"
 ktlint = "1.8.0"
@@ -30,6 +33,11 @@ okhttp-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref 
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
 okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver3" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidxTestCore" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -57,6 +65,7 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "room" }
 compose-gradlePlugin = { group = "org.jetbrains.kotlin", name = "compose-compiler-gradle-plugin", version.ref = "kotlin" }
 
 [plugins]
@@ -68,6 +77,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+room = { id = "androidx.room", version.ref = "room" }
 
 # Plugins defined by build-logic
 lumen-android-application = { id = "lumen.android.application" }
@@ -75,4 +85,5 @@ lumen-android-application-compose = { id = "lumen.android.application.compose" }
 lumen-android-library = { id = "lumen.android.library" }
 lumen-android-library-compose = { id = "lumen.android.library.compose" }
 lumen-jvm-library = { id = "lumen.jvm.library" }
+lumen-android-room = { id = "lumen.android.room" }
 lumen-hilt = { id = "lumen.hilt" }

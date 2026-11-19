@@ -8,6 +8,7 @@ dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.compose.gradlePlugin)
+    compileOnly(libs.room.gradlePlugin)
 }
 
 gradlePlugin {
@@ -48,6 +49,13 @@ gradlePlugin {
                     .get()
                     .pluginId
             implementationClass = "JvmLibraryConventionPlugin"
+        }
+        register("androidRoom") {
+            id =
+                libs.plugins.lumen.android.room
+                    .get()
+                    .pluginId
+            implementationClass = "AndroidRoomConventionPlugin"
         }
         register("hilt") {
             id =
