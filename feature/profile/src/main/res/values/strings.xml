@@ -4,6 +4,9 @@
     <string name="onboarding_tagline">Test what you know.</string>
     <string name="onboarding_get_started">Get started</string>
     <string name="onboarding_save_failed">Couldn\'t save your profile. Try again.</string>
+    <string name="profile_choose_photo">Choose from photos</string>
+    <string name="profile_photo_failed">Couldn\'t use this photo. Try another one.</string>
+    <string name="profile_avatar_photo">Your photo</string>
     <string name="profile_name_label">Your name</string>
     <string name="profile_name_error_blank">Enter your name</string>
     <plurals name="profile_name_error_too_long">

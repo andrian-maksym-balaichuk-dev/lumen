@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.domain.repository.UserProfileRepository
 import sk.mpage.lumen.core.model.Avatar
+import sk.mpage.lumen.core.model.AvatarInput
 import sk.mpage.lumen.core.ui.UiText
 import sk.mpage.lumen.feature.profile.R
 import sk.mpage.lumen.feature.profile.component.PlayerName
@@ -38,7 +39,11 @@ internal class OnboardingViewModel
                 }
 
                 is OnboardingAction.PresetSelected -> {
-                    state.update { it.copy(presetKey = action.key) }
+                    state.update { it.copy(avatar = Avatar.Preset(action.key)) }
+                }
+
+                is OnboardingAction.PhotoPicked -> {
+                    importPhoto(action.uriString)
                 }
 
                 OnboardingAction.Submit -> {
@@ -47,9 +52,26 @@ internal class OnboardingViewModel
             }
         }
 
+        private fun importPhoto(uriString: String) {
+            if (state.value.isImportingPhoto) return
+            state.update { it.copy(isImportingPhoto = true) }
+            viewModelScope.launch {
+                when (val result = profiles.updateAvatar(AvatarInput.Picked(uriString))) {
+                    is AppResult.Success -> {
+                        state.update { it.copy(avatar = result.value, isImportingPhoto = false) }
+                    }
+
+                    is AppResult.Failure -> {
+                        state.update { it.copy(isImportingPhoto = false) }
+                        effectChannel.send(OnboardingEffect.ShowMessage(UiText.Resource(R.string.profile_photo_failed)))
+                    }
+                }
+            }
+        }
+
         private fun submit() {
             val current = state.value
-            if (current.isSaving) return
+            if (current.isSaving || current.isImportingPhoto) return
             val error = PlayerName.validate(current.name)
             if (error != null) {
                 state.update { it.copy(nameError = error) }
@@ -57,7 +79,7 @@ internal class OnboardingViewModel
             }
             state.update { it.copy(isSaving = true) }
             viewModelScope.launch {
-                when (profiles.completeOnboarding(current.name.trim(), Avatar.Preset(current.presetKey))) {
+                when (profiles.completeOnboarding(current.name.trim(), current.avatar)) {
                     is AppResult.Success -> {
                         effectChannel.send(OnboardingEffect.Finished)
                     }

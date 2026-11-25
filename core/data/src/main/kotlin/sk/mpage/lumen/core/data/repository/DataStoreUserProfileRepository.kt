@@ -35,7 +35,14 @@ internal class DataStoreUserProfileRepository
         override suspend fun completeOnboarding(
             name: String,
             avatar: Avatar,
-        ): AppResult<Unit> = storage { preferences.setProfile(name, encodeAvatar(avatar)) }
+        ): AppResult<Unit> {
+            val previous = observeProfile().first().avatar
+            val result = storage { preferences.setProfile(name, encodeAvatar(avatar)) }
+            if (result is AppResult.Success && previous is Avatar.Custom && previous != avatar) {
+                avatarStorage.delete(previous.fileName)
+            }
+            return result
+        }
 
         override suspend fun updateName(name: String): AppResult<Unit> = storage { preferences.setProfileName(name) }
 

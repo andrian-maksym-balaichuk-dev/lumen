@@ -3,6 +3,9 @@
     <string name="onboarding_tagline">Otestuj, čo vieš.</string>
     <string name="onboarding_get_started">Začať</string>
     <string name="onboarding_save_failed">Profil sa nepodarilo uložiť. Skús to znova.</string>
+    <string name="profile_choose_photo">Vybrať z fotiek</string>
+    <string name="profile_photo_failed">Túto fotku sa nepodarilo použiť. Skús inú.</string>
+    <string name="profile_avatar_photo">Tvoja fotka</string>
     <string name="profile_name_label">Tvoje meno</string>
     <string name="profile_name_error_blank">Zadaj svoje meno</string>
     <plurals name="profile_name_error_too_long">

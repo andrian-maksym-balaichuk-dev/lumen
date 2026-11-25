@@ -70,6 +70,7 @@ class OnboardingViewModelTest {
         runTest {
             viewModel.onAction(OnboardingAction.NameChanged("  Ada  "))
             viewModel.onAction(OnboardingAction.PresetSelected("owl"))
+            assertEquals(Avatar.Preset("owl"), viewModel.uiState.value.avatar)
 
             viewModel.effects.test {
                 viewModel.onAction(OnboardingAction.Submit)
@@ -77,6 +78,38 @@ class OnboardingViewModelTest {
                 assertEquals(OnboardingEffect.Finished, awaitItem())
             }
             assertEquals(UserProfile("Ada", Avatar.Preset("owl"), onboarded = true), profiles.current)
+        }
+
+    @Test
+    fun `a picked photo becomes the avatar that is saved`() =
+        runTest {
+            viewModel.onAction(OnboardingAction.NameChanged("Ada"))
+            viewModel.onAction(OnboardingAction.PhotoPicked("content://media/picker/0/42"))
+            assertTrue(viewModel.uiState.value.isImportingPhoto)
+            assertFalse(viewModel.uiState.value.canSubmit)
+
+            mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
+            assertEquals(Avatar.Custom("42"), viewModel.uiState.value.avatar)
+
+            viewModel.effects.test {
+                viewModel.onAction(OnboardingAction.Submit)
+                assertEquals(OnboardingEffect.Finished, awaitItem())
+            }
+            assertEquals(UserProfile("Ada", Avatar.Custom("42"), onboarded = true), profiles.current)
+        }
+
+    @Test
+    fun `a photo that cannot be imported keeps the preset and shows a message`() =
+        runTest {
+            profiles.failNext(DataError.Storage)
+
+            viewModel.effects.test {
+                viewModel.onAction(OnboardingAction.PhotoPicked("content://media/picker/0/42"))
+
+                assertEquals(OnboardingEffect.ShowMessage(UiText.Resource(R.string.profile_photo_failed)), awaitItem())
+            }
+            assertEquals(Avatar.Preset("fox"), viewModel.uiState.value.avatar)
+            assertFalse(viewModel.uiState.value.isImportingPhoto)
         }
 
     @Test

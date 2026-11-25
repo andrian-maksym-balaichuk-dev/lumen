@@ -120,6 +120,33 @@ class DataStoreUserProfileRepositoryTest {
         }
 
     @Test
+    fun `finishing onboarding with a preset deletes a photo picked earlier`() =
+        runTest {
+            val repository = repository()
+            repository.pickedValue(pngFile(folder.root, 64, 64).toString())
+
+            repository.completeOnboarding("Ada", Avatar.Preset("owl"))
+
+            assertEquals(
+                UserProfile("Ada", Avatar.Preset("owl"), onboarded = true),
+                repository.observeProfile().first(),
+            )
+            assertEquals(emptyList(), avatars.list()?.toList())
+        }
+
+    @Test
+    fun `finishing onboarding with the picked photo keeps its file`() =
+        runTest {
+            val repository = repository()
+            val photo = repository.pickedValue(pngFile(folder.root, 64, 64).toString()) as Avatar.Custom
+
+            repository.completeOnboarding("Ada", photo)
+
+            assertEquals(photo, repository.observeProfile().first().avatar)
+            assertEquals(listOf(photo.fileName), avatars.list()?.toList())
+        }
+
+    @Test
     fun `an unreadable photo fails and keeps the old avatar`() =
         runTest {
             val repository = repository()

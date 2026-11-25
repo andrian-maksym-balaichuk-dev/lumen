@@ -7,7 +7,11 @@ public sealed interface Avatar {
 
     public data class Custom(
         val fileName: String,
-    ) : Avatar
+    ) : Avatar {
+        public companion object {
+            public const val DIRECTORY: String = "avatars"
+        }
+    }
 
     public data object None : Avatar
 }

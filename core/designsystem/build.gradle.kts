@@ -9,6 +9,7 @@ android {
 dependencies {
     api(libs.androidx.compose.material3)
     api(libs.haze)
+    implementation(libs.coil.compose)
     implementation(libs.haze.blur)
     implementation(libs.androidx.lifecycle.runtime.compose)
 }

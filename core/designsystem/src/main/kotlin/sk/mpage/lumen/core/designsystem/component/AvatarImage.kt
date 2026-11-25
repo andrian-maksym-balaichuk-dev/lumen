@@ -19,9 +19,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import sk.mpage.lumen.core.designsystem.icon.LumoraAvatars
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
 import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
+import java.io.File
 
 @Composable
 public fun AvatarImage(
@@ -29,9 +31,17 @@ public fun AvatarImage(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     size: Dp = 48.dp,
+    file: File? = null,
 ) {
     val circle = modifier.size(size).clip(CircleShape)
-    if (presetRes != null) {
+    if (file != null) {
+        AsyncImage(
+            model = file,
+            contentDescription = contentDescription,
+            modifier = circle.background(MaterialTheme.colorScheme.secondaryContainer),
+            contentScale = ContentScale.Crop,
+        )
+    } else if (presetRes != null) {
         Image(
             painter = painterResource(presetRes),
             contentDescription = contentDescription,

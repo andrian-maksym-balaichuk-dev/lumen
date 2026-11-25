@@ -5,3 +5,7 @@ plugins {
 android {
     namespace = "sk.mpage.lumen.feature.profile"
 }
+
+dependencies {
+    implementation(libs.androidx.activity.compose)
+}

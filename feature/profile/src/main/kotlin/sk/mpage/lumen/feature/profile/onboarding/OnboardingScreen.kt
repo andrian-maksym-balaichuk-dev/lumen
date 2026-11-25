@@ -32,6 +32,7 @@ import sk.mpage.lumen.core.designsystem.component.GlassSurface
 import sk.mpage.lumen.core.designsystem.preview.LumoraPreviews
 import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
 import sk.mpage.lumen.core.designsystem.theme.Lumora
+import sk.mpage.lumen.core.model.Avatar
 import sk.mpage.lumen.feature.profile.R
 import sk.mpage.lumen.feature.profile.component.AvatarPicker
 import sk.mpage.lumen.feature.profile.component.NameError
@@ -121,8 +122,10 @@ private fun ProfileCard(
             verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xl),
         ) {
             AvatarPicker(
-                selectedKey = state.presetKey,
-                onSelect = { onAction(OnboardingAction.PresetSelected(it)) },
+                avatar = state.avatar,
+                isImportingPhoto = state.isImportingPhoto,
+                onPresetSelected = { onAction(OnboardingAction.PresetSelected(it)) },
+                onPhotoPicked = { onAction(OnboardingAction.PhotoPicked(it)) },
             )
             NameField(
                 value = state.name,
@@ -160,7 +163,7 @@ private fun OnboardingEmptyPreview() {
 @LumoraPreviews
 @Composable
 private fun OnboardingValidPreview() {
-    PreviewSurface { OnboardingScreen(OnboardingUiState(name = "Ada", presetKey = "owl"), onAction = {}) }
+    PreviewSurface { OnboardingScreen(OnboardingUiState(name = "Ada", avatar = Avatar.Preset("owl")), onAction = {}) }
 }
 
 @LumoraPreviews
@@ -169,6 +172,12 @@ private fun OnboardingErrorPreview() {
     PreviewSurface {
         OnboardingScreen(OnboardingUiState(name = "A".repeat(25), nameError = NameError.TOO_LONG), onAction = {})
     }
+}
+
+@LumoraPreviews
+@Composable
+private fun OnboardingImportingPreview() {
+    PreviewSurface { OnboardingScreen(OnboardingUiState(name = "Ada", isImportingPhoto = true), onAction = {}) }
 }
 
 @LumoraPreviews

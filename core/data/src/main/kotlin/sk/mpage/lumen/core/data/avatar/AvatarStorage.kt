@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import sk.mpage.lumen.core.common.dispatcher.Dispatcher
 import sk.mpage.lumen.core.common.dispatcher.LumenDispatcher
+import sk.mpage.lumen.core.model.Avatar
 import java.io.File
 import java.io.IOException
 import java.time.Clock
@@ -24,7 +25,7 @@ internal class AvatarStorage
         private val clock: Clock,
         @Dispatcher(LumenDispatcher.IO) private val io: CoroutineDispatcher,
     ) {
-        private val directory: File get() = File(context.filesDir, DIRECTORY)
+        private val directory: File get() = File(context.filesDir, Avatar.Custom.DIRECTORY)
 
         fun file(fileName: String): File = File(directory, fileName)
 
@@ -70,6 +71,5 @@ internal class AvatarStorage
         companion object {
             const val MAX_SIZE_PX: Int = 512
             private const val JPEG_QUALITY = 85
-            private const val DIRECTORY = "avatars"
         }
     }
