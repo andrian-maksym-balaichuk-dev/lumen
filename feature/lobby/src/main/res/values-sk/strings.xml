@@ -1,0 +1,20 @@
+<resources>
+    <string name="lobby_greeting_morning">Dobré ráno, %1$s</string>
+    <string name="lobby_greeting_afternoon">Dobrý deň, %1$s</string>
+    <string name="lobby_greeting_evening">Dobrý večer, %1$s</string>
+    <string name="lobby_greeting_night">Dobrú noc, %1$s</string>
+    <string name="lobby_open_profile">Otvoriť profil</string>
+    <string name="lobby_mode">Režim</string>
+    <string name="lobby_mode_classic">Klasika</string>
+    <string name="lobby_mode_marathon">Maratón</string>
+    <string name="lobby_mode_classic_info">10 otázok · 15 s na každú</string>
+    <string name="lobby_mode_marathon_info">Do prvej chyby · 15 s na každú</string>
+    <string name="lobby_difficulty">Obtiažnosť</string>
+    <string name="lobby_difficulty_any">Akákoľvek</string>
+    <string name="lobby_difficulty_easy">Ľahká</string>
+    <string name="lobby_difficulty_medium">Stredná</string>
+    <string name="lobby_difficulty_hard">Ťažká</string>
+    <string name="lobby_type">Typ otázok</string>
+    <string name="lobby_type_multiple">Výber z možností</string>
+    <string name="lobby_type_boolean">Pravda / Nepravda</string>
+</resources>

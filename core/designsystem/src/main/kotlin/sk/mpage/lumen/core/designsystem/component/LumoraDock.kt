@@ -43,6 +43,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
@@ -154,6 +155,8 @@ public fun LumoraDock(
         }
     }
 }
+
+public val LumoraDockClearance: Dp = 96.dp
 
 private val DockPadding = 6.dp
 private val DockItemHeight = 52.dp

@@ -1,0 +1,20 @@
+<resources>
+    <string name="lobby_greeting_morning">Good morning, %1$s</string>
+    <string name="lobby_greeting_afternoon">Good afternoon, %1$s</string>
+    <string name="lobby_greeting_evening">Good evening, %1$s</string>
+    <string name="lobby_greeting_night">Good night, %1$s</string>
+    <string name="lobby_open_profile">Open profile</string>
+    <string name="lobby_mode">Mode</string>
+    <string name="lobby_mode_classic">Classic</string>
+    <string name="lobby_mode_marathon">Marathon</string>
+    <string name="lobby_mode_classic_info">10 questions · 15 s each</string>
+    <string name="lobby_mode_marathon_info">Until the first miss · 15 s each</string>
+    <string name="lobby_difficulty">Difficulty</string>
+    <string name="lobby_difficulty_any">Any</string>
+    <string name="lobby_difficulty_easy">Easy</string>
+    <string name="lobby_difficulty_medium">Medium</string>
+    <string name="lobby_difficulty_hard">Hard</string>
+    <string name="lobby_type">Question type</string>
+    <string name="lobby_type_multiple">Multiple choice</string>
+    <string name="lobby_type_boolean">True / False</string>
+</resources>

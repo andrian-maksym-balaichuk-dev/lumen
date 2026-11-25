@@ -2,6 +2,7 @@ package sk.mpage.lumen.ui.navigation
 
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import sk.mpage.lumen.feature.lobby.navigation.LobbyKey
 import sk.mpage.lumen.ui.TopLevelDestination
 
 internal class Navigator(

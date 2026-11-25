@@ -5,9 +5,9 @@ import androidx.annotation.StringRes
 import androidx.navigation3.runtime.NavKey
 import sk.mpage.lumen.R
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
+import sk.mpage.lumen.feature.lobby.navigation.LobbyKey
 import sk.mpage.lumen.ui.navigation.AwardsKey
 import sk.mpage.lumen.ui.navigation.HistoryKey
-import sk.mpage.lumen.ui.navigation.LobbyKey
 import sk.mpage.lumen.ui.navigation.ProfileKey
 
 internal enum class TopLevelDestination(

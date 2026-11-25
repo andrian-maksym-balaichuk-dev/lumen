@@ -10,9 +10,9 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import sk.mpage.lumen.core.designsystem.theme.LumoraTheme
+import sk.mpage.lumen.feature.lobby.navigation.LobbyKey
 import sk.mpage.lumen.feature.profile.navigation.OnboardingKey
 import sk.mpage.lumen.ui.LumenRoot
-import sk.mpage.lumen.ui.navigation.LobbyKey
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
