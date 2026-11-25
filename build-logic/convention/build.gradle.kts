@@ -50,6 +50,13 @@ gradlePlugin {
                     .pluginId
             implementationClass = "JvmLibraryConventionPlugin"
         }
+        register("androidFeature") {
+            id =
+                libs.plugins.lumen.android.feature
+                    .get()
+                    .pluginId
+            implementationClass = "AndroidFeatureConventionPlugin"
+        }
         register("androidRoom") {
             id =
                 libs.plugins.lumen.android.room

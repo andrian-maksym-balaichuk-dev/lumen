@@ -1,0 +1,14 @@
+<resources>
+    <string name="onboarding_welcome">Welcome to</string>
+    <string name="onboarding_app_name" translatable="false">Lumen</string>
+    <string name="onboarding_tagline">Test what you know.</string>
+    <string name="onboarding_get_started">Get started</string>
+    <string name="onboarding_save_failed">Couldn\'t save your profile. Try again.</string>
+    <string name="profile_name_label">Your name</string>
+    <string name="profile_name_error_blank">Enter your name</string>
+    <plurals name="profile_name_error_too_long">
+        <item quantity="one">Use at most %1$d character</item>
+        <item quantity="other">Use at most %1$d characters</item>
+    </plurals>
+    <string name="profile_name_counter">%1$d/%2$d</string>
+</resources>
