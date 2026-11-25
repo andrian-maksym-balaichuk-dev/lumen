@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
@@ -15,13 +16,15 @@ import sk.mpage.lumen.core.designsystem.component.AuraBackground
 import sk.mpage.lumen.core.designsystem.component.LocalHazeState
 import sk.mpage.lumen.core.designsystem.component.LumoraDock
 import sk.mpage.lumen.core.designsystem.component.LumoraDockItem
-import sk.mpage.lumen.ui.navigation.LobbyKey
 import sk.mpage.lumen.ui.navigation.LumenNavDisplay
 import sk.mpage.lumen.ui.navigation.Navigator
 
 @Composable
-internal fun LumenRoot(modifier: Modifier = Modifier) {
-    val backStack = rememberNavBackStack(LobbyKey)
+internal fun LumenRoot(
+    startKey: NavKey,
+    modifier: Modifier = Modifier,
+) {
+    val backStack = rememberNavBackStack(startKey)
     val navigator = remember(backStack) { Navigator(backStack) }
     val current = navigator.currentTopLevel
     val hazeState = rememberHazeState()

@@ -16,6 +16,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import sk.mpage.lumen.core.designsystem.theme.Lumora
+import sk.mpage.lumen.feature.profile.navigation.profileEntries
 import sk.mpage.lumen.ui.TopLevelDestination
 
 @Composable
@@ -35,6 +36,7 @@ internal fun LumenNavDisplay(
             ),
         entryProvider =
             entryProvider {
+                profileEntries(onOnboardingDone = { navigator.resetTo(LobbyKey) })
                 TopLevelDestination.entries.forEach { destination ->
                     entry(destination.key) { PlaceholderScreen(destination) }
                 }
