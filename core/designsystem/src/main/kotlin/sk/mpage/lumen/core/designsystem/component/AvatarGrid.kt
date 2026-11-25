@@ -72,7 +72,7 @@ private fun AvatarChoice(
     onClick: () -> Unit,
 ) {
     val motion = Lumora.motion
-    val ring by animateDpAsState(if (selected) 3.dp else 0.dp, motion.selection(), label = "avatar ring")
+    val ring by animateDpAsState(if (selected) RING_WIDTH else 0.dp, motion.selection(), label = "avatar ring")
     val scale by animateFloatAsState(if (selected) 1f else 0.9f, motion.selection(), label = "avatar scale")
     Box(
         modifier =
@@ -89,11 +89,16 @@ private fun AvatarChoice(
             modifier =
                 Modifier
                     .scale(scale)
-                    .border(ring, if (selected) MaterialTheme.colorScheme.primary else Color.Transparent, CircleShape)
-                    .padding(ring),
+                    .border(
+                        ring.coerceAtLeast(0.dp),
+                        if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                        CircleShape,
+                    ).padding(RING_WIDTH),
         )
     }
 }
+
+private val RING_WIDTH = 3.dp
 
 @PreviewLightDark
 @Composable
