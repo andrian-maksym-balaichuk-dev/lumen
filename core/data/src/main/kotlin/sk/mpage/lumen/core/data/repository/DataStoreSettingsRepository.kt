@@ -24,7 +24,8 @@ internal class DataStoreSettingsRepository
                 AppSettings(
                     themeMode = prefs[PreferenceKeys.THEME_MODE]?.let(::themeModeOrNull) ?: defaults.themeMode,
                     dynamicColor = prefs[PreferenceKeys.DYNAMIC_COLOR] ?: defaults.dynamicColor,
-                    reduceMotion = prefs[PreferenceKeys.REDUCE_MOTION]?.let(::reduceMotionFromCode) ?: defaults.reduceMotion,
+                    reduceMotion =
+                        prefs[PreferenceKeys.REDUCE_MOTION]?.let(::reduceMotionFromCode) ?: defaults.reduceMotion,
                     reduceTransparency = prefs[PreferenceKeys.REDUCE_TRANSPARENCY] ?: defaults.reduceTransparency,
                     streakReminders = prefs[PreferenceKeys.NOTIF_STREAK] ?: defaults.streakReminders,
                     inactivityReminders = prefs[PreferenceKeys.NOTIF_INACTIVITY] ?: defaults.inactivityReminders,
