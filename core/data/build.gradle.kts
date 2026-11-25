@@ -11,7 +11,10 @@ dependencies {
     api(projects.core.domain)
 
     implementation(projects.core.database)
+    implementation(projects.core.datastore)
     implementation(projects.core.network)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(platform(libs.okhttp.bom))
     testImplementation(libs.okhttp.mockwebserver)
