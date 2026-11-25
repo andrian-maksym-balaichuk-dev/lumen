@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import sk.mpage.lumen.core.designsystem.component.GlassSurface
 import sk.mpage.lumen.core.designsystem.preview.LumoraPreviews
@@ -47,21 +52,28 @@ internal fun OnboardingScreen(
 ) {
     Box(modifier.fillMaxSize()) {
         BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding().imePadding()) {
-            val wide = maxWidth >= WIDE_LAYOUT_MIN_WIDTH
-            val gutter = if (wide) Lumora.spacing.gutterMedium else Lumora.spacing.gutterCompact
-            if (wide) {
+            val gutter = Lumora.spacing.gutterCompact
+            val paneGap = Lumora.spacing.xxxl
+            val sideBySide = maxWidth >= PANE_MIN_WIDTH * 2 + paneGap + gutter * 2
+            val previewSize = (maxHeight * 0.2f).coerceIn(PREVIEW_MIN_SIZE, PREVIEW_MAX_SIZE)
+            if (sideBySide) {
                 Row(
                     modifier = Modifier.fillMaxSize().padding(horizontal = gutter),
-                    horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.xxxl),
-                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(paneGap, Alignment.CenterHorizontally),
                 ) {
-                    Welcome(Modifier.weight(1f))
-                    Column(
-                        modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(vertical = gutter),
-                        verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xxl),
-                    ) {
-                        ProfileCard(state, onAction)
+                    Pane {
+                        Welcome()
+                        NameInput(state, onAction)
                         GetStartedButton(state, onAction)
+                    }
+                    Pane {
+                        GlassSurface(
+                            modifier = Modifier.fillMaxWidth(),
+                            material = Lumora.glass.frost,
+                            shape = MaterialTheme.shapes.extraLarge,
+                        ) {
+                            Avatars(state, onAction, previewSize, Modifier.padding(Lumora.spacing.xl))
+                        }
                     }
                 }
             } else {
@@ -76,13 +88,28 @@ internal fun OnboardingScreen(
                     verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xxl),
                 ) {
                     Welcome(Modifier.padding(top = Lumora.spacing.xxl))
-                    ProfileCard(state, onAction)
+                    ProfileCard(state, onAction, previewSize)
                     GetStartedButton(state, onAction)
                 }
             }
         }
         SnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter).safeDrawingPadding())
     }
+}
+
+@Composable
+private fun RowScope.Pane(content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier =
+            Modifier
+                .weight(1f)
+                .widthIn(max = Lumora.spacing.contentMaxWidth)
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = Lumora.spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xl, Alignment.CenterVertically),
+        content = content,
+    )
 }
 
 @Composable
@@ -111,6 +138,7 @@ private fun Welcome(modifier: Modifier = Modifier) {
 private fun ProfileCard(
     state: OnboardingUiState,
     onAction: (OnboardingAction) -> Unit,
+    previewSize: Dp,
 ) {
     GlassSurface(
         modifier = Modifier.fillMaxWidth(),
@@ -121,20 +149,40 @@ private fun ProfileCard(
             modifier = Modifier.padding(Lumora.spacing.xl),
             verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xl),
         ) {
-            AvatarPicker(
-                avatar = state.avatar,
-                isImportingPhoto = state.isImportingPhoto,
-                onPresetSelected = { onAction(OnboardingAction.PresetSelected(it)) },
-                onPhotoPicked = { onAction(OnboardingAction.PhotoPicked(it)) },
-            )
-            NameField(
-                value = state.name,
-                error = state.nameError,
-                onValueChange = { onAction(OnboardingAction.NameChanged(it)) },
-                onDone = { onAction(OnboardingAction.Submit) },
-            )
+            Avatars(state, onAction, previewSize)
+            NameInput(state, onAction)
         }
     }
+}
+
+@Composable
+private fun Avatars(
+    state: OnboardingUiState,
+    onAction: (OnboardingAction) -> Unit,
+    previewSize: Dp,
+    modifier: Modifier = Modifier,
+) {
+    AvatarPicker(
+        avatar = state.avatar,
+        isImportingPhoto = state.isImportingPhoto,
+        onPresetSelected = { onAction(OnboardingAction.PresetSelected(it)) },
+        onPhotoPicked = { onAction(OnboardingAction.PhotoPicked(it)) },
+        previewSize = previewSize,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun NameInput(
+    state: OnboardingUiState,
+    onAction: (OnboardingAction) -> Unit,
+) {
+    NameField(
+        value = state.name,
+        error = state.nameError,
+        onValueChange = { onAction(OnboardingAction.NameChanged(it)) },
+        onDone = { onAction(OnboardingAction.Submit) },
+    )
 }
 
 @Composable
@@ -152,7 +200,15 @@ private fun GetStartedButton(
     }
 }
 
-private val WIDE_LAYOUT_MIN_WIDTH = 600.dp
+private val PANE_MIN_WIDTH = 280.dp
+private val PREVIEW_MIN_SIZE = 72.dp
+private val PREVIEW_MAX_SIZE = 112.dp
+
+@Preview(widthDp = 914, heightDp = 411)
+@Composable
+private fun OnboardingLandscapePhonePreview() {
+    PreviewSurface { OnboardingScreen(OnboardingUiState(name = "Ada"), onAction = {}) }
+}
 
 @LumoraPreviews
 @Composable

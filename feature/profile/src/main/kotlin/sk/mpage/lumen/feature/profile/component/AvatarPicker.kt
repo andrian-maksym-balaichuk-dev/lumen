@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import sk.mpage.lumen.core.designsystem.component.AvatarGrid
 import sk.mpage.lumen.core.designsystem.icon.LumoraAvatars
@@ -36,6 +37,7 @@ internal fun AvatarPicker(
     onPresetSelected: (String) -> Unit,
     onPhotoPicked: (String) -> Unit,
     modifier: Modifier = Modifier,
+    previewSize: Dp = 112.dp,
 ) {
     val motion = Lumora.motion
     val photoPicker =
@@ -59,7 +61,7 @@ internal fun AvatarPicker(
                 },
                 label = "selected avatar",
             ) { shown ->
-                ProfileAvatar(avatar = shown, contentDescription = avatarDescription(shown), size = 112.dp)
+                ProfileAvatar(avatar = shown, contentDescription = avatarDescription(shown), size = previewSize)
             }
             if (isImportingPhoto) CircularProgressIndicator(Modifier.size(48.dp))
         }
