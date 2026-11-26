@@ -125,6 +125,23 @@ class OpenTdbQuestionRepositoryTest {
             assertEquals(FeedResult.Failed(DataError.NoResults), feed().next())
         }
 
+    @Test
+    fun `a marathon feed asks for batches of 50`() =
+        runTest {
+            server.enqueue(token("t1"))
+            server.enqueue(questions(code = 0, count = 50))
+            val feed =
+                repository.feed(
+                    QuizConfig(GameMode.MARATHON, null, "", Difficulty.ANY, QuestionType.MULTIPLE_CHOICE),
+                    backgroundScope,
+                )
+
+            assertIs<FeedResult.Next>(feed.next())
+            server.takeRequest()
+            assertEquals("/api.php?amount=50&type=multiple&token=t1", server.takeRequest().target)
+            feed.close()
+        }
+
     private fun TestScope.feed() =
         repository.feed(
             QuizConfig(GameMode.CLASSIC, 9, "General Knowledge", Difficulty.HARD, QuestionType.MULTIPLE_CHOICE),

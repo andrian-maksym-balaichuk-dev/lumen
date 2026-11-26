@@ -5,11 +5,13 @@ import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.common.text.HtmlEntityDecoder
 import sk.mpage.lumen.core.data.feed.ClassicQuestionFeed
+import sk.mpage.lumen.core.data.feed.MarathonQuestionFeed
 import sk.mpage.lumen.core.data.mapper.toQuestion
 import sk.mpage.lumen.core.data.token.OpenTdbSessionTokenManager
 import sk.mpage.lumen.core.domain.game.QuestionFeed
 import sk.mpage.lumen.core.domain.repository.QuestionRepository
 import sk.mpage.lumen.core.model.Difficulty
+import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.model.Question
 import sk.mpage.lumen.core.model.QuizConfig
 import sk.mpage.lumen.core.network.OpenTdbRemoteDataSource
@@ -28,7 +30,11 @@ internal class OpenTdbQuestionRepository
         override fun feed(
             config: QuizConfig,
             scope: CoroutineScope,
-        ): QuestionFeed = ClassicQuestionFeed { amount -> fetch(config, amount) }
+        ): QuestionFeed =
+            when (config.mode) {
+                GameMode.CLASSIC -> ClassicQuestionFeed { amount -> fetch(config, amount) }
+                GameMode.MARATHON -> MarathonQuestionFeed(scope) { amount -> fetch(config, amount) }
+            }
 
         private suspend fun fetch(
             config: QuizConfig,
