@@ -5,12 +5,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
@@ -41,14 +39,12 @@ public fun AvatarGrid(
     modifier: Modifier = Modifier,
 ) {
     val presets = LumoraAvatars.presets
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(Lumora.sizes.xl),
-        modifier = modifier.heightIn(max = Lumora.sizes.giant).selectableGroup(),
-        horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.sm),
+    FlowRow(
+        modifier = modifier.fillMaxWidth().selectableGroup(),
+        horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.sm, Alignment.CenterHorizontally),
         verticalArrangement = Arrangement.spacedBy(Lumora.spacing.sm),
-        userScrollEnabled = false,
     ) {
-        itemsIndexed(presets, key = { _, preset -> preset.key }) { index, preset ->
+        presets.forEachIndexed { index, preset ->
             AvatarChoice(
                 preset = preset,
                 description =
@@ -78,7 +74,7 @@ private fun AvatarChoice(
     Box(
         modifier =
             Modifier
-                .aspectRatio(1f)
+                .size(Lumora.sizes.xl)
                 .clip(CircleShape)
                 .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
                 .semantics { contentDescription = description },
