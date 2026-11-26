@@ -106,7 +106,7 @@ class MarathonQuestionFeedTest {
 
             feed.take(50)
 
-            assertEquals(FeedResult.Failed(DataError.NoResults), feed.next())
+            assertEquals(FeedResult.Exhausted, feed.next())
             assertEquals(3, requests.size)
         }
 

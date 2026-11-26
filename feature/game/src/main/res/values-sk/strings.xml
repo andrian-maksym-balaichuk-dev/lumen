@@ -63,4 +63,5 @@
     <string name="game_feedback_wrong_title">Nesprávne</string>
     <string name="game_feedback_timeout_title">Čas vypršal</string>
     <string name="game_feedback_answer">Správna odpoveď: %1$s</string>
+    <string name="result_every_question">Odpovedali ste na všetky otázky pre tieto nastavenia!</string>
 </resources>

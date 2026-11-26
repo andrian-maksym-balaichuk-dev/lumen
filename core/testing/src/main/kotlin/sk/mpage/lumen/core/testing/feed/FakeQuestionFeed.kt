@@ -20,7 +20,7 @@ public class FakeQuestionFeed(
 
     override suspend fun next(): FeedResult {
         failures.removeFirstOrNull()?.let { return FeedResult.Failed(it) }
-        return remaining.removeFirstOrNull()?.let(FeedResult::Next) ?: FeedResult.Failed(DataError.NoResults)
+        return remaining.removeFirstOrNull()?.let(FeedResult::Next) ?: FeedResult.Exhausted
     }
 
     override fun close() {

@@ -1,5 +1,6 @@
 package sk.mpage.lumen.core.domain.game
 
+import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.domain.game.QuizPhase.Abandoned
 import sk.mpage.lumen.core.domain.game.QuizPhase.Answering
 import sk.mpage.lumen.core.domain.game.QuizPhase.Finished
@@ -69,6 +70,23 @@ public object QuizReducer {
                     Loading -> state.copy(phase = LoadFailed(action.error))
                     Waiting -> state.copy(phase = Stalled(action.error))
                     else -> state
+                }
+            }
+
+            is QuizAction.QuestionsExhausted -> {
+                when {
+                    phase == Loading && state.attempts.isEmpty() -> {
+                        state.copy(phase = LoadFailed(DataError.NoResults))
+                    }
+
+                    phase == Waiting -> {
+                        val game = finish(state, state.attempts, action.nowMs, action.now, EndReason.COMPLETED)
+                        state.copy(phase = Saving(game))
+                    }
+
+                    else -> {
+                        state
+                    }
                 }
             }
 

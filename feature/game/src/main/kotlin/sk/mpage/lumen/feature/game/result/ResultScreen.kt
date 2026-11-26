@@ -129,6 +129,14 @@ private fun ScoreBlock(state: ResultUiState.Content) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+        if (state.answeredEveryQuestion) {
+            Text(
+                text = stringResource(R.string.result_every_question),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center,
+            )
+        }
         Text(
             text =
                 stringResource(
@@ -222,6 +230,7 @@ private fun ResultPreview() {
                 ResultUiState.Content(
                     playerName = "Ada",
                     avatar = Avatar.Preset("owl"),
+                    answeredEveryQuestion = false,
                     config =
                         QuizConfig(
                             GameMode.CLASSIC,

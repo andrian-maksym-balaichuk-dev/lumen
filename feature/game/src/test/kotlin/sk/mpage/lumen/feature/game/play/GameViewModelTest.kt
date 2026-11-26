@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.domain.usecase.SaveQuizResultUseCase
+import sk.mpage.lumen.core.model.EndReason
 import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.testing.MainDispatcherRule
 import sk.mpage.lumen.core.testing.TestMonotonicClock
@@ -234,5 +235,29 @@ class GameViewModelTest {
             viewModel.onAction(GameAction.QuitConfirmed)
             runCurrent()
             assertTrue(history.saved.isEmpty())
+        }
+
+    @Test
+    fun `a marathon that runs out of questions is saved and opens results`() =
+        runTest {
+            val marathonFeed = FakeQuestionFeed(TestData.questions(1))
+            val viewModel =
+                GameViewModel(
+                    config = TestData.classicConfig.copy(mode = GameMode.MARATHON),
+                    questions = FakeQuestionRepository(marathonFeed),
+                    saveResult = SaveQuizResultUseCase(history),
+                    monotonicClock = TestMonotonicClock(testScheduler),
+                    clock = Clock.fixed(Instant.parse("2026-11-26T12:00:00Z"), ZoneOffset.UTC),
+                )
+            runCurrent()
+            show(viewModel)
+
+            viewModel.effects.test {
+                viewModel.onAction(GameAction.OptionTapped("Right 1", 1))
+                advanceTimeBy(1_201)
+                runCurrent()
+                assertIs<GameEffect.ShowResults>(awaitItem())
+            }
+            assertEquals(EndReason.COMPLETED, history.saved.single().endReason)
         }
 }

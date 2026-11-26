@@ -12,6 +12,7 @@ internal sealed interface ResultUiState {
         val playerName: String,
         val avatar: Avatar,
         val config: QuizConfig,
+        val answeredEveryQuestion: Boolean,
         val correct: Int,
         val total: Int,
         val wrong: Int,

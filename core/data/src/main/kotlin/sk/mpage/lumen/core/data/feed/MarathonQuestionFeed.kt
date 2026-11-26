@@ -24,7 +24,7 @@ internal class MarathonQuestionFeed(
     private val mutex = Mutex()
     private val buffer = ArrayDeque<Question>()
     private val seen = mutableSetOf<String>()
-    private var refill: Deferred<DataError?>? = null
+    private var refill: Deferred<Refill>? = null
 
     override suspend fun next(): FeedResult {
         while (true) {
@@ -37,9 +37,18 @@ internal class MarathonQuestionFeed(
                     }
                     startRefillLocked()
                 }
-            val error = pending.await()
-            if (error != null) {
-                mutex.withLock { if (buffer.isEmpty()) return FeedResult.Failed(error) }
+            when (val outcome = pending.await()) {
+                Refill.Added -> {
+                    Unit
+                }
+
+                Refill.Exhausted -> {
+                    mutex.withLock { if (buffer.isEmpty()) return FeedResult.Exhausted }
+                }
+
+                is Refill.Error -> {
+                    mutex.withLock { if (buffer.isEmpty()) return FeedResult.Failed(outcome.error) }
+                }
             }
         }
     }
@@ -48,17 +57,17 @@ internal class MarathonQuestionFeed(
         job.cancel()
     }
 
-    private fun startRefillLocked(): Deferred<DataError?> {
+    private fun startRefillLocked(): Deferred<Refill> {
         refill?.takeIf { it.isActive }?.let { return it }
         Log.d(TAG, "refill started with ${buffer.size} buffered")
         return feedScope.async { refillOnce() }.also { refill = it }
     }
 
-    private suspend fun refillOnce(): DataError? {
+    private suspend fun refillOnce(): Refill {
         repeat(FETCH_ATTEMPTS) {
             val questions =
                 when (val result = fetch(BATCH_SIZE)) {
-                    is AppResult.Failure -> return result.error
+                    is AppResult.Failure -> return Refill.Error(result.error)
                     is AppResult.Success -> result.value
                 }
             val added =
@@ -72,9 +81,19 @@ internal class MarathonQuestionFeed(
                     seen.addAll(fresh.map { it.id })
                     fresh.size
                 }
-            if (added > 0) return null
+            if (added > 0) return Refill.Added
         }
-        return DataError.NoResults
+        return Refill.Exhausted
+    }
+
+    private sealed interface Refill {
+        data object Added : Refill
+
+        data object Exhausted : Refill
+
+        data class Error(
+            val error: DataError,
+        ) : Refill
     }
 
     companion object {

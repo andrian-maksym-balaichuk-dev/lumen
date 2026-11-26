@@ -19,6 +19,8 @@ import kotlinx.coroutines.launch
 import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
 import sk.mpage.lumen.core.domain.repository.UserProfileRepository
 import sk.mpage.lumen.core.domain.usecase.BuildShareSummaryUseCase
+import sk.mpage.lumen.core.model.EndReason
+import sk.mpage.lumen.core.model.GameMode
 
 @HiltViewModel(assistedFactory = ResultViewModel.Factory::class)
 internal class ResultViewModel
@@ -41,6 +43,8 @@ internal class ResultViewModel
                     playerName = profile.name,
                     avatar = profile.avatar,
                     config = session.config,
+                    answeredEveryQuestion =
+                        session.config.mode == GameMode.MARATHON && session.endReason == EndReason.COMPLETED,
                     correct = session.correctCount,
                     total = session.totalQuestions,
                     wrong = session.wrongCount,

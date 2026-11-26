@@ -34,6 +34,11 @@ public sealed interface QuizAction {
         val error: DataError,
     ) : QuizAction
 
+    public data class QuestionsExhausted(
+        val nowMs: Long,
+        val now: ZonedDateTime,
+    ) : QuizAction
+
     public data object Retry : QuizAction
 
     public data object QuitConfirmed : QuizAction

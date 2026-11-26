@@ -141,6 +141,15 @@ internal class GameViewModel
                                 is FeedResult.Failed -> {
                                     dispatch(QuizAction.FeedFailed(result.error))
                                 }
+
+                                FeedResult.Exhausted -> {
+                                    dispatch(
+                                        QuizAction.QuestionsExhausted(
+                                            monotonicClock.elapsedRealtimeMs(),
+                                            ZonedDateTime.now(clock),
+                                        ),
+                                    )
+                                }
                             }
                         }
                     }

@@ -314,6 +314,30 @@ class QuizReducerTest {
         assertEquals(1, stalled.attempts.size)
     }
 
+    @Test
+    fun `a marathon that runs out of questions is saved as completed`() {
+        val marathon = QuizState(config = CONFIG.copy(mode = GameMode.MARATHON), gameUuid = "m")
+        val waiting =
+            marathon.reduce(
+                QuizAction.QuestionLoaded(question(1), 1),
+                QuizAction.QuestionReady(1, 1_000),
+                QuizAction.AnswerSelected(CORRECT, 1, 3_000, NOW),
+                QuizAction.Next,
+            )
+
+        val game = assertIs<Saving>(waiting.reduce(QuizAction.QuestionsExhausted(9_000, NOW)).phase).game
+        assertEquals(EndReason.COMPLETED, game.endReason)
+        assertEquals(1, game.attempts.size)
+        assertEquals(8, game.durationSeconds)
+    }
+
+    @Test
+    fun `no questions before the first one is a load failure`() {
+        val state = start.reduce(QuizAction.QuestionsExhausted(1_000, NOW))
+
+        assertEquals(LoadFailed(DataError.NoResults), state.phase)
+    }
+
     private fun playClassic(
         answers: Int,
         lastNowMs: Long,

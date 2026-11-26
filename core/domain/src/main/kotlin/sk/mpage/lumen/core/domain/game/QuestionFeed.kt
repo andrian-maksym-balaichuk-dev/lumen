@@ -17,4 +17,6 @@ public sealed interface FeedResult {
     public data class Failed(
         val error: DataError,
     ) : FeedResult
+
+    public data object Exhausted : FeedResult
 }
