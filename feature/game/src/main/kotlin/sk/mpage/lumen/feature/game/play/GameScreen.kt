@@ -31,6 +31,7 @@ import sk.mpage.lumen.feature.game.component.QuestionContent
 @Composable
 internal fun GameScreen(
     state: GameUiState,
+    remainingMs: () -> Long,
     onAction: (GameAction) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -40,6 +41,7 @@ internal fun GameScreen(
         GameHeader(
             position = playing?.position,
             total = playing?.total,
+            remainingMs = remainingMs,
             onClose = onClose,
             modifier = Modifier.padding(horizontal = Lumora.spacing.sm),
         )
@@ -93,7 +95,7 @@ private fun Waiting(label: String) {
 @Composable
 private fun GameQuestionPreview() {
     PreviewSurface {
-        GameScreen(state = PreviewPlaying, onAction = {}, onClose = {})
+        GameScreen(state = PreviewPlaying, remainingMs = { 12_000 }, onAction = {}, onClose = {})
     }
 }
 
@@ -113,6 +115,7 @@ private fun GameRevealPreview() {
                         ),
                     feedback = Feedback.Wrong("Jupiter"),
                 ),
+            remainingMs = { 7_000 },
             onAction = {},
             onClose = {},
         )
@@ -123,7 +126,12 @@ private fun GameRevealPreview() {
 @Composable
 private fun GameLoadFailedPreview() {
     PreviewSurface {
-        GameScreen(state = GameUiState.LoadFailed(DataError.NoInternet), onAction = {}, onClose = {})
+        GameScreen(
+            state = GameUiState.LoadFailed(DataError.NoInternet),
+            remainingMs = { 0 },
+            onAction = {},
+            onClose = {},
+        )
     }
 }
 

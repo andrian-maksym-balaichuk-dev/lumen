@@ -55,6 +55,10 @@ internal sealed interface GameAction {
         val presentationId: Int,
     ) : GameAction
 
+    data class VisibilityChanged(
+        val visible: Boolean,
+    ) : GameAction
+
     data object NextTapped : GameAction
 
     data object RetryTapped : GameAction

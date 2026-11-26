@@ -12,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -41,6 +42,11 @@ internal class GameViewModel
         private val actions = Channel<QuizAction>(Channel.UNLIMITED)
         private val feed = questions.feed(config, viewModelScope)
         private var phaseJob: Job? = null
+        private val visible = MutableStateFlow(true)
+        private val remaining = MutableStateFlow(GameRules.QUESTION_TIME_LIMIT_MS)
+        private var shownWhileHidden: Int? = null
+
+        val remainingMs: StateFlow<Long> = remaining
 
         val uiState: StateFlow<GameUiState> =
             state
@@ -74,7 +80,20 @@ internal class GameViewModel
                 }
 
                 is GameAction.QuestionShown -> {
-                    dispatch(QuizAction.QuestionReady(action.presentationId, monotonicClock.elapsedRealtimeMs()))
+                    if (visible.value) {
+                        dispatch(QuizAction.QuestionReady(action.presentationId, monotonicClock.elapsedRealtimeMs()))
+                    } else {
+                        shownWhileHidden = action.presentationId
+                    }
+                }
+
+                is GameAction.VisibilityChanged -> {
+                    visible.value = action.visible
+                    val pending = shownWhileHidden
+                    if (action.visible && pending != null) {
+                        shownWhileHidden = null
+                        dispatch(QuizAction.QuestionReady(pending, monotonicClock.elapsedRealtimeMs()))
+                    }
                 }
 
                 GameAction.NextTapped -> {
@@ -94,7 +113,7 @@ internal class GameViewModel
         private fun enter(state: QuizState) {
             phaseJob?.cancel()
             phaseJob =
-                when (state.phase) {
+                when (val phase = state.phase) {
                     QuizPhase.Loading -> {
                         viewModelScope.launch {
                             when (val result = feed.next()) {
@@ -114,8 +133,19 @@ internal class GameViewModel
                         }
                     }
 
+                    is QuizPhase.Presenting -> {
+                        remaining.value = GameRules.QUESTION_TIME_LIMIT_MS
+                        null
+                    }
+
+                    is QuizPhase.Answering -> {
+                        viewModelScope.launch { runTimer(phase) }
+                    }
+
                     is QuizPhase.Reveal -> {
+                        if (phase.attempt.selectedAnswer == null) remaining.value = 0
                         viewModelScope.launch {
+                            visible.first { it }
                             delay(GameRules.REVEAL_DURATION_MS)
                             dispatch(QuizAction.Next)
                         }
@@ -127,8 +157,25 @@ internal class GameViewModel
                 }
         }
 
+        private suspend fun runTimer(phase: QuizPhase.Answering) {
+            while (true) {
+                val now = monotonicClock.elapsedRealtimeMs()
+                val left = (phase.deadlineMs - now).coerceAtLeast(0)
+                remaining.value = left
+                if (left == 0L) {
+                    dispatch(QuizAction.TimeUp(phase.presentationId, now, ZonedDateTime.now(clock)))
+                    return
+                }
+                delay(minOf(TICK_MS, left))
+            }
+        }
+
         override fun onCleared() {
             feed.close()
+        }
+
+        private companion object {
+            const val TICK_MS = 100L
         }
 
         @AssistedFactory

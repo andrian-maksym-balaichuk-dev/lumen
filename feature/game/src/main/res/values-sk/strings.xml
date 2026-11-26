@@ -19,4 +19,10 @@
     <string name="game_difficulty_easy">Ľahká</string>
     <string name="game_difficulty_medium">Stredná</string>
     <string name="game_difficulty_hard">Ťažká</string>
+    <plurals name="game_time_left">
+        <item quantity="one">Zostáva %d sekunda</item>
+        <item quantity="few">Zostávajú %d sekundy</item>
+        <item quantity="many">Zostáva %d sekundy</item>
+        <item quantity="other">Zostáva %d sekúnd</item>
+    </plurals>
 </resources>
