@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,6 +18,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -38,6 +40,7 @@ import sk.mpage.lumen.core.ui.ProfileAvatar
 import sk.mpage.lumen.feature.lobby.component.CategorySelector
 import sk.mpage.lumen.feature.lobby.component.DifficultySelector
 import sk.mpage.lumen.feature.lobby.component.ModeSelector
+import sk.mpage.lumen.feature.lobby.component.OfflineBanner
 import sk.mpage.lumen.feature.lobby.component.TypeSelector
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,42 +74,55 @@ internal fun LobbyScreen(
             )
         },
     ) { padding ->
-        PullToRefreshBox(
-            isRefreshing = state.isRefreshing,
-            onRefresh = { onAction(LobbyAction.RefreshPulled) },
+        Column(
             modifier = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding()),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            LumoraFlex(
-                itemsFor = { columns ->
-                    val mode: @Composable () -> Unit = { ModeSection(state, onAction) }
-                    val difficulty: @Composable () -> Unit = { DifficultySection(state, onAction) }
-                    val type: @Composable () -> Unit = { TypeSection(state, onAction) }
-                    val category: @Composable () -> Unit = { CategorySection(state, onAction) }
-                    if (columns >= 2) {
-                        listOf(
-                            {
-                                Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xxl)) {
-                                    mode()
-                                    difficulty()
-                                    type()
-                                }
-                            },
-                            category,
-                        )
-                    } else {
-                        listOf(mode, difficulty, type, category)
-                    }
-                },
+            OfflineBanner(
+                visible = state.isOffline,
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(
-                            start = padding.calculateStartPadding(layoutDirection),
-                            end = padding.calculateEndPadding(layoutDirection),
-                            bottom = padding.calculateBottomPadding() + LumoraDockClearance,
-                        ).padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.lg),
+                    Modifier.padding(
+                        start = padding.calculateStartPadding(layoutDirection) + Lumora.spacing.gutterCompact,
+                        end = padding.calculateEndPadding(layoutDirection) + Lumora.spacing.gutterCompact,
+                    ),
             )
+            PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = { onAction(LobbyAction.RefreshPulled) },
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+            ) {
+                LumoraFlex(
+                    itemsFor = { columns ->
+                        val mode: @Composable () -> Unit = { ModeSection(state, onAction) }
+                        val difficulty: @Composable () -> Unit = { DifficultySection(state, onAction) }
+                        val type: @Composable () -> Unit = { TypeSection(state, onAction) }
+                        val category: @Composable () -> Unit = { CategorySection(state, onAction) }
+                        if (columns >= 2) {
+                            listOf(
+                                {
+                                    Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xxl)) {
+                                        mode()
+                                        difficulty()
+                                        type()
+                                    }
+                                },
+                                category,
+                            )
+                        } else {
+                            listOf(mode, difficulty, type, category)
+                        }
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(
+                                start = padding.calculateStartPadding(layoutDirection),
+                                end = padding.calculateEndPadding(layoutDirection),
+                                bottom = padding.calculateBottomPadding() + LumoraDockClearance,
+                            ).padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.lg),
+                )
+            }
         }
     }
 }
@@ -223,6 +239,7 @@ private fun LobbyOfflinePreview() {
                     playerName = "Ada",
                     avatar = Avatar.Preset("owl"),
                     categories = CategoriesUiState.Failed(DataError.NoInternet),
+                    isOffline = true,
                 ),
             onAction = {},
             onOpenProfile = {},

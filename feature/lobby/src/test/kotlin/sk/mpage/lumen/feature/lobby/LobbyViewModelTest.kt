@@ -11,14 +11,18 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import sk.mpage.lumen.core.common.result.DataError
+import sk.mpage.lumen.core.model.AppSettings
 import sk.mpage.lumen.core.model.Avatar
 import sk.mpage.lumen.core.model.Category
 import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.model.QuestionType
+import sk.mpage.lumen.core.model.QuizConfig
 import sk.mpage.lumen.core.model.UserProfile
 import sk.mpage.lumen.core.testing.MainDispatcherRule
+import sk.mpage.lumen.core.testing.port.FakeNetworkMonitor
 import sk.mpage.lumen.core.testing.repository.FakeCategoryRepository
+import sk.mpage.lumen.core.testing.repository.FakeSettingsRepository
 import sk.mpage.lumen.core.testing.repository.FakeUserProfileRepository
 import sk.mpage.lumen.core.ui.toUiText
 import java.time.Clock
@@ -37,11 +41,15 @@ class LobbyViewModelTest {
 
     private val profiles = FakeUserProfileRepository(UserProfile("Ada", Avatar.Preset("owl"), onboarded = true))
 
+    private val network = FakeNetworkMonitor()
+
+    private var settings = FakeSettingsRepository()
+
     private var categories = FakeCategoryRepository(cached = listOf(GENERAL, BOOKS))
 
     private fun viewModel(at: LocalTime = LocalTime.NOON): LobbyViewModel {
         val instant = LocalDateTime.of(2026, 11, 25, at.hour, at.minute).toInstant(ZoneOffset.UTC)
-        return LobbyViewModel(profiles, categories, Clock.fixed(instant, ZoneOffset.UTC))
+        return LobbyViewModel(profiles, categories, network, settings, Clock.fixed(instant, ZoneOffset.UTC))
     }
 
     private fun TestScope.started(viewModel: LobbyViewModel): LobbyViewModel {
@@ -188,9 +196,82 @@ class LobbyViewModelTest {
             assertNull(viewModel.uiState.value.categoryId)
         }
 
+    @Test
+    fun `the offline flag follows the network`() =
+        runTest {
+            val viewModel = started(viewModel())
+            assertFalse(viewModel.uiState.value.isOffline)
+
+            network.setOnline(false)
+            advanceUntilIdle()
+            assertTrue(viewModel.uiState.value.isOffline)
+
+            network.setOnline(true)
+            advanceUntilIdle()
+            assertFalse(viewModel.uiState.value.isOffline)
+        }
+
+    @Test
+    fun `the last saved configuration is restored`() =
+        runTest {
+            settings = FakeSettingsRepository(AppSettings(lastConfig = HARD_TRUE_FALSE_BOOKS))
+            val state = started(viewModel()).uiState.value
+
+            assertEquals(GameMode.MARATHON, state.mode)
+            assertEquals(Difficulty.HARD, state.difficulty)
+            assertEquals(QuestionType.TRUE_FALSE, state.type)
+            assertEquals(BOOKS.id, state.categoryId)
+        }
+
+    @Test
+    fun `a restored category that no longer exists shows any`() =
+        runTest {
+            categories = FakeCategoryRepository(cached = listOf(GENERAL))
+            settings = FakeSettingsRepository(AppSettings(lastConfig = HARD_TRUE_FALSE_BOOKS))
+            val state = started(viewModel()).uiState.value
+
+            assertEquals(Difficulty.HARD, state.difficulty)
+            assertNull(state.categoryId)
+        }
+
+    @Test
+    fun `every selection is saved with the category name`() =
+        runTest {
+            val viewModel = started(viewModel())
+
+            viewModel.onAction(LobbyAction.DifficultySelected(Difficulty.HARD))
+            viewModel.onAction(LobbyAction.CategorySelected(BOOKS.id))
+            advanceUntilIdle()
+            assertEquals(
+                QuizConfig(GameMode.CLASSIC, BOOKS.id, BOOKS.name, Difficulty.HARD, QuestionType.MULTIPLE_CHOICE),
+                settings.current.lastConfig,
+            )
+
+            viewModel.onAction(LobbyAction.CategorySelected(null))
+            advanceUntilIdle()
+            assertEquals(
+                QuizConfig(GameMode.CLASSIC, null, "", Difficulty.HARD, QuestionType.MULTIPLE_CHOICE),
+                settings.current.lastConfig,
+            )
+        }
+
+    @Test
+    fun `a choice made before the saved configuration loads is kept`() =
+        runTest {
+            settings = FakeSettingsRepository(AppSettings(lastConfig = HARD_TRUE_FALSE_BOOKS))
+            val viewModel = viewModel()
+            viewModel.onAction(LobbyAction.DifficultySelected(Difficulty.EASY))
+            started(viewModel)
+
+            assertEquals(Difficulty.EASY, viewModel.uiState.value.difficulty)
+            assertEquals(QuestionType.MULTIPLE_CHOICE, viewModel.uiState.value.type)
+        }
+
     private companion object {
         val GENERAL = Category(9, "General Knowledge")
         val BOOKS = Category(10, "Entertainment: Books")
         val ANIMALS = Category(27, "Animals")
+        val HARD_TRUE_FALSE_BOOKS =
+            QuizConfig(GameMode.MARATHON, BOOKS.id, BOOKS.name, Difficulty.HARD, QuestionType.TRUE_FALSE)
     }
 }

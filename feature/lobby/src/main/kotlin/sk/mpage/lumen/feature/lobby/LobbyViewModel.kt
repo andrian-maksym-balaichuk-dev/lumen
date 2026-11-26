@@ -15,12 +15,16 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.common.result.DataError
+import sk.mpage.lumen.core.domain.port.NetworkMonitor
 import sk.mpage.lumen.core.domain.repository.CategoryRepository
+import sk.mpage.lumen.core.domain.repository.SettingsRepository
 import sk.mpage.lumen.core.domain.repository.UserProfileRepository
 import sk.mpage.lumen.core.model.Category
+import sk.mpage.lumen.core.model.QuizConfig
 import sk.mpage.lumen.core.ui.toUiText
 import java.time.Clock
 import java.time.LocalTime
@@ -32,11 +36,14 @@ internal class LobbyViewModel
     constructor(
         profiles: UserProfileRepository,
         private val categories: CategoryRepository,
+        network: NetworkMonitor,
+        private val settings: SettingsRepository,
         clock: Clock,
     ) : ViewModel() {
         private val selection = MutableStateFlow(LobbyUiState(greeting = Greeting.at(LocalTime.now(clock))))
         private val refresh = MutableStateFlow(RefreshState(isRunning = false))
         private var refreshJob: Job? = null
+        private var selectionChanged = false
 
         private val effectChannel = Channel<LobbyEffect>(Channel.BUFFERED)
         val effects: Flow<LobbyEffect> = effectChannel.receiveAsFlow()
@@ -47,27 +54,69 @@ internal class LobbyViewModel
                 profiles.observeProfile(),
                 categories.observeCategories(),
                 refresh,
-            ) { state, profile, list, refreshState ->
+                network.isOnline,
+            ) { state, profile, list, refreshState, isOnline ->
                 state.copy(
                     playerName = profile.name,
                     avatar = profile.avatar,
                     categoryId = state.categoryId?.takeIf { id -> list.isEmpty() || list.any { it.id == id } },
                     categories = categoriesState(list, refreshState),
                     isRefreshing = refreshState.isRunning && list.isNotEmpty(),
+                    isOffline = !isOnline,
                 )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), selection.value)
 
         init {
+            restoreLastConfig()
             load { categories.refreshIfStale() }
         }
 
         fun onAction(action: LobbyAction) {
             when (action) {
-                is LobbyAction.ModeSelected -> selection.update { it.copy(mode = action.mode) }
-                is LobbyAction.DifficultySelected -> selection.update { it.copy(difficulty = action.difficulty) }
-                is LobbyAction.TypeSelected -> selection.update { it.copy(type = action.type) }
-                is LobbyAction.CategorySelected -> selection.update { it.copy(categoryId = action.categoryId) }
+                is LobbyAction.ModeSelected -> select { it.copy(mode = action.mode) }
+                is LobbyAction.DifficultySelected -> select { it.copy(difficulty = action.difficulty) }
+                is LobbyAction.TypeSelected -> select { it.copy(type = action.type) }
+                is LobbyAction.CategorySelected -> select { it.copy(categoryId = action.categoryId) }
                 LobbyAction.RefreshPulled, LobbyAction.RetryTapped -> load { categories.refresh() }
+            }
+        }
+
+        private fun restoreLastConfig() {
+            viewModelScope.launch {
+                val saved = settings.observeSettings().first().lastConfig ?: return@launch
+                if (selectionChanged) return@launch
+                selection.update {
+                    it.copy(
+                        mode = saved.mode,
+                        difficulty = saved.difficulty,
+                        type = saved.type,
+                        categoryId = saved.categoryId,
+                    )
+                }
+            }
+        }
+
+        private fun select(change: (LobbyUiState) -> LobbyUiState) {
+            selectionChanged = true
+            val state = selection.updateAndGet(change)
+            viewModelScope.launch {
+                val categoryName =
+                    state.categoryId?.let { id ->
+                        categories
+                            .observeCategories()
+                            .first()
+                            .firstOrNull { it.id == id }
+                            ?.name
+                    }
+                settings.setLastQuizConfig(
+                    QuizConfig(
+                        mode = state.mode,
+                        categoryId = state.categoryId.takeIf { categoryName != null },
+                        categoryName = categoryName.orEmpty(),
+                        difficulty = state.difficulty,
+                        type = state.type,
+                    ),
+                )
             }
         }
 

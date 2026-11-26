@@ -50,6 +50,7 @@ internal data class LobbyUiState(
     val categoryId: Int? = null,
     val categories: CategoriesUiState = CategoriesUiState.Loading,
     val isRefreshing: Boolean = false,
+    val isOffline: Boolean = false,
 )
 
 internal sealed interface LobbyAction {

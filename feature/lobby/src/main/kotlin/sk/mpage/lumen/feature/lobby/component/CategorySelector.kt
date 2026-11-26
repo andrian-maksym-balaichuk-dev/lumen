@@ -3,6 +3,8 @@ package sk.mpage.lumen.feature.lobby.component
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.designsystem.component.CategoryChipGrid
@@ -10,10 +12,11 @@ import sk.mpage.lumen.core.designsystem.component.CategoryChipPlaceholders
 import sk.mpage.lumen.core.designsystem.component.ErrorState
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
 import sk.mpage.lumen.core.ui.categoryIcon
-import sk.mpage.lumen.core.ui.shortName
+import sk.mpage.lumen.core.ui.displayName
 import sk.mpage.lumen.core.ui.toUiText
 import sk.mpage.lumen.feature.lobby.CategoriesUiState
 import sk.mpage.lumen.feature.lobby.R
+import java.text.Collator
 
 @Composable
 internal fun CategorySelector(
@@ -41,10 +44,16 @@ internal fun CategorySelector(
 
             is CategoriesUiState.Loaded -> {
                 val anyLabel = stringResource(R.string.lobby_category_any)
-                val names = remember(categories) { categories.categories.associate { it.id to it.shortName } }
+                val resources = LocalResources.current
+                val locale = LocalConfiguration.current.locales[0]
+                val names =
+                    remember(categories, resources) {
+                        categories.categories.associate { it.id to it.displayName(resources) }
+                    }
                 val options =
-                    remember(categories) {
-                        listOf<Int?>(null) + categories.categories.sortedBy { it.shortName }.map { it.id }
+                    remember(names, locale) {
+                        val collator = Collator.getInstance(locale)
+                        listOf<Int?>(null) + names.entries.sortedWith(compareBy(collator) { it.value }).map { it.key }
                     }
                 CategoryChipGrid(
                     options = options,

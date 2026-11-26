@@ -21,4 +21,6 @@
     <string name="lobby_category_any">Any category</string>
     <string name="lobby_categories_failed">Couldn\'t load categories</string>
     <string name="lobby_retry">Retry</string>
+    <string name="lobby_offline_title">You\'re offline</string>
+    <string name="lobby_offline_body">Quizzes need a connection. Cached categories stay available.</string>
 </resources>

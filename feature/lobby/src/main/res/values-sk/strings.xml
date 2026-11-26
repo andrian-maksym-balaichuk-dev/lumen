@@ -10,7 +10,7 @@
     <string name="lobby_mode_classic_info">10 otázok · 15 s na každú</string>
     <string name="lobby_mode_marathon_info">Do prvej chyby · 15 s na každú</string>
     <string name="lobby_difficulty">Obtiažnosť</string>
-    <string name="lobby_difficulty_any">Akákoľvek</string>
+    <string name="lobby_difficulty_any">Všetky</string>
     <string name="lobby_difficulty_easy">Ľahká</string>
     <string name="lobby_difficulty_medium">Stredná</string>
     <string name="lobby_difficulty_hard">Ťažká</string>
@@ -21,4 +21,6 @@
     <string name="lobby_category_any">Ľubovoľná kategória</string>
     <string name="lobby_categories_failed">Kategórie sa nepodarilo načítať</string>
     <string name="lobby_retry">Skúsiť znova</string>
+    <string name="lobby_offline_title">Ste offline</string>
+    <string name="lobby_offline_body">Kvízy potrebujú pripojenie. Uložené kategórie zostávajú dostupné.</string>
 </resources>

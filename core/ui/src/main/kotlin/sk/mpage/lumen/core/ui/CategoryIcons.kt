@@ -2,7 +2,6 @@ package sk.mpage.lumen.core.ui
 
 import androidx.annotation.DrawableRes
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
-import sk.mpage.lumen.core.model.Category
 
 @DrawableRes
 public fun categoryIcon(categoryId: Int?): Int =
@@ -34,6 +33,3 @@ public fun categoryIcon(categoryId: Int?): Int =
         32 -> LumoraIcons.MovieFilter
         else -> LumoraIcons.Category
     }
-
-public val Category.shortName: String
-    get() = name.substringAfter(": ")
