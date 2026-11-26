@@ -7,9 +7,6 @@
     <string name="game_option_correct">Vaša odpoveď, správna</string>
     <string name="game_option_wrong">Vaša odpoveď, nesprávna</string>
     <string name="game_option_revealed">Správna odpoveď</string>
-    <string name="game_feedback_correct">Správne!</string>
-    <string name="game_feedback_wrong">Nesprávne. Správna odpoveď: %1$s</string>
-    <string name="game_feedback_timeout">Čas vypršal. Správna odpoveď: %1$s</string>
     <string name="game_next">Ďalej</string>
     <string name="game_loading">Načítavajú sa otázky…</string>
     <string name="game_load_failed">Otázky sa nepodarilo načítať</string>
@@ -62,4 +59,8 @@
     <string name="game_waiting">Načítavajú sa ďalšie otázky…</string>
     <string name="game_stalled">Spojenie sa prerušilo</string>
     <string name="game_quit_discard">Ukončiť a zahodiť</string>
+    <string name="game_feedback_correct_title">Správne!</string>
+    <string name="game_feedback_wrong_title">Nesprávne</string>
+    <string name="game_feedback_timeout_title">Čas vypršal</string>
+    <string name="game_feedback_answer">Správna odpoveď: %1$s</string>
 </resources>

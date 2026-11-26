@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
+import sk.mpage.lumen.core.designsystem.component.LumoraPrimaryButton
 import sk.mpage.lumen.core.designsystem.component.StatTile
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
 import sk.mpage.lumen.core.designsystem.layout.LumoraFlex
@@ -182,9 +183,7 @@ private fun Stats(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(vertical = Lumora.spacing.sm),
         )
-        Button(onClick = onShare, modifier = Modifier.fillMaxWidth().height(Lumora.sizes.lg)) {
-            Text(stringResource(R.string.result_share))
-        }
+        LumoraPrimaryButton(text = stringResource(R.string.result_share), onClick = onShare)
         FilledTonalButton(
             onClick = { onPlayAgain(state.config) },
             modifier = Modifier.fillMaxWidth().height(Lumora.sizes.lg),

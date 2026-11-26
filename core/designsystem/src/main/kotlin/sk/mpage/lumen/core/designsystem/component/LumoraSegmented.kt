@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -15,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.ui.semantics.CollectionItemInfo
 import androidx.compose.ui.semantics.collectionInfo
@@ -35,20 +37,37 @@ public fun <T> LumoraSegmented(
 ) {
     require(options.size in 2..4) { "A segmented control needs two to four options" }
 
-    SingleChoiceSegmentedButtonRow(
-        modifier = modifier.fillMaxWidth().semantics { collectionInfo = CollectionInfo(1, options.size) },
-    ) {
-        options.forEachIndexed { index, option ->
-            SegmentedButton(
-                selected = option == selected,
-                onClick = { onSelect(option) },
-                shape = SegmentedButtonDefaults.itemShape(index, options.size, baseShape = CircleShape),
-                modifier =
-                    Modifier.semantics {
-                        collectionItemInfo = CollectionItemInfo(0, 1, index, 1)
-                    },
-                label = { Text(text = label(option), maxLines = 2, textAlign = TextAlign.Center) },
-            )
+    val colors =
+        SegmentedButtonDefaults.colors(
+            activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            activeContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            activeBorderColor = Color.Transparent,
+            inactiveContainerColor = Color.Transparent,
+            inactiveContentColor = MaterialTheme.colorScheme.onSurface,
+            inactiveBorderColor = Color.Transparent,
+        )
+    GlassSurface(modifier = modifier.fillMaxWidth(), material = Lumora.glass.frost) {
+        SingleChoiceSegmentedButtonRow(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(Lumora.spacing.xs)
+                    .semantics { collectionInfo = CollectionInfo(1, options.size) },
+            space = Lumora.spacing.xs,
+        ) {
+            options.forEachIndexed { index, option ->
+                SegmentedButton(
+                    selected = option == selected,
+                    onClick = { onSelect(option) },
+                    shape = CircleShape,
+                    colors = colors,
+                    modifier =
+                        Modifier.semantics {
+                            collectionItemInfo = CollectionItemInfo(0, 1, index, 1)
+                        },
+                    label = { Text(text = label(option), maxLines = 2, textAlign = TextAlign.Center) },
+                )
+            }
         }
     }
 }

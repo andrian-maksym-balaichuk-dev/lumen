@@ -37,6 +37,7 @@ import kotlinx.collections.immutable.persistentListOf
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.designsystem.component.LumoraDockClearance
 import sk.mpage.lumen.core.designsystem.component.LumoraLargeTopBar
+import sk.mpage.lumen.core.designsystem.component.LumoraPrimaryButton
 import sk.mpage.lumen.core.designsystem.layout.LumoraFlex
 import sk.mpage.lumen.core.designsystem.preview.LumoraPreviews
 import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
@@ -77,17 +78,12 @@ internal fun LobbyScreen(
                         .padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.sm),
                 contentAlignment = Alignment.Center,
             ) {
-                Button(
+                LumoraPrimaryButton(
+                    text = stringResource(R.string.lobby_start),
                     onClick = { onAction(LobbyAction.StartTapped) },
                     enabled = !state.isOffline,
-                    modifier =
-                        Modifier
-                            .widthIn(max = Lumora.spacing.contentMaxWidth)
-                            .fillMaxWidth()
-                            .height(Lumora.sizes.lg),
-                ) {
-                    Text(stringResource(R.string.lobby_start), style = MaterialTheme.typography.titleMedium)
-                }
+                    modifier = Modifier.widthIn(max = Lumora.spacing.contentMaxWidth),
+                )
             }
         },
         topBar = {

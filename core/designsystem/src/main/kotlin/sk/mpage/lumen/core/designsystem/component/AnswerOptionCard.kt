@@ -85,8 +85,8 @@ public fun AnswerOptionCard(
         ) {
             Surface(
                 shape = CircleShape,
-                color = if (state == AnswerState.IDLE) scheme.secondaryContainer else Color.Transparent,
-                contentColor = if (state == AnswerState.IDLE) scheme.onSecondaryContainer else style.content,
+                color = if (state == AnswerState.IDLE) scheme.primaryContainer else Color.Transparent,
+                contentColor = if (state == AnswerState.IDLE) scheme.onPrimaryContainer else style.content,
                 border = if (state == AnswerState.IDLE) null else BorderStroke(1.dp, style.content),
                 modifier = Modifier.size(Lumora.sizes.sm),
             ) {

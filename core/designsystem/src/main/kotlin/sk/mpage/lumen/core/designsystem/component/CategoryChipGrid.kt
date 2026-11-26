@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
 import sk.mpage.lumen.core.designsystem.R
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
 import sk.mpage.lumen.core.designsystem.modifier.shimmer
@@ -55,7 +56,21 @@ public fun <T> CategoryChipGrid(
                         modifier = Modifier.size(FilterChipDefaults.IconSize),
                     )
                 },
-                colors = FilterChipDefaults.filterChipColors(containerColor = Lumora.glass.frost.tint),
+                colors =
+                    FilterChipDefaults.filterChipColors(
+                        containerColor = Lumora.glass.frost.tint,
+                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ),
+                border =
+                    FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = option == selected,
+                        borderColor = MaterialTheme.colorScheme.outlineVariant,
+                        selectedBorderColor = MaterialTheme.colorScheme.primary,
+                        selectedBorderWidth = 1.dp,
+                    ),
             )
         }
     }

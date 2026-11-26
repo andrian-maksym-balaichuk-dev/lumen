@@ -7,9 +7,6 @@
     <string name="game_option_correct">Your answer, correct</string>
     <string name="game_option_wrong">Your answer, wrong</string>
     <string name="game_option_revealed">Correct answer</string>
-    <string name="game_feedback_correct">Correct!</string>
-    <string name="game_feedback_wrong">Wrong. Correct answer: %1$s</string>
-    <string name="game_feedback_timeout">Time\'s up. Correct answer: %1$s</string>
     <string name="game_next">Next</string>
     <string name="game_loading">Loading questions…</string>
     <string name="game_load_failed">Couldn\'t load questions</string>
@@ -56,4 +53,8 @@
     <string name="game_waiting">Loading more questions…</string>
     <string name="game_stalled">Connection lost</string>
     <string name="game_quit_discard">Quit and discard</string>
+    <string name="game_feedback_correct_title">Correct!</string>
+    <string name="game_feedback_wrong_title">Wrong</string>
+    <string name="game_feedback_timeout_title">Time\'s up</string>
+    <string name="game_feedback_answer">Correct answer: %1$s</string>
 </resources>

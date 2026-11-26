@@ -7,11 +7,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,6 +23,7 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
@@ -30,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import sk.mpage.lumen.core.designsystem.component.AnswerOptionCard
 import sk.mpage.lumen.core.designsystem.component.AnswerState
+import sk.mpage.lumen.core.designsystem.component.GlassSurface
+import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
 import sk.mpage.lumen.core.designsystem.layout.LumoraFlex
 import sk.mpage.lumen.core.designsystem.theme.Lumora
 import sk.mpage.lumen.core.model.Difficulty
@@ -151,20 +156,55 @@ private fun FeedbackRow(
     feedback: Feedback,
     onNext: () -> Unit,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text =
-                when (feedback) {
-                    Feedback.Correct -> stringResource(R.string.game_feedback_correct)
-                    is Feedback.Wrong -> stringResource(R.string.game_feedback_wrong, feedback.correctAnswer)
-                    is Feedback.TimedOut -> stringResource(R.string.game_feedback_timeout, feedback.correctAnswer)
-                },
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.weight(1f).semantics { liveRegion = LiveRegionMode.Polite },
-        )
-        Box {
-            TextButton(onClick = onNext) { Text(stringResource(R.string.game_next)) }
+    val scheme = MaterialTheme.colorScheme
+    val (icon, tint) =
+        when (feedback) {
+            Feedback.Correct -> LumoraIcons.CheckCircle to Lumora.colors.success
+            is Feedback.Wrong -> LumoraIcons.Cancel to scheme.error
+            is Feedback.TimedOut -> LumoraIcons.TimerOff to Lumora.colors.warning
+        }
+    val title =
+        when (feedback) {
+            Feedback.Correct -> stringResource(R.string.game_feedback_correct_title)
+            is Feedback.Wrong -> stringResource(R.string.game_feedback_wrong_title)
+            is Feedback.TimedOut -> stringResource(R.string.game_feedback_timeout_title)
+        }
+    val answer =
+        when (feedback) {
+            Feedback.Correct -> null
+            is Feedback.Wrong -> feedback.correctAnswer
+            is Feedback.TimedOut -> feedback.correctAnswer
+        }
+    GlassSurface(material = Lumora.glass.frost, shape = MaterialTheme.shapes.large) {
+        Row(
+            modifier = Modifier.padding(Lumora.spacing.md),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.md),
+        ) {
+            Icon(
+                painterResource(icon),
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier.size(Lumora.sizes.sm),
+            )
+            Column(Modifier.weight(1f).semantics(mergeDescendants = true) { liveRegion = LiveRegionMode.Polite }) {
+                Text(title, style = MaterialTheme.typography.titleMedium, color = tint)
+                if (answer != null) {
+                    Text(
+                        text = stringResource(R.string.game_feedback_answer, answer),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = scheme.onSurface,
+                    )
+                }
+            }
+            FilledTonalButton(onClick = onNext) {
+                Text(stringResource(R.string.game_next))
+                Icon(
+                    painter = painterResource(LumoraIcons.ArrowForward),
+                    contentDescription = null,
+                    modifier = Modifier.padding(start = Lumora.spacing.xs).size(Lumora.sizes.xxs),
+                )
+            }
         }
     }
 }

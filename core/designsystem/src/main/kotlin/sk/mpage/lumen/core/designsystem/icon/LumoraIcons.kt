@@ -19,6 +19,10 @@ public object LumoraIcons {
 
     @DrawableRes public val Cancel: Int = R.drawable.ic_cancel
 
+    @DrawableRes public val ArrowForward: Int = R.drawable.ic_arrow_forward
+
+    @DrawableRes public val TimerOff: Int = R.drawable.ic_timer_off
+
     @DrawableRes public val Flame: Int = R.drawable.ic_flame
 
     @DrawableRes public val CloudOff: Int = R.drawable.ic_cloud_off
