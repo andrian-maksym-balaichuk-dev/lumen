@@ -33,4 +33,17 @@
     <string name="category_gadgets">Technické vychytávky</string>
     <string name="category_anime_manga">Japonské anime a manga</string>
     <string name="category_cartoons">Kreslené filmy a animácie</string>
+    <string name="share_classic">Výsledok v Lumen: %1$d/%2$d (%3$d %%) v kategórii %4$s · %5$s za %6$s.</string>
+    <plurals name="share_marathon">
+        <item quantity="one">Výsledok v Lumen: %1$d správna odpoveď za sebou v kategórii %2$s · %3$s za %4$s.</item>
+        <item quantity="few">Výsledok v Lumen: %1$d správne odpovede za sebou v kategórii %2$s · %3$s za %4$s.</item>
+        <item quantity="many">Výsledok v Lumen: %1$d správnej odpovede za sebou v kategórii %2$s · %3$s za %4$s.</item>
+        <item quantity="other">Výsledok v Lumen: %1$d správnych odpovedí za sebou v kategórii %2$s · %3$s za %4$s.</item>
+    </plurals>
+    <string name="share_closing">Prekonáš ma?</string>
+    <string name="share_any_category">Ľubovoľná</string>
+    <string name="share_difficulty_any">Ľubovoľná</string>
+    <string name="share_difficulty_easy">Ľahká</string>
+    <string name="share_difficulty_medium">Stredná</string>
+    <string name="share_difficulty_hard">Ťažká</string>
 </resources>

@@ -66,4 +66,6 @@ internal sealed interface GameAction {
     data object NextTapped : GameAction
 
     data object RetryTapped : GameAction
+
+    data object QuitConfirmed : GameAction
 }

@@ -1,5 +1,6 @@
 package sk.mpage.lumen.core.domain.usecase
 
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.common.result.DataError
@@ -11,6 +12,7 @@ import sk.mpage.lumen.core.model.FinishedGame
 import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.model.QuestionType
 import sk.mpage.lumen.core.model.QuizConfig
+import sk.mpage.lumen.core.model.QuizSessionDetail
 import java.time.Instant
 import java.time.LocalDate
 import kotlin.test.Test
@@ -35,6 +37,8 @@ class SaveQuizResultUseCaseTest {
 
     private fun repository(result: AppResult<SaveOutcome>) =
         object : QuizHistoryRepository {
+            override fun observeSessionDetail(sessionId: Long) = emptyFlow<QuizSessionDetail?>()
+
             override suspend fun save(game: FinishedGame) = result
         }
 

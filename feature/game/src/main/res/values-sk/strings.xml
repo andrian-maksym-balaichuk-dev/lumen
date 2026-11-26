@@ -26,4 +26,32 @@
         <item quantity="other">Zostáva %d sekúnd</item>
     </plurals>
     <string name="game_save_failed">Hru sa nepodarilo uložiť</string>
+    <string name="result_close">Späť na hru</string>
+    <string name="result_not_found">Táto hra sa nenašla.</string>
+    <string name="result_score">%1$d / %2$d</string>
+    <string name="result_score_description">Skóre %1$d z %2$d, %1$d správne, %3$d nesprávne, %4$d po čase, %5$d percent, celkový čas %6$s</string>
+    <string name="result_title_great">Skvelá hra, %1$s!</string>
+    <string name="result_title_done">Koniec hry, %1$s</string>
+    <string name="result_correct">Správne</string>
+    <string name="result_wrong">Nesprávne</string>
+    <string name="result_accuracy">Úspešnosť</string>
+    <string name="result_total_time">Celkový čas</string>
+    <string name="result_average_time">Priemerná odpoveď</string>
+    <string name="result_seconds">%1$s s</string>
+    <string name="result_play_again">Hrať znova</string>
+    <string name="result_any_category">Ľubovoľná kategória</string>
+    <string name="result_any_difficulty">Ľubovoľná obtiažnosť</string>
+    <string name="result_mode_classic">Klasika</string>
+    <string name="result_mode_marathon">Maratón</string>
+    <plurals name="result_timed_out">
+        <item quantity="one">%d po čase</item>
+        <item quantity="few">%d po čase</item>
+        <item quantity="many">%d po čase</item>
+        <item quantity="other">%d po čase</item>
+    </plurals>
+    <string name="result_share">Zdieľať výsledok</string>
+    <string name="game_quit_title">Ukončiť kvíz?</string>
+    <string name="game_quit_message">Táto hra sa neuloží.</string>
+    <string name="game_quit_confirm">Ukončiť</string>
+    <string name="game_quit_dismiss">Hrať ďalej</string>
 </resources>

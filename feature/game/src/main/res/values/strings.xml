@@ -24,4 +24,30 @@
         <item quantity="other">%d seconds left</item>
     </plurals>
     <string name="game_save_failed">Couldn\'t save your game</string>
+    <string name="result_close">Back to Play</string>
+    <string name="result_not_found">This game could not be found.</string>
+    <string name="result_score">%1$d / %2$d</string>
+    <string name="result_score_description">Score %1$d of %2$d, %1$d correct, %3$d wrong, %4$d timed out, %5$d percent, total time %6$s</string>
+    <string name="result_title_great">Great run, %1$s!</string>
+    <string name="result_title_done">Game over, %1$s</string>
+    <string name="result_correct">Correct</string>
+    <string name="result_wrong">Wrong</string>
+    <string name="result_accuracy">Accuracy</string>
+    <string name="result_total_time">Total time</string>
+    <string name="result_average_time">Average answer</string>
+    <string name="result_seconds">%1$s s</string>
+    <string name="result_play_again">Play again</string>
+    <string name="result_any_category">Any category</string>
+    <string name="result_any_difficulty">Any difficulty</string>
+    <string name="result_mode_classic">Classic</string>
+    <string name="result_mode_marathon">Marathon</string>
+    <plurals name="result_timed_out">
+        <item quantity="one">%d timed out</item>
+        <item quantity="other">%d timed out</item>
+    </plurals>
+    <string name="result_share">Share result</string>
+    <string name="game_quit_title">Quit quiz?</string>
+    <string name="game_quit_message">This game will not be saved.</string>
+    <string name="game_quit_confirm">Quit</string>
+    <string name="game_quit_dismiss">Keep playing</string>
 </resources>

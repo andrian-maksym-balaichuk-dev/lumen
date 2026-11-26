@@ -17,6 +17,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import sk.mpage.lumen.core.designsystem.theme.Lumora
 import sk.mpage.lumen.feature.game.navigation.GameKey
+import sk.mpage.lumen.feature.game.navigation.ResultKey
 import sk.mpage.lumen.feature.game.navigation.gameEntries
 import sk.mpage.lumen.feature.lobby.navigation.LobbyKey
 import sk.mpage.lumen.feature.lobby.navigation.lobbyEntries
@@ -45,7 +46,11 @@ internal fun LumenNavDisplay(
                     onOpenProfile = { navigator.selectTab(TopLevelDestination.PROFILE) },
                     onStartGame = { config -> navigator.push(GameKey(config)) },
                 )
-                gameEntries(onClose = navigator::back)
+                gameEntries(
+                    onClose = navigator::back,
+                    onShowResults = { sessionId -> navigator.replaceTop(ResultKey(sessionId)) },
+                    onPlayAgain = { config -> navigator.replaceTop(GameKey(config)) },
+                )
                 TopLevelDestination.entries.filter { it != TopLevelDestination.PLAY }.forEach { destination ->
                     entry(destination.key) { PlaceholderScreen(destination) }
                 }

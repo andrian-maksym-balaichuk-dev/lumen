@@ -1,5 +1,6 @@
 package sk.mpage.lumen.feature.game.play
 
+import app.cash.turbine.test
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -185,5 +186,22 @@ class GameViewModelTest {
             viewModel.onAction(GameAction.RetryTapped)
             runCurrent()
             assertEquals(1, history.saved.size)
+        }
+
+    @Test
+    fun `quitting closes the game without saving`() =
+        runTest {
+            val viewModel = viewModel()
+            show(viewModel)
+            viewModel.onAction(GameAction.OptionTapped("Right 1", 1))
+            runCurrent()
+
+            viewModel.effects.test {
+                viewModel.onAction(GameAction.QuitConfirmed)
+                runCurrent()
+                assertEquals(GameEffect.Closed, awaitItem())
+            }
+            assertTrue(history.saved.isEmpty())
+            assertTrue(feed.closed)
         }
 }

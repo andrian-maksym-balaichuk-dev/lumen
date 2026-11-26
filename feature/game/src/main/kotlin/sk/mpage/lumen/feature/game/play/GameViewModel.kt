@@ -9,11 +9,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import sk.mpage.lumen.core.common.result.AppResult
@@ -50,6 +52,9 @@ internal class GameViewModel
         private var shownWhileHidden: Int? = null
 
         val remainingMs: StateFlow<Long> = remaining
+
+        private val effectChannel = Channel<GameEffect>(Channel.BUFFERED)
+        val effects: Flow<GameEffect> = effectChannel.receiveAsFlow()
 
         val uiState: StateFlow<GameUiState> =
             state
@@ -105,6 +110,10 @@ internal class GameViewModel
 
                 GameAction.RetryTapped -> {
                     dispatch(QuizAction.Retry)
+                }
+
+                GameAction.QuitConfirmed -> {
+                    dispatch(QuizAction.QuitConfirmed)
                 }
             }
         }
@@ -167,6 +176,15 @@ internal class GameViewModel
                                 }
                             }
                         }
+                    }
+
+                    QuizPhase.Abandoned -> {
+                        feed.close()
+                        viewModelScope.launch { effectChannel.send(GameEffect.Closed) }
+                    }
+
+                    is QuizPhase.Finished -> {
+                        viewModelScope.launch { effectChannel.send(GameEffect.ShowResults(phase.sessionId)) }
                     }
 
                     else -> {
