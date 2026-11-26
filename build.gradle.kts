@@ -12,14 +12,13 @@ plugins {
 
 spotless {
     val ktlintVersion = libs.versions.ktlint.get()
+    val skipped = listOf("**/build/**", "**/.gradle/**", "**/.kotlin/**")
     kotlin {
-        target("**/*.kt")
-        targetExclude("**/build/**")
+        target(fileTree(rootDir) { include("**/*.kt").exclude(skipped) })
         ktlint(ktlintVersion)
     }
     kotlinGradle {
-        target("**/*.kts")
-        targetExclude("**/build/**")
+        target(fileTree(rootDir) { include("**/*.kts").exclude(skipped) })
         ktlint(ktlintVersion)
     }
 }

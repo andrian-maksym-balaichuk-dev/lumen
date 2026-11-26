@@ -1,6 +1,10 @@
 package sk.mpage.lumen.core.data.repository
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.withContext
+import sk.mpage.lumen.core.common.dispatcher.Dispatcher
+import sk.mpage.lumen.core.common.dispatcher.LumenDispatcher
 import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.common.text.HtmlEntityDecoder
@@ -26,6 +30,7 @@ internal class OpenTdbQuestionRepository
         private val tokens: OpenTdbSessionTokenManager,
         private val decoder: HtmlEntityDecoder,
         private val random: Random,
+        @Dispatcher(LumenDispatcher.Default) private val default: CoroutineDispatcher,
     ) : QuestionRepository {
         override fun feed(
             config: QuizConfig,
@@ -40,7 +45,7 @@ internal class OpenTdbQuestionRepository
             config: QuizConfig,
             amount: Int,
         ): AppResult<List<Question>> {
-            var token = tokens.token()
+            var token = tokens.current()
             repeat(TOKEN_ATTEMPTS) {
                 val result =
                     remote.questions(
@@ -57,12 +62,13 @@ internal class OpenTdbQuestionRepository
                     }
                 when (response) {
                     is RemoteQuestions.Loaded -> {
-                        return map(response, config, amount)
+                        if (token == null) tokens.requestInBackground()
+                        return withContext(default) { map(response, config, amount) }
                     }
 
                     RemoteQuestions.TokenNotFound -> {
                         tokens.onTokenNotFound()
-                        token = tokens.token()
+                        token = null
                     }
 
                     RemoteQuestions.TokenExhausted -> {

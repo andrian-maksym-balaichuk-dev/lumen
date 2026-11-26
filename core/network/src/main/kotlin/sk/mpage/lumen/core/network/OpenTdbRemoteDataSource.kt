@@ -1,5 +1,9 @@
 package sk.mpage.lumen.core.network
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
+import sk.mpage.lumen.core.common.dispatcher.Dispatcher
+import sk.mpage.lumen.core.common.dispatcher.LumenDispatcher
 import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.network.dto.CategoryDto
@@ -17,9 +21,13 @@ public class OpenTdbRemoteDataSource
     internal constructor(
         private val api: OpenTdbApi,
         private val rateLimiter: OpenTdbRateLimiter,
+        @Dispatcher(LumenDispatcher.IO) private val io: CoroutineDispatcher,
     ) {
+        private suspend fun <T> call(block: suspend () -> T): AppResult<T> =
+            rateLimiter.throttle { withContext(io) { safeCall(block) } }
+
         public suspend fun categories(): AppResult<List<RemoteCategory>> =
-            when (val result = rateLimiter.throttle { safeCall { api.categories() } }) {
+            when (val result = call { api.categories() }) {
                 is AppResult.Success -> AppResult.Success(result.value.categories.map(CategoryDto::toRemote))
                 is AppResult.Failure -> result
             }
@@ -33,16 +41,14 @@ public class OpenTdbRemoteDataSource
         ): AppResult<RemoteQuestions> =
             when (
                 val result =
-                    rateLimiter.throttle {
-                        safeCall {
-                            api.questions(
-                                amount,
-                                category,
-                                difficulty,
-                                type,
-                                token,
-                            )
-                        }
+                    call {
+                        api.questions(
+                            amount,
+                            category,
+                            difficulty,
+                            type,
+                            token,
+                        )
                     }
             ) {
                 is AppResult.Success -> {
@@ -74,8 +80,8 @@ public class OpenTdbRemoteDataSource
         public suspend fun resetToken(token: String): AppResult<String> =
             token { api.token(command = "reset", token = token) }
 
-        private suspend fun token(call: suspend () -> TokenResponseDto): AppResult<String> =
-            when (val result = rateLimiter.throttle { safeCall { call() } }) {
+        private suspend fun token(request: suspend () -> TokenResponseDto): AppResult<String> =
+            when (val result = call { request() }) {
                 is AppResult.Success -> {
                     val token = result.value.token
                     val error = OpenTdbResponseCode.toDataError(result.value.responseCode)

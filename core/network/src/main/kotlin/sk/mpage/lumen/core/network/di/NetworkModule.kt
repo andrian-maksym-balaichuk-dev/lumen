@@ -17,6 +17,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.create
 import sk.mpage.lumen.core.network.BuildConfig
 import sk.mpage.lumen.core.network.OpenTdbApi
+import sk.mpage.lumen.core.network.TaggedSocketFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -36,6 +37,7 @@ internal object NetworkModule {
             .readTimeout(15, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
             .callTimeout(20, TimeUnit.SECONDS)
+            .socketFactory(TaggedSocketFactory())
             .apply {
                 if (BuildConfig.DEBUG) {
                     addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))

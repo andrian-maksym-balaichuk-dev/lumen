@@ -18,6 +18,7 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension) {
         defaultConfig.minSdk = MIN_SDK
         compileOptions.sourceCompatibility = JavaVersion.VERSION_17
         compileOptions.targetCompatibility = JavaVersion.VERSION_17
+        lint.ignoreTestSources = true
     }
     extensions.configure<KotlinAndroidProjectExtension> {
         jvmToolchain(JVM_VERSION)

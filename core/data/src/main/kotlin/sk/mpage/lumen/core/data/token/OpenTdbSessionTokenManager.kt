@@ -1,8 +1,11 @@
 package sk.mpage.lumen.core.data.token
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import sk.mpage.lumen.core.common.dispatcher.ApplicationScope
 import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.datastore.PreferenceKeys
 import sk.mpage.lumen.core.datastore.UserPreferencesDataSource
@@ -19,14 +22,18 @@ internal class OpenTdbSessionTokenManager
         private val remote: OpenTdbRemoteDataSource,
         private val preferences: UserPreferencesDataSource,
         private val clock: Clock,
+        @ApplicationScope private val appScope: CoroutineScope,
     ) {
         private val mutex = Mutex()
         private var current: String? = null
 
-        suspend fun token(): String? =
-            mutex.withLock {
-                current ?: stored() ?: request()
+        suspend fun current(): String? = mutex.withLock { current ?: stored() }
+
+        fun requestInBackground() {
+            appScope.launch {
+                mutex.withLock { if (current == null && stored() == null) request() }
             }
+        }
 
         suspend fun onTokenNotFound() {
             mutex.withLock {

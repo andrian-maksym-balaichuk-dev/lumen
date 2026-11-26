@@ -1,5 +1,6 @@
 package sk.mpage.lumen.core.network
 
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
@@ -142,7 +143,12 @@ class OpenTdbRemoteDataSourceTest {
             val url = closed.url("/")
             closed.close()
 
-            val dataSource = OpenTdbRemoteDataSource(openTdbApi(url, OkHttpClient(), openTdbJson()), limiter())
+            val dataSource =
+                OpenTdbRemoteDataSource(
+                    openTdbApi(url, OkHttpClient(), openTdbJson()),
+                    limiter(),
+                    StandardTestDispatcher(testScheduler),
+                )
 
             assertEquals(AppResult.Failure(DataError.NoInternet), dataSource.categories())
         }
@@ -173,7 +179,11 @@ class OpenTdbRemoteDataSourceTest {
     private fun TestScope.limiter() = OpenTdbRateLimiter(TestMonotonicClock(testScheduler))
 
     private fun TestScope.dataSource(client: OkHttpClient = OkHttpClient()) =
-        OpenTdbRemoteDataSource(openTdbApi(server.url("/"), client, openTdbJson()), limiter())
+        OpenTdbRemoteDataSource(
+            openTdbApi(server.url("/"), client, openTdbJson()),
+            limiter(),
+            StandardTestDispatcher(testScheduler),
+        )
 
     private suspend fun TestScope.questions() = questions(dataSource())
 

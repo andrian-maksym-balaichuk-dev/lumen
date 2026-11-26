@@ -4,6 +4,8 @@ import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
@@ -62,6 +64,17 @@ class OfflineFirstCategoryRepositoryTest {
     fun tearDown() {
         server.close()
     }
+
+    @Test
+    fun `two lobbies opening together download the categories once`() =
+        runTest {
+            server.enqueue(MockResponse(body = """{"trivia_categories":[{"id":9,"name":"General Knowledge"}]}"""))
+
+            val results = List(2) { async { repository.refreshIfStale() } }.awaitAll()
+
+            assertEquals(List(2) { AppResult.Success(Unit) }, results)
+            assertEquals(1, server.requestCount)
+        }
 
     @Test
     fun `a fresh cache skips the network`() =

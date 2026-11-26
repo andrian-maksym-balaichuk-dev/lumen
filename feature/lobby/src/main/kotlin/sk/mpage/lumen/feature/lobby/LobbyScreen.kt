@@ -25,6 +25,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,12 +35,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import sk.mpage.lumen.core.common.result.DataError
+import sk.mpage.lumen.core.designsystem.component.LocalHazeState
 import sk.mpage.lumen.core.designsystem.component.LumoraDockClearance
 import sk.mpage.lumen.core.designsystem.component.LumoraLargeTopBar
 import sk.mpage.lumen.core.designsystem.component.LumoraPrimaryButton
 import sk.mpage.lumen.core.designsystem.layout.LumoraFlex
+import sk.mpage.lumen.core.designsystem.layout.LumoraWindow
+import sk.mpage.lumen.core.designsystem.modifier.hazeContent
 import sk.mpage.lumen.core.designsystem.preview.LumoraPreviews
 import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
 import sk.mpage.lumen.core.designsystem.theme.Lumora
@@ -64,26 +70,24 @@ internal fun LobbyScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val layoutDirection = LocalLayoutDirection.current
+    val compactHeight = LumoraWindow.isCompactHeight
     Scaffold(
         modifier = modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = Color.Transparent,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.navigationBars)
-                        .padding(bottom = LumoraDockClearance)
-                        .padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.sm),
-                contentAlignment = Alignment.Center,
-            ) {
-                LumoraPrimaryButton(
-                    text = stringResource(R.string.lobby_start),
-                    onClick = { onAction(LobbyAction.StartTapped) },
-                    enabled = !state.isOffline,
-                    modifier = Modifier.widthIn(max = Lumora.spacing.contentMaxWidth),
-                )
+            if (!compactHeight) {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .windowInsetsPadding(WindowInsets.navigationBars)
+                            .padding(bottom = LumoraDockClearance)
+                            .padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.sm),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    StartButton(state, onAction, Modifier.widthIn(max = Lumora.spacing.contentMaxWidth))
+                }
             }
         },
         topBar = {
@@ -102,57 +106,84 @@ internal fun LobbyScreen(
             )
         },
     ) { padding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            OfflineBanner(
-                visible = state.isOffline,
-                modifier =
-                    Modifier.padding(
-                        start = padding.calculateStartPadding(layoutDirection) + Lumora.spacing.gutterCompact,
-                        end = padding.calculateEndPadding(layoutDirection) + Lumora.spacing.gutterCompact,
-                    ),
-            )
-            PullToRefreshBox(
-                isRefreshing = state.isRefreshing,
-                onRefresh = { onAction(LobbyAction.RefreshPulled) },
-                modifier = Modifier.weight(1f).fillMaxWidth(),
-            ) {
-                LumoraFlex(
-                    itemsFor = { columns ->
-                        val mode: @Composable () -> Unit = { ModeSection(state, onAction) }
-                        val difficulty: @Composable () -> Unit = { DifficultySection(state, onAction) }
-                        val type: @Composable () -> Unit = { TypeSection(state, onAction) }
-                        val category: @Composable () -> Unit = { CategorySection(state, onAction) }
-                        if (columns >= 2) {
-                            listOf(
-                                {
-                                    Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xxl)) {
-                                        mode()
-                                        difficulty()
-                                        type()
-                                    }
-                                },
-                                category,
-                            )
-                        } else {
-                            listOf(mode, difficulty, type, category)
-                        }
-                    },
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(
-                                start = padding.calculateStartPadding(layoutDirection),
-                                end = padding.calculateEndPadding(layoutDirection),
-                                bottom = padding.calculateBottomPadding(),
-                            ).padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.lg),
+        val topPadding = padding.calculateTopPadding()
+        val pullState = rememberPullToRefreshState()
+        PullToRefreshBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = { onAction(LobbyAction.RefreshPulled) },
+            modifier = Modifier.fillMaxSize(),
+            state = pullState,
+            indicator = {
+                PullToRefreshDefaults.Indicator(
+                    state = pullState,
+                    isRefreshing = state.isRefreshing,
+                    modifier = Modifier.align(Alignment.TopCenter).padding(top = topPadding),
                 )
+            },
+        ) {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .hazeContent(LocalHazeState.current)
+                        .verticalScroll(rememberScrollState())
+                        .padding(
+                            top = topPadding,
+                            start = padding.calculateStartPadding(layoutDirection),
+                            end = padding.calculateEndPadding(layoutDirection),
+                            bottom = padding.calculateBottomPadding() + if (compactHeight) LumoraDockClearance else 0.dp,
+                        ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                OfflineBanner(
+                    visible = state.isOffline,
+                    modifier = Modifier.padding(horizontal = Lumora.spacing.gutterCompact),
+                )
+                    LumoraFlex(
+                        itemsFor = { columns ->
+                            val mode: @Composable () -> Unit = { ModeSection(state, onAction) }
+                            val difficulty: @Composable () -> Unit = { DifficultySection(state, onAction) }
+                            val type: @Composable () -> Unit = { TypeSection(state, onAction) }
+                            val category: @Composable () -> Unit = { CategorySection(state, onAction) }
+                            val start: @Composable () -> Unit = { StartButton(state, onAction) }
+                            if (columns >= 2) {
+                                listOf(
+                                    {
+                                        Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xxl)) {
+                                            mode()
+                                            difficulty()
+                                            type()
+                                            if (compactHeight) start()
+                                        }
+                                    },
+                                    category,
+                                )
+                            } else {
+                                listOfNotNull(mode, difficulty, type, category, start.takeIf { compactHeight })
+                            }
+                        },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.lg),
+                    )
             }
         }
     }
+}
+
+@Composable
+private fun StartButton(
+    state: LobbyUiState,
+    onAction: (LobbyAction) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LumoraPrimaryButton(
+        text = stringResource(R.string.lobby_start),
+        onClick = { onAction(LobbyAction.StartTapped) },
+        enabled = !state.isOffline,
+        modifier = modifier,
+    )
 }
 
 @Composable

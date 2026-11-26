@@ -14,6 +14,7 @@ import org.junit.Rule
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import sk.mpage.lumen.core.common.result.DataError
+import sk.mpage.lumen.core.datastore.UserPreferencesDataSource
 import sk.mpage.lumen.core.domain.game.FeedResult
 import sk.mpage.lumen.core.domain.repository.QuestionRepository
 import sk.mpage.lumen.core.model.Difficulty
@@ -22,9 +23,12 @@ import sk.mpage.lumen.core.model.QuestionType
 import sk.mpage.lumen.core.model.QuizConfig
 import sk.mpage.lumen.core.network.di.OpenTdbBaseUrl
 import sk.mpage.lumen.core.network.di.OpenTdbBaseUrlModule
+import java.time.Clock
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
@@ -45,6 +49,12 @@ class OpenTdbQuestionRepositoryTest {
     @Inject
     lateinit var repository: QuestionRepository
 
+    @Inject
+    lateinit var preferences: UserPreferencesDataSource
+
+    @Inject
+    lateinit var clock: Clock
+
     @Before
     fun setUp() {
         hiltRule.inject()
@@ -58,7 +68,7 @@ class OpenTdbQuestionRepositoryTest {
     @Test
     fun `a classic feed serves ten decoded questions from one request`() =
         runTest {
-            server.enqueue(token("t1"))
+            storeToken("t1")
             server.enqueue(questions(code = 0))
             val feed = feed()
 
@@ -67,59 +77,56 @@ class OpenTdbQuestionRepositoryTest {
             assertEquals("Question 1 &", questions.first().text)
             assertEquals(10, questions.map { it.id }.toSet().size)
             assertIs<FeedResult.Failed>(feed.next())
-            assertEquals("/api_token.php?command=request", server.takeRequest().target)
             assertEquals(
                 "/api.php?amount=10&category=9&difficulty=hard&type=multiple&token=t1",
                 server.takeRequest().target,
             )
-            assertEquals(2, server.requestCount)
+            assertEquals(1, server.requestCount)
         }
 
     @Test
-    fun `an unknown token is replaced and the request retried`() =
+    fun `without a stored token the game starts at once and the token is fetched afterwards`() =
         runTest {
-            server.enqueue(token("t1"))
-            server.enqueue(questions(code = 3))
-            server.enqueue(token("t2"))
             server.enqueue(questions(code = 0))
+            server.enqueue(token("t1"))
 
             assertIs<FeedResult.Next>(feed().next())
-            server.takeRequest()
+
+            assertEquals("/api.php?amount=10&category=9&difficulty=hard&type=multiple", server.takeRequest().target)
+            assertEquals("/api_token.php?command=request", server.takeRequest(10, TimeUnit.SECONDS)?.target)
+        }
+
+    @Test
+    fun `an unknown token is dropped and the request retried without it`() =
+        runTest {
+            storeToken("t1")
+            server.enqueue(questions(code = 3))
+            server.enqueue(questions(code = 0))
+            server.enqueue(token("t2"))
+
+            assertIs<FeedResult.Next>(feed().next())
             assertTrue(server.takeRequest().target.endsWith("token=t1"))
-            assertEquals("/api_token.php?command=request", server.takeRequest().target)
-            assertTrue(server.takeRequest().target.endsWith("token=t2"))
+            assertFalse("token" in server.takeRequest().target)
         }
 
     @Test
     fun `an exhausted token is reset and the request retried`() =
         runTest {
-            server.enqueue(token("t1"))
+            storeToken("t1")
             server.enqueue(questions(code = 4))
             server.enqueue(token("t1"))
             server.enqueue(questions(code = 0))
 
             assertIs<FeedResult.Next>(feed().next())
             server.takeRequest()
-            server.takeRequest()
             assertEquals("/api_token.php?command=reset&token=t1", server.takeRequest().target)
-            assertEquals(4, server.requestCount)
-        }
-
-    @Test
-    fun `a failed token request still plays without a token`() =
-        runTest {
-            server.enqueue(MockResponse(code = 503))
-            server.enqueue(questions(code = 0))
-
-            assertIs<FeedResult.Next>(feed().next())
-            server.takeRequest()
-            assertTrue("token" !in server.takeRequest().target)
+            assertEquals(3, server.requestCount)
         }
 
     @Test
     fun `too few questions is no results`() =
         runTest {
-            server.enqueue(token("t1"))
+            storeToken("t1")
             server.enqueue(questions(code = 0, count = 7))
 
             assertEquals(FeedResult.Failed(DataError.NoResults), feed().next())
@@ -128,7 +135,7 @@ class OpenTdbQuestionRepositoryTest {
     @Test
     fun `a marathon feed asks for batches of 50`() =
         runTest {
-            server.enqueue(token("t1"))
+            storeToken("t1")
             server.enqueue(questions(code = 0, count = 50))
             val feed =
                 repository.feed(
@@ -137,10 +144,13 @@ class OpenTdbQuestionRepositoryTest {
                 )
 
             assertIs<FeedResult.Next>(feed.next())
-            server.takeRequest()
             assertEquals("/api.php?amount=50&type=multiple&token=t1", server.takeRequest().target)
             feed.close()
         }
+
+    private suspend fun storeToken(value: String) {
+        preferences.setSessionToken(value, clock.millis())
+    }
 
     private fun TestScope.feed() =
         repository.feed(

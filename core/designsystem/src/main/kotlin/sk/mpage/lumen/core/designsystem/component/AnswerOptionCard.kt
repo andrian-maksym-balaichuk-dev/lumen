@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -53,8 +54,10 @@ public fun AnswerOptionCard(
     enabled: Boolean = true,
     stateDescription: String? = null,
     minHeight: Dp = Lumora.sizes.xl,
+    compact: Boolean = false,
 ) {
     val style = state.style()
+    val gap = if (compact) Lumora.spacing.sm else Lumora.spacing.md
     val scheme = MaterialTheme.colorScheme
     Card(
         onClick = onClick,
@@ -79,28 +82,33 @@ public fun AnswerOptionCard(
         border = style.border,
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().heightIn(min = minHeight).padding(Lumora.spacing.md),
+            modifier = Modifier.fillMaxSize().heightIn(min = minHeight).padding(gap),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.md),
+            horizontalArrangement = Arrangement.spacedBy(gap),
         ) {
             Surface(
                 shape = CircleShape,
                 color = if (state == AnswerState.IDLE) scheme.primaryContainer else Color.Transparent,
                 contentColor = if (state == AnswerState.IDLE) scheme.onPrimaryContainer else style.content,
                 border = if (state == AnswerState.IDLE) null else BorderStroke(1.dp, style.content),
-                modifier = Modifier.size(Lumora.sizes.sm),
+                modifier = Modifier.size(if (compact) Lumora.sizes.xs else Lumora.sizes.sm),
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(letter, style = MaterialTheme.typography.labelLarge)
+                    Text(
+                        text = letter,
+                        style = if (compact) MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelLarge,
+                    )
                 }
             }
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodyLarge,
+                style = if (compact) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.weight(1f),
             )
-            if (style.icon != null) {
-                Icon(painterResource(style.icon), contentDescription = null, modifier = Modifier.size(Lumora.sizes.xs))
+            Box(Modifier.size(Lumora.sizes.xs)) {
+                if (style.icon != null) {
+                    Icon(painterResource(style.icon), contentDescription = null, modifier = Modifier.size(Lumora.sizes.xs))
+                }
             }
         }
     }

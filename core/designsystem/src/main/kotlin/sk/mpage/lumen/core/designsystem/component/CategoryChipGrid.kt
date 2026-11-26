@@ -23,10 +23,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import sk.mpage.lumen.core.designsystem.R
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
+import sk.mpage.lumen.core.designsystem.layout.JustifiedFlowRow
 import sk.mpage.lumen.core.designsystem.modifier.shimmer
 import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
 import sk.mpage.lumen.core.designsystem.theme.Lumora
@@ -40,15 +42,15 @@ public fun <T> CategoryChipGrid(
     icon: (T) -> Int,
     modifier: Modifier = Modifier,
 ) {
-    FlowRow(
+    JustifiedFlowRow(
         modifier = modifier.fillMaxWidth().selectableGroup(),
-        horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.sm),
+        horizontalGap = Lumora.spacing.sm,
     ) {
         options.forEach { option ->
             FilterChip(
                 selected = option == selected,
                 onClick = { onSelect(option) },
-                label = { Text(label(option)) },
+                label = { Text(label(option), maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis) },
                 leadingIcon = {
                     Icon(
                         painter = painterResource(icon(option)),

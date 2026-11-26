@@ -4,8 +4,11 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -23,12 +26,14 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import sk.mpage.lumen.core.designsystem.component.AnswerOptionCard
@@ -36,9 +41,11 @@ import sk.mpage.lumen.core.designsystem.component.AnswerState
 import sk.mpage.lumen.core.designsystem.component.GlassSurface
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
 import sk.mpage.lumen.core.designsystem.layout.LumoraFlex
+import sk.mpage.lumen.core.designsystem.layout.LumoraWindow
 import sk.mpage.lumen.core.designsystem.theme.Lumora
 import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.QuestionType
+import sk.mpage.lumen.core.ui.categoryDisplayName
 import sk.mpage.lumen.feature.game.R
 import sk.mpage.lumen.feature.game.play.Feedback
 import sk.mpage.lumen.feature.game.play.GameUiState
@@ -59,12 +66,20 @@ internal fun QuestionContent(
         withFrameNanos {}
         currentOnShown()
     }
+    val compact = LumoraWindow.isCompactHeight
     LumoraFlex(
-        items =
+        itemsFor = { columns ->
+            val sideBySide = compact && columns >= 2
             listOf(
-                { QuestionText(state) },
-                { Options(state, onOptionTapped, onNext) },
-            ),
+                {
+                    Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.lg)) {
+                        QuestionText(state)
+                        if (sideBySide) state.feedback?.let { FeedbackRow(it, onNext) }
+                    }
+                },
+                { Options(state, onOptionTapped, onNext, grid = compact, showFeedback = !sideBySide) },
+            )
+        },
         modifier =
             modifier
                 .fillMaxSize()
@@ -77,7 +92,11 @@ internal fun QuestionContent(
 private fun QuestionText(state: GameUiState.Playing) {
     Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.sm)) {
         Text(
-            text = "${state.categoryName.substringAfter(": ")} · ${difficultyLabel(state.difficulty)}".uppercase(),
+            text =
+                "${categoryDisplayName(
+                    state.categoryName,
+                    LocalResources.current,
+                )} · ${difficultyLabel(state.difficulty)}".uppercase(),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -95,20 +114,33 @@ private fun Options(
     state: GameUiState.Playing,
     onOptionTapped: (String) -> Unit,
     onNext: () -> Unit,
+    grid: Boolean,
+    showFeedback: Boolean,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.md)) {
-        if (state.type == QuestionType.TRUE_FALSE) {
-            Row(horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.md)) {
-                state.options.forEachIndexed { index, option ->
-                    Option(state, index, option, onOptionTapped, Modifier.weight(1f), tall = true)
+    val gap = if (grid) Lumora.spacing.sm else Lumora.spacing.md
+    Column(verticalArrangement = Arrangement.spacedBy(gap)) {
+        val perRow = if (state.type == QuestionType.TRUE_FALSE || grid) 2 else 1
+        state.options.withIndex().chunked(perRow).forEach { row ->
+            Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(gap)) {
+                row.forEach { (index, option) ->
+                    Option(
+                        state = state,
+                        index = index,
+                        option = option,
+                        onOptionTapped = onOptionTapped,
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        compact = grid,
+                        minHeight =
+                            when {
+                                grid -> Lumora.sizes.md
+                                state.type == QuestionType.TRUE_FALSE -> Lumora.sizes.huge
+                                else -> Lumora.sizes.xl
+                            },
+                    )
                 }
             }
-        } else {
-            state.options.forEachIndexed { index, option ->
-                Option(state, index, option, onOptionTapped, Modifier, tall = false)
-            }
         }
-        state.feedback?.let { FeedbackRow(it, onNext) }
+        if (showFeedback) state.feedback?.let { FeedbackRow(it, onNext) }
     }
 }
 
@@ -119,7 +151,8 @@ private fun Option(
     option: OptionUi,
     onOptionTapped: (String) -> Unit,
     modifier: Modifier,
-    tall: Boolean,
+    minHeight: Dp,
+    compact: Boolean,
 ) {
     val motion = Lumora.motion
     val entrance = remember(state.presentationId) { Animatable(if (motion.isReduced) 1f else 0f) }
@@ -142,7 +175,8 @@ private fun Option(
                 AnswerState.REVEALED_CORRECT -> stringResource(R.string.game_option_revealed)
                 AnswerState.IDLE, AnswerState.DISABLED -> null
             },
-        minHeight = if (tall) Lumora.sizes.huge else Lumora.sizes.xl,
+        minHeight = minHeight,
+        compact = compact,
         modifier =
             modifier.graphicsLayer {
                 alpha = entrance.value

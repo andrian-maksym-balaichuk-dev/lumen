@@ -51,7 +51,7 @@ public fun LumoraLargeTopBar(
                         val state = scrollBehavior.state
                         alpha = maxOf(state.collapsedFraction, state.overlappedFraction)
                     },
-            material = Lumora.glass.thick,
+            material = if (LocalHazeState.current != null) Lumora.glass.thin else Lumora.glass.thick,
             shape = RectangleShape,
         ) {}
         if (LumoraWindow.isCompactHeight) {

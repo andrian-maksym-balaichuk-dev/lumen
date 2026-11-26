@@ -25,9 +25,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import sk.mpage.lumen.core.designsystem.component.EmptyState
+import sk.mpage.lumen.core.designsystem.component.LocalHazeState
 import sk.mpage.lumen.core.designsystem.component.LumoraDockClearance
 import sk.mpage.lumen.core.designsystem.component.LumoraLargeTopBar
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
+import sk.mpage.lumen.core.designsystem.modifier.hazeContent
 import sk.mpage.lumen.core.designsystem.preview.LumoraPreviews
 import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
 import sk.mpage.lumen.core.designsystem.theme.Lumora
@@ -57,7 +59,7 @@ internal fun HistoryScreen(
         containerColor = Color.Transparent,
         topBar = { LumoraLargeTopBar(title = stringResource(R.string.history_title), scrollBehavior = scrollBehavior) },
     ) { padding ->
-        Box(Modifier.fillMaxSize().padding(top = padding.calculateTopPadding())) {
+        Box(Modifier.fillMaxSize()) {
             when (state) {
                 HistoryUiState.Loading -> {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
@@ -70,16 +72,17 @@ internal fun HistoryScreen(
                         body = stringResource(R.string.history_empty_body),
                         actionLabel = stringResource(R.string.history_empty_action),
                         onAction = onStartQuiz,
-                        modifier = Modifier.align(Alignment.Center),
+                        modifier = Modifier.align(Alignment.Center).padding(top = padding.calculateTopPadding()),
                     )
                 }
 
                 is HistoryUiState.Content -> {
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize().hazeContent(LocalHazeState.current),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         contentPadding =
                             PaddingValues(
+                                top = padding.calculateTopPadding(),
                                 start = Lumora.spacing.gutterCompact,
                                 end = Lumora.spacing.gutterCompact,
                                 bottom = padding.calculateBottomPadding() + LumoraDockClearance,
@@ -89,7 +92,11 @@ internal fun HistoryScreen(
                         state.items.forEach { item ->
                             when (item) {
                                 is HistoryListItem.DayHeader -> {
-                                    stickyHeader { DayHeader(item) }
+                                    stickyHeader {
+                                        Box(Modifier.widthIn(max = Lumora.spacing.contentMaxWidth).fillMaxWidth()) {
+                                            DayHeader(item)
+                                        }
+                                    }
                                 }
 
                                 is HistoryListItem.Session -> {

@@ -42,8 +42,18 @@ public fun ProgressPill(
             horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.md),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            LinearProgressIndicator(progress = { animated }, modifier = Modifier.width(Lumora.sizes.xxxl))
-            Text(label, style = MaterialTheme.typography.labelLarge)
+            LinearProgressIndicator(
+                progress = { animated },
+                modifier = Modifier.width(Lumora.sizes.xxxl),
+                trackColor = MaterialTheme.colorScheme.primaryContainer,
+                drawStopIndicator = {},
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelLarge.copy(fontFeatureSettings = "tnum"),
+                maxLines = 1,
+                softWrap = false,
+            )
         }
     }
 }

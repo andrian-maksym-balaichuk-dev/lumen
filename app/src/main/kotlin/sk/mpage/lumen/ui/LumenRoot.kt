@@ -10,12 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
-import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import sk.mpage.lumen.core.designsystem.component.AuraBackground
 import sk.mpage.lumen.core.designsystem.component.LocalHazeState
 import sk.mpage.lumen.core.designsystem.component.LumoraDock
 import sk.mpage.lumen.core.designsystem.component.LumoraDockItem
+import sk.mpage.lumen.core.designsystem.modifier.hazeBackground
 import sk.mpage.lumen.ui.navigation.LumenNavDisplay
 import sk.mpage.lumen.ui.navigation.Navigator
 
@@ -31,10 +31,8 @@ internal fun LumenRoot(
 
     CompositionLocalProvider(LocalHazeState provides hazeState) {
         Box(modifier = modifier.fillMaxSize()) {
-            Box(Modifier.fillMaxSize().hazeSource(hazeState)) {
-                AuraBackground()
-                LumenNavDisplay(backStack = backStack, navigator = navigator)
-            }
+            AuraBackground(Modifier.fillMaxSize().hazeBackground(hazeState))
+            LumenNavDisplay(backStack = backStack, navigator = navigator)
             if (current != null) {
                 LumoraDock(
                     items =

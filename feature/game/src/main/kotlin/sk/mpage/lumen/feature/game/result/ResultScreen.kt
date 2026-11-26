@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -36,11 +37,13 @@ import sk.mpage.lumen.core.designsystem.preview.LumoraPreviews
 import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
 import sk.mpage.lumen.core.designsystem.theme.Lumora
 import sk.mpage.lumen.core.model.Avatar
+import sk.mpage.lumen.core.model.Category
 import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.model.QuestionType
 import sk.mpage.lumen.core.model.QuizConfig
 import sk.mpage.lumen.core.ui.ProfileAvatar
+import sk.mpage.lumen.core.ui.displayName
 import sk.mpage.lumen.core.ui.formatDuration
 import sk.mpage.lumen.core.ui.formatSeconds
 import sk.mpage.lumen.feature.game.R
@@ -203,7 +206,10 @@ private fun Stats(
 
 @Composable
 private fun configLabel(config: QuizConfig): String {
-    val category = config.categoryName.substringAfter(": ").ifEmpty { stringResource(R.string.result_any_category) }
+    val resources = LocalResources.current
+    val category =
+        config.categoryId?.let { Category(it, config.categoryName).displayName(resources) }
+            ?: stringResource(R.string.result_any_category)
     val difficulty =
         when (config.difficulty) {
             Difficulty.ANY -> stringResource(R.string.result_any_difficulty)

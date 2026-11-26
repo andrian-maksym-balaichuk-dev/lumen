@@ -1,7 +1,13 @@
 package sk.mpage.lumen.core.data.repository
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import sk.mpage.lumen.core.common.dispatcher.Dispatcher
+import sk.mpage.lumen.core.common.dispatcher.LumenDispatcher
 import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.common.text.HtmlEntityDecoder
@@ -24,17 +30,23 @@ internal class OfflineFirstCategoryRepository
         private val remote: OpenTdbRemoteDataSource,
         private val decoder: HtmlEntityDecoder,
         private val clock: Clock,
+        @Dispatcher(LumenDispatcher.Default) private val default: CoroutineDispatcher,
     ) : CategoryRepository {
+        private val refreshLock = Mutex()
+
         override fun observeCategories(): Flow<List<Category>> =
             local.observeAll().map { categories -> categories.map(CategoryEntity::toCategory) }
 
-        override suspend fun refreshIfStale(maxAge: Duration): AppResult<Unit> {
-            val oldest = local.oldestUpdate()
-            val fresh = oldest != null && oldest.plus(maxAge.toJavaDuration()).isAfter(clock.instant())
-            return if (fresh) AppResult.Success(Unit) else refresh()
-        }
+        override suspend fun refreshIfStale(maxAge: Duration): AppResult<Unit> =
+            refreshLock.withLock {
+                val oldest = local.oldestUpdate()
+                val fresh = oldest != null && oldest.plus(maxAge.toJavaDuration()).isAfter(clock.instant())
+                if (fresh) AppResult.Success(Unit) else download()
+            }
 
-        override suspend fun refresh(): AppResult<Unit> {
+        override suspend fun refresh(): AppResult<Unit> = refreshLock.withLock { download() }
+
+        private suspend fun download(): AppResult<Unit> {
             val categories =
                 when (val result = remote.categories()) {
                     is AppResult.Failure -> return result
@@ -42,7 +54,8 @@ internal class OfflineFirstCategoryRepository
                 }
             if (categories.isEmpty()) return AppResult.Failure(DataError.NoResults)
             val now = clock.instant()
-            local.replaceAll(categories.map { it.toEntity(decoder, updatedAt = now) })
+            val entities = withContext(default) { categories.map { it.toEntity(decoder, updatedAt = now) } }
+            local.replaceAll(entities)
             return AppResult.Success(Unit)
         }
     }
