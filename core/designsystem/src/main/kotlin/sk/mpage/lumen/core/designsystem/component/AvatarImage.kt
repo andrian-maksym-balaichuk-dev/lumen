@@ -23,6 +23,7 @@ import coil3.compose.AsyncImage
 import sk.mpage.lumen.core.designsystem.icon.LumoraAvatars
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
 import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
+import sk.mpage.lumen.core.designsystem.theme.Lumora
 import java.io.File
 
 @Composable
@@ -30,7 +31,7 @@ public fun AvatarImage(
     @DrawableRes presetRes: Int?,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    size: Dp = 48.dp,
+    size: Dp = Lumora.sizes.md,
     file: File? = null,
 ) {
     val circle = modifier.size(size).clip(CircleShape)
@@ -64,14 +65,14 @@ public fun AvatarImage(
 @Composable
 private fun AvatarImagePreview() {
     PreviewSurface {
-        Row(Modifier.padding(16.dp)) {
-            AvatarImage(presetRes = null, contentDescription = null, size = 64.dp)
+        Row(Modifier.padding(Lumora.spacing.lg)) {
+            AvatarImage(presetRes = null, contentDescription = null, size = Lumora.sizes.xl)
             LumoraAvatars.presets.take(3).forEach {
                 AvatarImage(
                     it.drawableRes,
                     contentDescription = null,
-                    size = 64.dp,
-                    modifier = Modifier.padding(start = 8.dp),
+                    size = Lumora.sizes.xl,
+                    modifier = Modifier.padding(start = Lumora.spacing.sm),
                 )
             }
         }

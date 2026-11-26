@@ -38,8 +38,8 @@ class LobbyViewModelTest {
         assertEquals(Greeting.AFTERNOON, Greeting.at(LocalTime.of(17, 59)))
         assertEquals(Greeting.EVENING, Greeting.at(LocalTime.of(18, 0)))
         assertEquals(Greeting.EVENING, Greeting.at(LocalTime.of(21, 59)))
-        assertEquals(Greeting.NIGHT, Greeting.at(LocalTime.of(22, 0)))
-        assertEquals(Greeting.NIGHT, viewModel(at = LocalTime.of(23, 30)).uiState.value.greeting)
+        assertEquals(Greeting.EVENING, Greeting.at(LocalTime.of(23, 59)))
+        assertEquals(Greeting.NIGHT, viewModel(at = LocalTime.of(2, 30)).uiState.value.greeting)
     }
 
     @Test

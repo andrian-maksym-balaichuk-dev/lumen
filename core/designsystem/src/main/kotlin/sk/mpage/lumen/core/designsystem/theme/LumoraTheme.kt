@@ -23,9 +23,11 @@ import androidx.compose.ui.unit.dp
 import sk.mpage.lumen.core.designsystem.tokens.GlassTokens
 import sk.mpage.lumen.core.designsystem.tokens.LocalGlass
 import sk.mpage.lumen.core.designsystem.tokens.LocalMotion
+import sk.mpage.lumen.core.designsystem.tokens.LocalSizes
 import sk.mpage.lumen.core.designsystem.tokens.LocalSpacing
 import sk.mpage.lumen.core.designsystem.tokens.LumoraGlass
 import sk.mpage.lumen.core.designsystem.tokens.LumoraMotion
+import sk.mpage.lumen.core.designsystem.tokens.LumoraSizes
 import sk.mpage.lumen.core.designsystem.tokens.LumoraSpacing
 
 @Composable
@@ -51,6 +53,7 @@ public fun LumoraTheme(
                 .of(darkTheme, glassEnabled, colorScheme.surfaceContainerHigh)
                 .copy(showAura = !reduceTransparency),
         LocalSpacing provides LumoraSpacing(),
+        LocalSizes provides LumoraSizes(),
         LocalMotion provides if (reduceMotion) LumoraMotion.Reduced else LumoraMotion.Default,
     ) {
         MaterialTheme(
@@ -77,6 +80,11 @@ public object Lumora {
         @Composable
         @ReadOnlyComposable
         get() = LocalSpacing.current
+
+    public val sizes: LumoraSizes
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalSizes.current
 
     public val motion: LumoraMotion
         @Composable
@@ -105,8 +113,8 @@ private fun ColorRoles() {
             Triple("streakFlame", semantic.streakFlame, scheme.surface),
         )
     Column(
-        modifier = Modifier.background(scheme.background).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.background(scheme.background).padding(Lumora.spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xs),
     ) {
         Text("Lumora", style = MaterialTheme.typography.headlineLarge, color = scheme.onBackground)
         roles.forEach { (name, container, content) -> ColorRole(name, container, content) }
@@ -124,7 +132,7 @@ private fun ColorRole(
             Modifier
                 .fillMaxWidth()
                 .background(container, MaterialTheme.shapes.small)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = Lumora.spacing.md, vertical = Lumora.spacing.sm),
     ) {
         Text(name, style = MaterialTheme.typography.labelLarge, color = content)
     }

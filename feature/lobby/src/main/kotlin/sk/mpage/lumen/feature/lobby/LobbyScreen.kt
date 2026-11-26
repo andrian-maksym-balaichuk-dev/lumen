@@ -3,9 +3,7 @@ package sk.mpage.lumen.feature.lobby
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,15 +11,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import sk.mpage.lumen.core.designsystem.component.LumoraDockClearance
 import sk.mpage.lumen.core.designsystem.component.LumoraLargeTopBar
-import sk.mpage.lumen.core.designsystem.component.LumoraTwoPane
+import sk.mpage.lumen.core.designsystem.layout.LumoraFlex
 import sk.mpage.lumen.core.designsystem.preview.LumoraPreviews
 import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
 import sk.mpage.lumen.core.designsystem.theme.Lumora
@@ -54,40 +50,39 @@ internal fun LobbyScreen(
                         ProfileAvatar(
                             avatar = state.avatar,
                             contentDescription = stringResource(R.string.lobby_open_profile),
-                            size = 36.dp,
+                            size = Lumora.sizes.sm,
                         )
                     }
                 },
             )
         },
     ) { padding ->
-        LumoraTwoPane(
+        LumoraFlex(
+            itemsFor = { columns ->
+                val mode: @Composable () -> Unit = { ModeSection(state, onAction) }
+                val difficulty: @Composable () -> Unit = { DifficultySection(state, onAction) }
+                val type: @Composable () -> Unit = { TypeSection(state, onAction) }
+                if (columns == 2) {
+                    listOf(
+                        {
+                            Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xxl)) {
+                                mode()
+                                type()
+                            }
+                        },
+                        difficulty,
+                    )
+                } else {
+                    listOf(mode, difficulty, type)
+                }
+            },
             modifier =
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .padding(padding)
-                    .padding(bottom = LumoraDockClearance),
-            start = {
-                ModeSection(state, onAction)
-                TypeSection(state, onAction)
-            },
-            end = { DifficultySection(state, onAction) },
-            singlePane = {
-                Column(
-                    modifier =
-                        Modifier
-                            .align(Alignment.TopCenter)
-                            .widthIn(max = Lumora.spacing.contentMaxWidth)
-                            .fillMaxWidth()
-                            .padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.lg),
-                    verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xxl),
-                ) {
-                    ModeSection(state, onAction)
-                    DifficultySection(state, onAction)
-                    TypeSection(state, onAction)
-                }
-            },
+                    .padding(bottom = LumoraDockClearance)
+                    .padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.lg),
         )
     }
 }

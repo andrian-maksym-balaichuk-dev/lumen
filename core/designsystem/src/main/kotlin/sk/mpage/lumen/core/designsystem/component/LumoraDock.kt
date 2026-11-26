@@ -30,6 +30,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -69,6 +70,7 @@ public fun LumoraDock(
     require(selectedIndex in items.indices) { "The selected destination must belong to the dock" }
 
     val spacing = Lumora.spacing
+    val itemHeight = Lumora.sizes.lg
     val showLabels = LocalDensity.current.fontScale <= 1.5f
     val selectedPosition by animateFloatAsState(
         targetValue = selectedIndex.toFloat(),
@@ -88,7 +90,7 @@ public fun LumoraDock(
         GlassSurface(
             modifier = Modifier.widthIn(max = spacing.contentMaxWidth).fillMaxWidth(),
         ) {
-            BoxWithConstraints(Modifier.padding(DockPadding).height(DockItemHeight)) {
+            BoxWithConstraints(Modifier.padding(spacing.xs).height(itemHeight)) {
                 // NavigationBar places an 8 dp gap between its equally weighted items.
                 val itemWidth = (maxWidth - spacing.sm * (items.size - 1)) / items.size
                 Box(
@@ -96,11 +98,11 @@ public fun LumoraDock(
                         .offset {
                             IntOffset(x = ((itemWidth + spacing.sm) * selectedPosition).roundToPx(), y = 0)
                         }.width(itemWidth)
-                        .height(DockItemHeight)
+                        .height(itemHeight)
                         .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
                 )
                 NavigationBar(
-                    modifier = Modifier.height(DockItemHeight),
+                    modifier = Modifier.height(itemHeight),
                     containerColor = Color.Transparent,
                     tonalElevation = 0.dp,
                     windowInsets = WindowInsets(0),
@@ -122,7 +124,7 @@ public fun LumoraDock(
                             onClick = { onItemSelected(index) },
                             modifier =
                                 Modifier
-                                    .height(DockItemHeight)
+                                    .height(itemHeight)
                                     .clip(CircleShape),
                             colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent),
                             icon = {
@@ -134,7 +136,7 @@ public fun LumoraDock(
                                     Icon(
                                         painter = painterResource(item.iconRes),
                                         contentDescription = null,
-                                        modifier = Modifier.size(24.dp),
+                                        modifier = Modifier.size(Lumora.sizes.xs),
                                         tint = color,
                                     )
                                     if (showLabels) {
@@ -156,10 +158,10 @@ public fun LumoraDock(
     }
 }
 
-public val LumoraDockClearance: Dp = 96.dp
-
-private val DockPadding = 6.dp
-private val DockItemHeight = 52.dp
+public val LumoraDockClearance: Dp
+    @Composable
+    @ReadOnlyComposable
+    get() = Lumora.sizes.xxxl
 
 @LumoraPreviews
 @Composable

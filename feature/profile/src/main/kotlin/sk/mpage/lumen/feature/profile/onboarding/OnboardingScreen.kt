@@ -4,15 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -30,9 +28,8 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import sk.mpage.lumen.core.designsystem.component.GlassSurface
-import sk.mpage.lumen.core.designsystem.component.LumoraTwoPane
+import sk.mpage.lumen.core.designsystem.layout.LumoraFlex
 import sk.mpage.lumen.core.designsystem.preview.LumoraPreviews
 import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
 import sk.mpage.lumen.core.designsystem.theme.Lumora
@@ -51,39 +48,42 @@ internal fun OnboardingScreen(
 ) {
     Box(modifier.fillMaxSize()) {
         BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding().imePadding()) {
-            val previewSize = (maxHeight * 0.2f).coerceIn(PREVIEW_MIN_SIZE, PREVIEW_MAX_SIZE)
-            LumoraTwoPane(
-                modifier = Modifier.fillMaxSize(),
-                scrollPanes = true,
-                paneArrangement = Arrangement.spacedBy(Lumora.spacing.xl, Alignment.CenterVertically),
-                start = {
-                    Welcome()
-                    NameInput(state, onAction)
-                    GetStartedButton(state, onAction)
-                },
-                end = {
-                    GlassSurface(
-                        modifier = Modifier.fillMaxWidth(),
-                        material = Lumora.glass.frost,
-                        shape = MaterialTheme.shapes.extraLarge,
-                    ) {
-                        Avatars(state, onAction, previewSize, Modifier.padding(Lumora.spacing.xl))
-                    }
-                },
-                singlePane = {
-                    Column(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                                .padding(Lumora.spacing.gutterCompact)
-                                .widthIn(max = Lumora.spacing.contentMaxWidth)
-                                .align(Alignment.TopCenter),
-                        verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xxl),
-                    ) {
-                        Welcome(Modifier.padding(top = Lumora.spacing.xxl))
-                        ProfileCard(state, onAction, previewSize)
-                        GetStartedButton(state, onAction)
+            val previewSize = (maxHeight * 0.2f).coerceIn(Lumora.sizes.xxl, Lumora.sizes.huge)
+            LumoraFlex(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .heightIn(min = maxHeight)
+                        .padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.lg),
+                contentAlignment = Alignment.Center,
+                itemAlignment = Alignment.CenterVertically,
+                itemsFor = { columns ->
+                    if (columns >= 2) {
+                        listOf(
+                            {
+                                Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xl)) {
+                                    Welcome()
+                                    NameInput(state, onAction)
+                                    GetStartedButton(state, onAction)
+                                }
+                            },
+                            {
+                                GlassSurface(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    material = Lumora.glass.frost,
+                                    shape = MaterialTheme.shapes.extraLarge,
+                                ) {
+                                    Avatars(state, onAction, previewSize, Modifier.padding(Lumora.spacing.xl))
+                                }
+                            },
+                        )
+                    } else {
+                        listOf(
+                            { Welcome(Modifier.padding(top = Lumora.spacing.xxl)) },
+                            { ProfileCard(state, onAction, previewSize) },
+                            { GetStartedButton(state, onAction) },
+                        )
                     }
                 },
             )
@@ -174,14 +174,11 @@ private fun GetStartedButton(
         onClick = { onAction(OnboardingAction.Submit) },
         enabled = state.canSubmit,
         shape = CircleShape,
-        modifier = Modifier.fillMaxWidth().height(56.dp),
+        modifier = Modifier.fillMaxWidth().height(Lumora.sizes.lg),
     ) {
         Text(stringResource(R.string.onboarding_get_started), style = MaterialTheme.typography.titleMedium)
     }
 }
-
-private val PREVIEW_MIN_SIZE = 72.dp
-private val PREVIEW_MAX_SIZE = 112.dp
 
 @Preview(widthDp = 914, heightDp = 411)
 @Composable

@@ -5,9 +5,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import sk.mpage.lumen.core.designsystem.component.AvatarImage
 import sk.mpage.lumen.core.designsystem.icon.LumoraAvatars
+import sk.mpage.lumen.core.designsystem.theme.Lumora
 import sk.mpage.lumen.core.model.Avatar
 import java.io.File
 
@@ -16,7 +16,7 @@ public fun ProfileAvatar(
     avatar: Avatar,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    size: Dp = 48.dp,
+    size: Dp = Lumora.sizes.md,
 ) {
     val context = LocalContext.current
     when (avatar) {

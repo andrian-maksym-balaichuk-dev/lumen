@@ -67,8 +67,8 @@ public fun GlassSurface(
 private fun GlassSurfacePreview() {
     PreviewSurface {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(Lumora.spacing.lg),
+            verticalArrangement = Arrangement.spacedBy(Lumora.spacing.md),
         ) {
             listOf("Frost" to Lumora.glass.frost, "Regular" to Lumora.glass.regular, "Thick" to Lumora.glass.thick)
                 .forEach { (name, material) ->
@@ -77,7 +77,11 @@ private fun GlassSurfacePreview() {
                         material = material,
                         shape = MaterialTheme.shapes.large,
                     ) {
-                        Text(name, modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            name,
+                            modifier = Modifier.padding(Lumora.spacing.lg),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
                     }
                 }
         }

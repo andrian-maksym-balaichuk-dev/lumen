@@ -42,8 +42,8 @@ public fun AvatarGrid(
 ) {
     val presets = LumoraAvatars.presets
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(64.dp),
-        modifier = modifier.heightIn(max = 320.dp).selectableGroup(),
+        columns = GridCells.Adaptive(Lumora.sizes.xl),
+        modifier = modifier.heightIn(max = Lumora.sizes.giant).selectableGroup(),
         horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.sm),
         verticalArrangement = Arrangement.spacedBy(Lumora.spacing.sm),
         userScrollEnabled = false,
@@ -87,7 +87,7 @@ private fun AvatarChoice(
         AvatarImage(
             presetRes = preset.drawableRes,
             contentDescription = null,
-            size = 56.dp,
+            size = Lumora.sizes.lg,
             modifier =
                 Modifier
                     .scale(scale)
@@ -106,6 +106,6 @@ private val RING_WIDTH = 3.dp
 @Composable
 private fun AvatarGridPreview() {
     PreviewSurface {
-        AvatarGrid(selectedKey = "cat", onSelect = {}, modifier = Modifier.padding(16.dp))
+        AvatarGrid(selectedKey = "cat", onSelect = {}, modifier = Modifier.padding(Lumora.spacing.lg))
     }
 }
