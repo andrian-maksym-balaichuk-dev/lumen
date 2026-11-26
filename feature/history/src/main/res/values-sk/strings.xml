@@ -1,0 +1,16 @@
+<resources>
+    <string name="history_title">História</string>
+    <string name="history_any_category">Ľubovoľná kategória</string>
+    <string name="history_score">%1$d/%2$d</string>
+    <string name="history_difficulty_any">Ľubovoľná obtiažnosť</string>
+    <string name="history_difficulty_easy">Ľahká</string>
+    <string name="history_difficulty_medium">Stredná</string>
+    <string name="history_difficulty_hard">Ťažká</string>
+    <string name="history_mode_classic">Klasika</string>
+    <string name="history_mode_marathon">Maratón</string>
+    <string name="history_today">Dnes</string>
+    <string name="history_yesterday">Včera</string>
+    <string name="history_empty_title">Zatiaľ žiadne kvízy</string>
+    <string name="history_empty_body">Dohrané hry sa tu zobrazia so skóre a časom.</string>
+    <string name="history_empty_action">Spustiť kvíz</string>
+</resources>

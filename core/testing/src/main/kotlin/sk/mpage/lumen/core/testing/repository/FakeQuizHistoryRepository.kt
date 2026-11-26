@@ -9,6 +9,8 @@ import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
 import sk.mpage.lumen.core.domain.repository.SaveOutcome
 import sk.mpage.lumen.core.model.FinishedGame
+import sk.mpage.lumen.core.model.HistoryFilter
+import sk.mpage.lumen.core.model.QuizSession
 import sk.mpage.lumen.core.model.QuizSessionDetail
 
 public class FakeQuizHistoryRepository : QuizHistoryRepository {
@@ -19,6 +21,20 @@ public class FakeQuizHistoryRepository : QuizHistoryRepository {
 
     public fun failNext(error: DataError) {
         failures.addLast(error)
+    }
+
+    private val sessions = MutableStateFlow<List<QuizSession>>(emptyList())
+    private val filters = mutableListOf<HistoryFilter>()
+
+    public val requestedFilters: List<HistoryFilter> get() = filters
+
+    public fun emitSessions(value: List<QuizSession>) {
+        sessions.value = value
+    }
+
+    override fun observeSessions(filter: HistoryFilter): Flow<List<QuizSession>> {
+        filters += filter
+        return sessions
     }
 
     private val details = MutableStateFlow<Map<Long, QuizSessionDetail>>(emptyMap())

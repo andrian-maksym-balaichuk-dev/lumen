@@ -11,11 +11,14 @@ import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.data.mapper.toDetail
 import sk.mpage.lumen.core.data.mapper.toEntity
+import sk.mpage.lumen.core.data.mapper.toSession
 import sk.mpage.lumen.core.data.mapper.toSessionEntity
 import sk.mpage.lumen.core.database.source.QuizHistoryLocalDataSource
 import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
 import sk.mpage.lumen.core.domain.repository.SaveOutcome
 import sk.mpage.lumen.core.model.FinishedGame
+import sk.mpage.lumen.core.model.HistoryFilter
+import sk.mpage.lumen.core.model.QuizSession
 import sk.mpage.lumen.core.model.QuizSessionDetail
 import javax.inject.Inject
 
@@ -25,6 +28,9 @@ internal class RoomQuizHistoryRepository
         private val local: QuizHistoryLocalDataSource,
         @Dispatcher(LumenDispatcher.IO) private val io: CoroutineDispatcher,
     ) : QuizHistoryRepository {
+        override fun observeSessions(filter: HistoryFilter): Flow<List<QuizSession>> =
+            local.observeSessions(filter).map { sessions -> sessions.map { it.toSession() } }
+
         override fun observeSessionDetail(sessionId: Long): Flow<QuizSessionDetail?> =
             local.observeSessionDetail(sessionId).map { it?.toDetail() }
 

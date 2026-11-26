@@ -1,0 +1,86 @@
+package sk.mpage.lumen.feature.history.list
+
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import org.junit.Rule
+import sk.mpage.lumen.core.model.Difficulty
+import sk.mpage.lumen.core.model.EndReason
+import sk.mpage.lumen.core.model.GameMode
+import sk.mpage.lumen.core.model.QuestionType
+import sk.mpage.lumen.core.model.QuizConfig
+import sk.mpage.lumen.core.model.QuizSession
+import sk.mpage.lumen.core.testing.MainDispatcherRule
+import sk.mpage.lumen.core.testing.repository.FakeQuizHistoryRepository
+import java.time.Clock
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class HistoryViewModelTest {
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
+    private val history = FakeQuizHistoryRepository()
+    private val clock = Clock.fixed(Instant.parse("2026-11-26T12:00:00Z"), ZoneOffset.UTC)
+
+    @Test
+    fun `no games shows the empty state`() =
+        runTest {
+            val viewModel = HistoryViewModel(history, clock)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+            advanceUntilIdle()
+
+            assertEquals(HistoryUiState.Empty, viewModel.uiState.value)
+        }
+
+    @Test
+    fun `sessions are grouped under today, yesterday and older dates`() =
+        runTest {
+            val today = session(3, LocalDate.of(2026, 11, 26))
+            val yesterday = session(2, LocalDate.of(2026, 11, 25))
+            val older = session(1, LocalDate.of(2026, 11, 20))
+            history.emitSessions(listOf(today, yesterday, older))
+            val viewModel = HistoryViewModel(history, clock)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+            advanceUntilIdle()
+
+            assertEquals(
+                HistoryUiState.Content(
+                    listOf(
+                        HistoryListItem.DayHeader(today.localDate, DayLabel.TODAY),
+                        HistoryListItem.Session(today),
+                        HistoryListItem.DayHeader(yesterday.localDate, DayLabel.YESTERDAY),
+                        HistoryListItem.Session(yesterday),
+                        HistoryListItem.DayHeader(older.localDate, DayLabel.DATE),
+                        HistoryListItem.Session(older),
+                    ),
+                ),
+                viewModel.uiState.value,
+            )
+        }
+
+    private fun session(
+        id: Long,
+        date: LocalDate,
+    ) = QuizSession(
+        id = id,
+        config = QuizConfig(GameMode.CLASSIC, null, "", Difficulty.ANY, QuestionType.MULTIPLE_CHOICE),
+        startedAt = Instant.EPOCH,
+        finishedAt = Instant.EPOCH,
+        localDate = date,
+        durationSeconds = 60,
+        answerTimeMs = 30_000,
+        totalQuestions = 10,
+        correctCount = 8,
+        wrongCount = 2,
+        timeoutCount = 0,
+        scorePercent = 80,
+        averageAnswerMs = 3_000,
+        endReason = EndReason.COMPLETED,
+    )
+}

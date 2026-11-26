@@ -10,8 +10,10 @@ import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.EndReason
 import sk.mpage.lumen.core.model.FinishedGame
 import sk.mpage.lumen.core.model.GameMode
+import sk.mpage.lumen.core.model.HistoryFilter
 import sk.mpage.lumen.core.model.QuestionType
 import sk.mpage.lumen.core.model.QuizConfig
+import sk.mpage.lumen.core.model.QuizSession
 import sk.mpage.lumen.core.model.QuizSessionDetail
 import java.time.Instant
 import java.time.LocalDate
@@ -37,6 +39,8 @@ class SaveQuizResultUseCaseTest {
 
     private fun repository(result: AppResult<SaveOutcome>) =
         object : QuizHistoryRepository {
+            override fun observeSessions(filter: HistoryFilter) = emptyFlow<List<QuizSession>>()
+
             override fun observeSessionDetail(sessionId: Long) = emptyFlow<QuizSessionDetail?>()
 
             override suspend fun save(game: FinishedGame) = result
