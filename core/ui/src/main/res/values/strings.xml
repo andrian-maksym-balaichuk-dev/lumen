@@ -1,0 +1,12 @@
+<resources>
+    <string name="error_no_internet">You\'re offline. Check your connection and try again.</string>
+    <string name="error_timeout">The quiz server took too long to answer. Try again.</string>
+    <string name="error_rate_limited">Too many requests. Wait a few seconds and try again.</string>
+    <string name="error_no_results">The quiz server returned no results.</string>
+    <string name="error_token_invalid">The quiz session expired. Try again.</string>
+    <string name="error_invalid_request">The quiz server rejected the request.</string>
+    <string name="error_http">The quiz server is having trouble. Try again later.</string>
+    <string name="error_serialization">The quiz server sent data the app can\'t read.</string>
+    <string name="error_storage">Couldn\'t read or save data on this device.</string>
+    <string name="error_unknown">Something went wrong. Try again.</string>
+</resources>

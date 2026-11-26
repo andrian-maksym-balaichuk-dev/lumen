@@ -1,9 +1,13 @@
 package sk.mpage.lumen.feature.lobby
 
+import kotlinx.collections.immutable.ImmutableList
+import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.model.Avatar
+import sk.mpage.lumen.core.model.Category
 import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.model.QuestionType
+import sk.mpage.lumen.core.ui.UiText
 import java.time.LocalTime
 
 internal enum class Greeting {
@@ -24,6 +28,18 @@ internal enum class Greeting {
     }
 }
 
+internal sealed interface CategoriesUiState {
+    data object Loading : CategoriesUiState
+
+    data class Loaded(
+        val categories: ImmutableList<Category>,
+    ) : CategoriesUiState
+
+    data class Failed(
+        val error: DataError,
+    ) : CategoriesUiState
+}
+
 internal data class LobbyUiState(
     val greeting: Greeting = Greeting.MORNING,
     val playerName: String = "",
@@ -31,6 +47,9 @@ internal data class LobbyUiState(
     val mode: GameMode = GameMode.CLASSIC,
     val difficulty: Difficulty = Difficulty.ANY,
     val type: QuestionType = QuestionType.MULTIPLE_CHOICE,
+    val categoryId: Int? = null,
+    val categories: CategoriesUiState = CategoriesUiState.Loading,
+    val isRefreshing: Boolean = false,
 )
 
 internal sealed interface LobbyAction {
@@ -45,4 +64,18 @@ internal sealed interface LobbyAction {
     data class TypeSelected(
         val type: QuestionType,
     ) : LobbyAction
+
+    data class CategorySelected(
+        val categoryId: Int?,
+    ) : LobbyAction
+
+    data object RefreshPulled : LobbyAction
+
+    data object RetryTapped : LobbyAction
+}
+
+internal sealed interface LobbyEffect {
+    data class ShowMessage(
+        val message: UiText,
+    ) : LobbyEffect
 }

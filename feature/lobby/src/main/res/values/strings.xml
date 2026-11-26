@@ -17,4 +17,8 @@
     <string name="lobby_type">Question type</string>
     <string name="lobby_type_multiple">Multiple choice</string>
     <string name="lobby_type_boolean">True / False</string>
+    <string name="lobby_category">Category</string>
+    <string name="lobby_category_any">Any category</string>
+    <string name="lobby_categories_failed">Couldn\'t load categories</string>
+    <string name="lobby_retry">Retry</string>
 </resources>

@@ -8,4 +8,5 @@
     <string name="avatar_rabbit">rabbit</string>
     <string name="avatar_penguin">penguin</string>
     <string name="avatar_preset_description">Avatar %1$d of %2$d, %3$s</string>
+    <string name="category_chips_loading">Loading categories</string>
 </resources>

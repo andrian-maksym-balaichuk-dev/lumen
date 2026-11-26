@@ -17,4 +17,8 @@
     <string name="lobby_type">Typ otázok</string>
     <string name="lobby_type_multiple">Výber z možností</string>
     <string name="lobby_type_boolean">Pravda / Nepravda</string>
+    <string name="lobby_category">Kategória</string>
+    <string name="lobby_category_any">Ľubovoľná kategória</string>
+    <string name="lobby_categories_failed">Kategórie sa nepodarilo načítať</string>
+    <string name="lobby_retry">Skúsiť znova</string>
 </resources>
