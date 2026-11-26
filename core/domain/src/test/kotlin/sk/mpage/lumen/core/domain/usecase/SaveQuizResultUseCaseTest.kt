@@ -1,0 +1,54 @@
+package sk.mpage.lumen.core.domain.usecase
+
+import kotlinx.coroutines.test.runTest
+import sk.mpage.lumen.core.common.result.AppResult
+import sk.mpage.lumen.core.common.result.DataError
+import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
+import sk.mpage.lumen.core.domain.repository.SaveOutcome
+import sk.mpage.lumen.core.model.Difficulty
+import sk.mpage.lumen.core.model.EndReason
+import sk.mpage.lumen.core.model.FinishedGame
+import sk.mpage.lumen.core.model.GameMode
+import sk.mpage.lumen.core.model.QuestionType
+import sk.mpage.lumen.core.model.QuizConfig
+import java.time.Instant
+import java.time.LocalDate
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class SaveQuizResultUseCaseTest {
+    @Test
+    fun `maps the outcome to the session id`() =
+        runTest {
+            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(42, null, false))))
+
+            assertEquals(AppResult.Success(SaveResult(42, isNewBest = false, previousBest = null)), useCase(GAME))
+        }
+
+    @Test
+    fun `passes a storage failure through`() =
+        runTest {
+            val useCase = SaveQuizResultUseCase(repository(AppResult.Failure(DataError.Storage)))
+
+            assertEquals(AppResult.Failure(DataError.Storage), useCase(GAME))
+        }
+
+    private fun repository(result: AppResult<SaveOutcome>) =
+        object : QuizHistoryRepository {
+            override suspend fun save(game: FinishedGame) = result
+        }
+
+    private companion object {
+        val GAME =
+            FinishedGame(
+                gameUuid = "g",
+                config = QuizConfig(GameMode.CLASSIC, null, "", Difficulty.ANY, QuestionType.MULTIPLE_CHOICE),
+                attempts = emptyList(),
+                startedAt = Instant.EPOCH,
+                finishedAt = Instant.EPOCH,
+                localDate = LocalDate.EPOCH,
+                durationSeconds = 0,
+                endReason = EndReason.COMPLETED,
+            )
+    }
+}

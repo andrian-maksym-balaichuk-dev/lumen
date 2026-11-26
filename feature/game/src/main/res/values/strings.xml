@@ -23,4 +23,5 @@
         <item quantity="one">%d second left</item>
         <item quantity="other">%d seconds left</item>
     </plurals>
+    <string name="game_save_failed">Couldn\'t save your game</string>
 </resources>

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.common.time.MonotonicClock
 import sk.mpage.lumen.core.domain.game.FeedResult
 import sk.mpage.lumen.core.domain.game.GameRules
@@ -24,6 +25,7 @@ import sk.mpage.lumen.core.domain.game.QuizPhase
 import sk.mpage.lumen.core.domain.game.QuizReducer
 import sk.mpage.lumen.core.domain.game.QuizState
 import sk.mpage.lumen.core.domain.repository.QuestionRepository
+import sk.mpage.lumen.core.domain.usecase.SaveQuizResultUseCase
 import sk.mpage.lumen.core.model.QuizConfig
 import java.time.Clock
 import java.time.ZonedDateTime
@@ -35,6 +37,7 @@ internal class GameViewModel
     constructor(
         @Assisted config: QuizConfig,
         questions: QuestionRepository,
+        private val saveResult: SaveQuizResultUseCase,
         private val monotonicClock: MonotonicClock,
         private val clock: Clock,
     ) : ViewModel() {
@@ -148,6 +151,21 @@ internal class GameViewModel
                             visible.first { it }
                             delay(GameRules.REVEAL_DURATION_MS)
                             dispatch(QuizAction.Next)
+                        }
+                    }
+
+                    is QuizPhase.Saving -> {
+                        feed.close()
+                        viewModelScope.launch {
+                            when (val result = saveResult(phase.game)) {
+                                is AppResult.Success -> {
+                                    dispatch(QuizAction.Saved(result.value.sessionId, result.value.isNewBest))
+                                }
+
+                                is AppResult.Failure -> {
+                                    dispatch(QuizAction.SaveFailed(result.error))
+                                }
+                            }
                         }
                     }
 

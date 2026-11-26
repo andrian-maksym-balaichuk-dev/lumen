@@ -22,8 +22,9 @@ internal object QuizStateMapper {
 
             is QuizPhase.Reveal -> playing(state, phase.attempt.question, phase.attempt.position, phase.attempt)
 
+            is QuizPhase.SaveFailed -> GameUiState.SaveFailed(phase.error)
+
             is QuizPhase.Saving,
-            is QuizPhase.SaveFailed,
             is QuizPhase.Finished,
             QuizPhase.Abandoned,
             -> GameUiState.Saving

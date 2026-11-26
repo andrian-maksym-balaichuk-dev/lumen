@@ -16,4 +16,12 @@ public data class FinishedGame(
     @Serializable(with = LocalDateSerializer::class) val localDate: LocalDate,
     val durationSeconds: Long,
     val endReason: EndReason,
-)
+) {
+    val totalQuestions: Int get() = attempts.size
+    val correctCount: Int get() = attempts.count { it.isCorrect }
+    val wrongCount: Int get() = totalQuestions - correctCount
+    val timeoutCount: Int get() = attempts.count { it.selectedAnswer == null }
+    val answerTimeMs: Long get() = attempts.sumOf { it.timeSpentMs }
+    val averageAnswerMs: Long get() = if (attempts.isEmpty()) 0 else answerTimeMs / attempts.size
+    val scorePercent: Int get() = if (attempts.isEmpty()) 0 else correctCount * 100 / totalQuestions
+}

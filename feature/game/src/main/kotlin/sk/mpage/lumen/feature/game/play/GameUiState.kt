@@ -26,6 +26,10 @@ internal sealed interface GameUiState {
     ) : GameUiState
 
     data object Saving : GameUiState
+
+    data class SaveFailed(
+        val error: DataError,
+    ) : GameUiState
 }
 
 internal data class OptionUi(

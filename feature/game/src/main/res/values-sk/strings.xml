@@ -25,4 +25,5 @@
         <item quantity="many">Zostáva %d sekundy</item>
         <item quantity="other">Zostáva %d sekúnd</item>
     </plurals>
+    <string name="game_save_failed">Hru sa nepodarilo uložiť</string>
 </resources>

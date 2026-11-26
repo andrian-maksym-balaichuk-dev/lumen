@@ -55,6 +55,16 @@ internal fun GameScreen(
                     Waiting(stringResource(R.string.game_saving))
                 }
 
+                is GameUiState.SaveFailed -> {
+                    ErrorState(
+                        title = stringResource(R.string.game_save_failed),
+                        message = state.error.toUiText().asString(),
+                        retryLabel = stringResource(R.string.game_retry),
+                        onRetry = { onAction(GameAction.RetryTapped) },
+                        modifier = Modifier.align(Alignment.Center).padding(Lumora.spacing.gutterCompact),
+                    )
+                }
+
                 is GameUiState.LoadFailed -> {
                     ErrorState(
                         title = stringResource(R.string.game_load_failed),
