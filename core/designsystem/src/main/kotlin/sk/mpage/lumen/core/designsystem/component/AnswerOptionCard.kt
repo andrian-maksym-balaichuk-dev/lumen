@@ -1,5 +1,6 @@
 package sk.mpage.lumen.core.designsystem.component
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,52 +54,8 @@ public fun AnswerOptionCard(
     stateDescription: String? = null,
     minHeight: Dp = Lumora.sizes.xl,
 ) {
+    val style = state.style()
     val scheme = MaterialTheme.colorScheme
-    val semantic = Lumora.colors
-    val container =
-        when (state) {
-            AnswerState.IDLE -> {
-                Lumora.glass.frost.tint
-            }
-
-            AnswerState.CORRECT -> {
-                semantic.successContainer
-            }
-
-            AnswerState.WRONG -> {
-                scheme.errorContainer
-            }
-
-            AnswerState.REVEALED_CORRECT -> {
-                semantic.successContainer.copy(alpha = 0.6f)
-            }
-
-            AnswerState.DISABLED -> {
-                Lumora.glass.frost.tint
-                    .copy(alpha = 0.5f)
-            }
-        }
-    val content =
-        when (state) {
-            AnswerState.IDLE -> scheme.onSurface
-            AnswerState.CORRECT, AnswerState.REVEALED_CORRECT -> semantic.onSuccessContainer
-            AnswerState.WRONG -> scheme.onErrorContainer
-            AnswerState.DISABLED -> scheme.onSurface.copy(alpha = 0.38f)
-        }
-    val border =
-        when (state) {
-            AnswerState.IDLE -> BorderStroke(1.dp, scheme.outlineVariant)
-            AnswerState.CORRECT -> BorderStroke(2.dp, semantic.success)
-            AnswerState.WRONG -> BorderStroke(2.dp, scheme.error)
-            AnswerState.REVEALED_CORRECT -> BorderStroke(1.dp, semantic.success)
-            AnswerState.DISABLED -> null
-        }
-    val icon =
-        when (state) {
-            AnswerState.CORRECT, AnswerState.REVEALED_CORRECT -> LumoraIcons.CheckCircle
-            AnswerState.WRONG -> LumoraIcons.Cancel
-            AnswerState.IDLE, AnswerState.DISABLED -> null
-        }
     Card(
         onClick = onClick,
         enabled = enabled,
@@ -114,12 +71,12 @@ public fun AnswerOptionCard(
         shape = MaterialTheme.shapes.medium,
         colors =
             CardDefaults.cardColors(
-                containerColor = container,
-                contentColor = content,
-                disabledContainerColor = container,
-                disabledContentColor = content,
+                containerColor = style.container,
+                contentColor = style.content,
+                disabledContainerColor = style.container,
+                disabledContentColor = style.content,
             ),
-        border = border,
+        border = style.border,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().heightIn(min = minHeight).padding(Lumora.spacing.md),
@@ -129,8 +86,8 @@ public fun AnswerOptionCard(
             Surface(
                 shape = CircleShape,
                 color = if (state == AnswerState.IDLE) scheme.secondaryContainer else Color.Transparent,
-                contentColor = if (state == AnswerState.IDLE) scheme.onSecondaryContainer else content,
-                border = if (state == AnswerState.IDLE) null else BorderStroke(1.dp, content),
+                contentColor = if (state == AnswerState.IDLE) scheme.onSecondaryContainer else style.content,
+                border = if (state == AnswerState.IDLE) null else BorderStroke(1.dp, style.content),
                 modifier = Modifier.size(Lumora.sizes.sm),
             ) {
                 Box(contentAlignment = Alignment.Center) {
@@ -142,9 +99,59 @@ public fun AnswerOptionCard(
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.weight(1f),
             )
-            if (icon != null) {
-                Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(Lumora.sizes.xs))
+            if (style.icon != null) {
+                Icon(painterResource(style.icon), contentDescription = null, modifier = Modifier.size(Lumora.sizes.xs))
             }
+        }
+    }
+}
+
+private data class AnswerStyle(
+    val container: Color,
+    val content: Color,
+    val border: BorderStroke?,
+    @param:DrawableRes val icon: Int?,
+)
+
+@Composable
+private fun AnswerState.style(): AnswerStyle {
+    val scheme = MaterialTheme.colorScheme
+    val semantic = Lumora.colors
+    val frost = Lumora.glass.frost.tint
+    return when (this) {
+        AnswerState.IDLE -> {
+            AnswerStyle(frost, scheme.onSurface, BorderStroke(1.dp, scheme.outlineVariant), null)
+        }
+
+        AnswerState.CORRECT -> {
+            AnswerStyle(
+                semantic.successContainer,
+                semantic.onSuccessContainer,
+                BorderStroke(2.dp, semantic.success),
+                LumoraIcons.CheckCircle,
+            )
+        }
+
+        AnswerState.WRONG -> {
+            AnswerStyle(
+                scheme.errorContainer,
+                scheme.onErrorContainer,
+                BorderStroke(2.dp, scheme.error),
+                LumoraIcons.Cancel,
+            )
+        }
+
+        AnswerState.REVEALED_CORRECT -> {
+            AnswerStyle(
+                semantic.successContainer.copy(alpha = 0.6f),
+                semantic.onSuccessContainer,
+                BorderStroke(1.dp, semantic.success),
+                LumoraIcons.CheckCircle,
+            )
+        }
+
+        AnswerState.DISABLED -> {
+            AnswerStyle(frost.copy(alpha = 0.5f), scheme.onSurface.copy(alpha = 0.38f), null, null)
         }
     }
 }
