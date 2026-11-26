@@ -13,6 +13,12 @@ public object LumoraIcons {
 
     @DrawableRes public val Profile: Int = R.drawable.ic_profile
 
+    @DrawableRes public val Close: Int = R.drawable.ic_close
+
+    @DrawableRes public val CheckCircle: Int = R.drawable.ic_check_circle
+
+    @DrawableRes public val Cancel: Int = R.drawable.ic_cancel
+
     @DrawableRes public val CloudOff: Int = R.drawable.ic_cloud_off
 
     @DrawableRes public val Error: Int = R.drawable.ic_error

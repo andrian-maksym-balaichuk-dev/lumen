@@ -267,6 +267,37 @@ class LobbyViewModelTest {
             assertEquals(QuestionType.MULTIPLE_CHOICE, viewModel.uiState.value.type)
         }
 
+    @Test
+    fun `start opens the game with the selected configuration only when online`() =
+        runTest {
+            val viewModel = started(viewModel())
+            viewModel.onAction(LobbyAction.CategorySelected(BOOKS.id))
+            advanceUntilIdle()
+
+            viewModel.effects.test {
+                viewModel.onAction(LobbyAction.StartTapped)
+                advanceUntilIdle()
+                assertEquals(
+                    LobbyEffect.StartGame(
+                        QuizConfig(
+                            GameMode.CLASSIC,
+                            BOOKS.id,
+                            BOOKS.name,
+                            Difficulty.ANY,
+                            QuestionType.MULTIPLE_CHOICE,
+                        ),
+                    ),
+                    awaitItem(),
+                )
+
+                network.setOnline(false)
+                advanceUntilIdle()
+                viewModel.onAction(LobbyAction.StartTapped)
+                advanceUntilIdle()
+                expectNoEvents()
+            }
+        }
+
     private companion object {
         val GENERAL = Category(9, "General Knowledge")
         val BOOKS = Category(10, "Entertainment: Books")

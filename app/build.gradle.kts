@@ -19,6 +19,7 @@ dependencies {
     implementation(projects.core.data)
     implementation(projects.core.designsystem)
     implementation(projects.core.domain)
+    implementation(projects.feature.game)
     implementation(projects.feature.lobby)
     implementation(projects.feature.profile)
     implementation(libs.androidx.activity.compose)

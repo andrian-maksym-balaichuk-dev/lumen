@@ -1,0 +1,22 @@
+<resources>
+    <string name="game_close">Zavrieť hru</string>
+    <string name="game_progress">%1$d / %2$d</string>
+    <string name="game_progress_description">Otázka %1$d z %2$d</string>
+    <string name="game_progress_marathon">#%1$d</string>
+    <string name="game_progress_marathon_description">Otázka %1$d</string>
+    <string name="game_option_description">Možnosť %1$s, %2$s</string>
+    <string name="game_option_correct">Vaša odpoveď, správna</string>
+    <string name="game_option_wrong">Vaša odpoveď, nesprávna</string>
+    <string name="game_option_revealed">Správna odpoveď</string>
+    <string name="game_feedback_correct">Správne!</string>
+    <string name="game_feedback_wrong">Nesprávne. Správna odpoveď: %1$s</string>
+    <string name="game_feedback_timeout">Čas vypršal. Správna odpoveď: %1$s</string>
+    <string name="game_next">Ďalej</string>
+    <string name="game_loading">Načítavajú sa otázky…</string>
+    <string name="game_load_failed">Otázky sa nepodarilo načítať</string>
+    <string name="game_retry">Skúsiť znova</string>
+    <string name="game_saving">Ukladá sa hra…</string>
+    <string name="game_difficulty_easy">Ľahká</string>
+    <string name="game_difficulty_medium">Stredná</string>
+    <string name="game_difficulty_hard">Ťažká</string>
+</resources>

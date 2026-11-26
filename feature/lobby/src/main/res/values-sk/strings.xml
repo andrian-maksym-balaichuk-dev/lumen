@@ -23,4 +23,5 @@
     <string name="lobby_retry">Skúsiť znova</string>
     <string name="lobby_offline_title">Ste offline</string>
     <string name="lobby_offline_body">Kvízy potrebujú pripojenie. Uložené kategórie zostávajú dostupné.</string>
+    <string name="lobby_start">Štart</string>
 </resources>

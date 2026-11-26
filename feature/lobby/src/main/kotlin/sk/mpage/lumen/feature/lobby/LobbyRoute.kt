@@ -9,11 +9,13 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import sk.mpage.lumen.core.model.QuizConfig
 import sk.mpage.lumen.core.ui.ObserveAsEvents
 
 @Composable
 internal fun LobbyRoute(
     onOpenProfile: () -> Unit,
+    onStartGame: (QuizConfig) -> Unit,
     viewModel: LobbyViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -22,6 +24,10 @@ internal fun LobbyRoute(
     val resources = LocalResources.current
     ObserveAsEvents(viewModel.effects) { effect ->
         when (effect) {
+            is LobbyEffect.StartGame -> {
+                onStartGame(effect.config)
+            }
+
             is LobbyEffect.ShowMessage -> {
                 scope.launch { snackbarHostState.showSnackbar(effect.message.asString(resources)) }
             }

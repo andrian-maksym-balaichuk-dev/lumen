@@ -78,6 +78,7 @@ internal class LobbyViewModel
                 is LobbyAction.TypeSelected -> select { it.copy(type = action.type) }
                 is LobbyAction.CategorySelected -> select { it.copy(categoryId = action.categoryId) }
                 LobbyAction.RefreshPulled, LobbyAction.RetryTapped -> load { categories.refresh() }
+                LobbyAction.StartTapped -> start()
             }
         }
 
@@ -99,25 +100,32 @@ internal class LobbyViewModel
         private fun select(change: (LobbyUiState) -> LobbyUiState) {
             selectionChanged = true
             val state = selection.updateAndGet(change)
+            viewModelScope.launch { settings.setLastQuizConfig(config(state)) }
+        }
+
+        private fun start() {
             viewModelScope.launch {
-                val categoryName =
-                    state.categoryId?.let { id ->
-                        categories
-                            .observeCategories()
-                            .first()
-                            .firstOrNull { it.id == id }
-                            ?.name
-                    }
-                settings.setLastQuizConfig(
-                    QuizConfig(
-                        mode = state.mode,
-                        categoryId = state.categoryId.takeIf { categoryName != null },
-                        categoryName = categoryName.orEmpty(),
-                        difficulty = state.difficulty,
-                        type = state.type,
-                    ),
-                )
+                if (uiState.value.isOffline) return@launch
+                effectChannel.send(LobbyEffect.StartGame(config(selection.value)))
             }
+        }
+
+        private suspend fun config(state: LobbyUiState): QuizConfig {
+            val categoryName =
+                state.categoryId?.let { id ->
+                    categories
+                        .observeCategories()
+                        .first()
+                        .firstOrNull { it.id == id }
+                        ?.name
+                }
+            return QuizConfig(
+                mode = state.mode,
+                categoryId = state.categoryId.takeIf { categoryName != null },
+                categoryName = categoryName.orEmpty(),
+                difficulty = state.difficulty,
+                type = state.type,
+            )
         }
 
         private fun load(request: suspend () -> AppResult<Unit>) {

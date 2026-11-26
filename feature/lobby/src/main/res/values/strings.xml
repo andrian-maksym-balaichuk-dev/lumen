@@ -23,4 +23,5 @@
     <string name="lobby_retry">Retry</string>
     <string name="lobby_offline_title">You\'re offline</string>
     <string name="lobby_offline_body">Quizzes need a connection. Cached categories stay available.</string>
+    <string name="lobby_start">Start</string>
 </resources>

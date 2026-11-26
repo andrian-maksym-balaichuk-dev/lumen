@@ -7,6 +7,7 @@ import sk.mpage.lumen.core.model.Category
 import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.model.QuestionType
+import sk.mpage.lumen.core.model.QuizConfig
 import sk.mpage.lumen.core.ui.UiText
 import java.time.LocalTime
 
@@ -73,9 +74,15 @@ internal sealed interface LobbyAction {
     data object RefreshPulled : LobbyAction
 
     data object RetryTapped : LobbyAction
+
+    data object StartTapped : LobbyAction
 }
 
 internal sealed interface LobbyEffect {
+    data class StartGame(
+        val config: QuizConfig,
+    ) : LobbyEffect
+
     data class ShowMessage(
         val message: UiText,
     ) : LobbyEffect

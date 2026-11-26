@@ -1,19 +1,28 @@
 package sk.mpage.lumen.feature.lobby
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -57,7 +66,30 @@ internal fun LobbyScreen(
     Scaffold(
         modifier = modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = Color.Transparent,
-        snackbarHost = { SnackbarHost(snackbarHostState, Modifier.padding(bottom = LumoraDockClearance)) },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        bottomBar = {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.navigationBars)
+                        .padding(bottom = LumoraDockClearance)
+                        .padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.sm),
+                contentAlignment = Alignment.Center,
+            ) {
+                Button(
+                    onClick = { onAction(LobbyAction.StartTapped) },
+                    enabled = !state.isOffline,
+                    modifier =
+                        Modifier
+                            .widthIn(max = Lumora.spacing.contentMaxWidth)
+                            .fillMaxWidth()
+                            .height(Lumora.sizes.lg),
+                ) {
+                    Text(stringResource(R.string.lobby_start), style = MaterialTheme.typography.titleMedium)
+                }
+            }
+        },
         topBar = {
             LumoraLargeTopBar(
                 title = greetingText(state),
@@ -119,7 +151,7 @@ internal fun LobbyScreen(
                             .padding(
                                 start = padding.calculateStartPadding(layoutDirection),
                                 end = padding.calculateEndPadding(layoutDirection),
-                                bottom = padding.calculateBottomPadding() + LumoraDockClearance,
+                                bottom = padding.calculateBottomPadding(),
                             ).padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.lg),
                 )
             }
