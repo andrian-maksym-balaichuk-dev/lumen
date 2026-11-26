@@ -2,6 +2,7 @@ package sk.mpage.lumen.core.datastore
 
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 
 public object PreferenceKeys {
@@ -18,4 +19,6 @@ public object PreferenceKeys {
         booleanPreferencesKey("notif_inactivity")
     public val LAST_QUIZ_CONFIG: Preferences.Key<String> =
         stringPreferencesKey("last_quiz_config")
+    public val SESSION_TOKEN: Preferences.Key<String> = stringPreferencesKey("session_token")
+    public val SESSION_TOKEN_AT: Preferences.Key<Long> = longPreferencesKey("session_token_at")
 }

@@ -63,4 +63,21 @@ public class UserPreferencesDataSource
         public suspend fun setLastQuizConfig(json: String) {
             dataStore.edit { it[PreferenceKeys.LAST_QUIZ_CONFIG] = json }
         }
+
+        public suspend fun setSessionToken(
+            token: String,
+            issuedAtEpochMs: Long,
+        ) {
+            dataStore.edit {
+                it[PreferenceKeys.SESSION_TOKEN] = token
+                it[PreferenceKeys.SESSION_TOKEN_AT] = issuedAtEpochMs
+            }
+        }
+
+        public suspend fun clearSessionToken() {
+            dataStore.edit {
+                it.remove(PreferenceKeys.SESSION_TOKEN)
+                it.remove(PreferenceKeys.SESSION_TOKEN_AT)
+            }
+        }
     }

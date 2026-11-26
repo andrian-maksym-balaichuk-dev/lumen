@@ -12,6 +12,7 @@ import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.network.di.openTdbApi
 import sk.mpage.lumen.core.network.di.openTdbJson
 import sk.mpage.lumen.core.network.model.RemoteCategory
+import sk.mpage.lumen.core.network.model.RemoteQuestions
 import sk.mpage.lumen.core.testing.TestMonotonicClock
 import java.util.concurrent.TimeUnit
 import kotlin.test.Test
@@ -45,9 +46,9 @@ class OpenTdbRemoteDataSourceTest {
         runTest {
             server.enqueue(MockResponse(body = questionsBody(responseCode = 0)))
 
-            val result = assertIs<AppResult.Success<*>>(questions())
+            val result = assertIs<AppResult.Success<RemoteQuestions>>(questions())
 
-            assertEquals(1, (result.value as List<*>).size)
+            assertEquals(1, assertIs<RemoteQuestions.Loaded>(result.value).questions.size)
         }
 
     @Test
@@ -57,8 +58,6 @@ class OpenTdbRemoteDataSourceTest {
                 mapOf(
                     1 to DataError.NoResults,
                     2 to DataError.InvalidRequest,
-                    3 to DataError.TokenInvalid,
-                    4 to DataError.TokenInvalid,
                     5 to DataError.RateLimited,
                     42 to DataError.Unknown,
                 )
@@ -68,6 +67,30 @@ class OpenTdbRemoteDataSourceTest {
 
                 assertEquals(AppResult.Failure(error), questions(dataSource), "response_code $code")
             }
+        }
+
+    @Test
+    fun `token codes are results the caller recovers from`() =
+        runTest {
+            val dataSource = dataSource()
+            server.enqueue(MockResponse(body = questionsBody(responseCode = 3)))
+            server.enqueue(MockResponse(body = questionsBody(responseCode = 4)))
+
+            assertEquals(AppResult.Success(RemoteQuestions.TokenNotFound), questions(dataSource))
+            assertEquals(AppResult.Success(RemoteQuestions.TokenExhausted), questions(dataSource))
+        }
+
+    @Test
+    fun `requests and resets a session token`() =
+        runTest {
+            val dataSource = dataSource()
+            server.enqueue(MockResponse(body = """{"response_code":0,"token":"abc"}"""))
+            server.enqueue(MockResponse(body = """{"response_code":0,"token":"abc"}"""))
+
+            assertEquals(AppResult.Success("abc"), dataSource.requestToken())
+            assertEquals("/api_token.php?command=request", server.takeRequest().target)
+            assertEquals(AppResult.Success("abc"), dataSource.resetToken("abc"))
+            assertEquals("/api_token.php?command=reset&token=abc", server.takeRequest().target)
         }
 
     @Test
