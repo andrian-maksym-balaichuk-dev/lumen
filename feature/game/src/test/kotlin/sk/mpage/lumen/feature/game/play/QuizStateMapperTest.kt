@@ -12,8 +12,10 @@ import sk.mpage.lumen.core.model.QuizConfig
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class QuizStateMapperTest {
     private val base = QuizState(config = CONFIG, gameUuid = "g")
@@ -28,6 +30,7 @@ class QuizStateMapperTest {
         assertEquals(1, ui.position)
         assertEquals(10, ui.total)
         assertEquals(List(4) { AnswerState.IDLE }, ui.options.map { it.state })
+        assertTrue(ui.acceptsAnswers)
         assertNull(ui.feedback)
     }
 
@@ -40,6 +43,7 @@ class QuizStateMapperTest {
             ui.options.map { it.state },
         )
         assertEquals(Feedback.Wrong("Jupiter"), ui.feedback)
+        assertFalse(ui.acceptsAnswers)
     }
 
     @Test
@@ -57,7 +61,9 @@ class QuizStateMapperTest {
                 phase = QuizPhase.Presenting(QUESTION, 1),
             )
 
-        assertNull(assertIs<GameUiState.Playing>(QuizStateMapper.map(marathon)).total)
+        val ui = assertIs<GameUiState.Playing>(QuizStateMapper.map(marathon))
+        assertNull(ui.total)
+        assertFalse(ui.acceptsAnswers)
     }
 
     private fun reveal(selected: String?): GameUiState.Playing {

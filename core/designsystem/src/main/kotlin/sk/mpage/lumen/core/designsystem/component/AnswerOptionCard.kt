@@ -49,6 +49,7 @@ public fun AnswerOptionCard(
     onClick: () -> Unit,
     description: String,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     stateDescription: String? = null,
     minHeight: Dp = Lumora.sizes.xl,
 ) {
@@ -100,6 +101,7 @@ public fun AnswerOptionCard(
         }
     Card(
         onClick = onClick,
+        enabled = enabled,
         modifier =
             modifier
                 .fillMaxWidth()
@@ -110,7 +112,13 @@ public fun AnswerOptionCard(
                     stateDescription?.let { this.stateDescription = it }
                 },
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = container, contentColor = content),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = container,
+                contentColor = content,
+                disabledContainerColor = container,
+                disabledContentColor = content,
+            ),
         border = border,
     ) {
         Row(

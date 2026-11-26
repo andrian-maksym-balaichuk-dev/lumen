@@ -12,22 +12,42 @@ import sk.mpage.lumen.core.model.QuestionAttempt
 internal object QuizStateMapper {
     fun map(state: QuizState): GameUiState =
         when (val phase = state.phase) {
-            QuizPhase.Loading -> GameUiState.Loading
+            QuizPhase.Loading -> {
+                GameUiState.Loading
+            }
 
-            is QuizPhase.LoadFailed -> GameUiState.LoadFailed(phase.error)
+            is QuizPhase.LoadFailed -> {
+                GameUiState.LoadFailed(phase.error)
+            }
 
-            is QuizPhase.Presenting -> playing(state, phase.question, phase.presentationId, attempt = null)
+            is QuizPhase.Presenting -> {
+                playing(state, phase.question, phase.presentationId, null, accepts = false)
+            }
 
-            is QuizPhase.Answering -> playing(state, phase.question, phase.presentationId, attempt = null)
+            is QuizPhase.Answering -> {
+                playing(state, phase.question, phase.presentationId, null, accepts = true)
+            }
 
-            is QuizPhase.Reveal -> playing(state, phase.attempt.question, phase.attempt.position, phase.attempt)
+            is QuizPhase.Reveal -> {
+                playing(
+                    state,
+                    phase.attempt.question,
+                    phase.attempt.position,
+                    phase.attempt,
+                    accepts = false,
+                )
+            }
 
-            is QuizPhase.SaveFailed -> GameUiState.SaveFailed(phase.error)
+            is QuizPhase.SaveFailed -> {
+                GameUiState.SaveFailed(phase.error)
+            }
 
             is QuizPhase.Saving,
             is QuizPhase.Finished,
             QuizPhase.Abandoned,
-            -> GameUiState.Saving
+            -> {
+                GameUiState.Saving
+            }
         }
 
     private fun playing(
@@ -35,6 +55,7 @@ internal object QuizStateMapper {
         question: Question,
         presentationId: Int,
         attempt: QuestionAttempt?,
+        accepts: Boolean,
     ): GameUiState.Playing =
         GameUiState.Playing(
             position = attempt?.position ?: (state.attempts.size + 1),
@@ -45,6 +66,7 @@ internal object QuizStateMapper {
             text = question.text,
             presentationId = presentationId,
             options = question.options.map { OptionUi(it, optionState(it, question, attempt)) }.toImmutableList(),
+            acceptsAnswers = accepts,
             feedback = attempt?.let(::feedback),
         )
 

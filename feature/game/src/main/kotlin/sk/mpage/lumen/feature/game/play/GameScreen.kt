@@ -123,6 +123,7 @@ private fun GameRevealPreview() {
                             OptionUi("Earth", AnswerState.WRONG),
                             OptionUi("Venus", AnswerState.DISABLED),
                         ),
+                    acceptsAnswers = false,
                     feedback = Feedback.Wrong("Jupiter"),
                 ),
             remainingMs = { 7_000 },
@@ -161,5 +162,6 @@ private val PreviewPlaying =
                 OptionUi("Earth", AnswerState.IDLE),
                 OptionUi("Venus", AnswerState.IDLE),
             ),
+        acceptsAnswers = true,
         feedback = null,
     )

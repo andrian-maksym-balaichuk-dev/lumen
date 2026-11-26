@@ -22,6 +22,7 @@ internal sealed interface GameUiState {
         val text: String,
         val presentationId: Int,
         val options: ImmutableList<OptionUi>,
+        val acceptsAnswers: Boolean,
         val feedback: Feedback?,
     ) : GameUiState
 

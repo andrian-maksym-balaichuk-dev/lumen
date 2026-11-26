@@ -128,6 +128,7 @@ private fun Option(
         text = option.text,
         state = option.state,
         onClick = { onOptionTapped(option.text) },
+        enabled = state.acceptsAnswers,
         description = stringResource(R.string.game_option_description, letter, option.text),
         stateDescription =
             when (option.state) {
