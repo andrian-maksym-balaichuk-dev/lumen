@@ -1,5 +1,6 @@
 package sk.mpage.lumen.feature.history.list
 
+import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -9,6 +10,8 @@ import org.junit.Rule
 import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.EndReason
 import sk.mpage.lumen.core.model.GameMode
+import sk.mpage.lumen.core.model.HistoryFilter
+import sk.mpage.lumen.core.model.HistorySort
 import sk.mpage.lumen.core.model.QuestionType
 import sk.mpage.lumen.core.model.QuizConfig
 import sk.mpage.lumen.core.model.QuizSession
@@ -20,6 +23,7 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 
 class HistoryViewModelTest {
     @get:Rule
@@ -31,7 +35,7 @@ class HistoryViewModelTest {
     @Test
     fun `no games shows the empty state`() =
         runTest {
-            val viewModel = HistoryViewModel(history, clock)
+            val viewModel = HistoryViewModel(history, SavedStateHandle(), clock)
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
             advanceUntilIdle()
 
@@ -45,12 +49,14 @@ class HistoryViewModelTest {
             val yesterday = session(2, LocalDate.of(2026, 11, 25))
             val older = session(1, LocalDate.of(2026, 11, 20))
             history.emitSessions(listOf(today, yesterday, older))
-            val viewModel = HistoryViewModel(history, clock)
+            val viewModel = HistoryViewModel(history, SavedStateHandle(), clock)
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
             advanceUntilIdle()
 
             assertEquals(
                 HistoryUiState.Content(
+                    HistoryFilter.Default,
+                    emptyList(),
                     listOf(
                         HistoryListItem.DayHeader(today.localDate, DayLabel.TODAY),
                         HistoryListItem.Session(today),
@@ -64,12 +70,67 @@ class HistoryViewModelTest {
             )
         }
 
+    @Test
+    fun `changing a filter queries again and other sorts have no day headers`() =
+        runTest {
+            val classic = session(2, LocalDate.of(2026, 11, 26))
+            val marathon = session(1, LocalDate.of(2026, 11, 26), GameMode.MARATHON)
+            history.emitSessions(listOf(classic, marathon))
+            val viewModel = HistoryViewModel(history, SavedStateHandle(), clock)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+
+            viewModel.onAction(HistoryAction.SortChanged(HistorySort.BEST_SCORE))
+            viewModel.onAction(HistoryAction.ModeChanged(GameMode.MARATHON))
+            advanceUntilIdle()
+
+            val content = assertIs<HistoryUiState.Content>(viewModel.uiState.value)
+            assertEquals(listOf(HistoryListItem.Session(marathon)), content.items)
+            assertEquals(
+                HistoryFilter(null, GameMode.MARATHON, HistorySort.BEST_SCORE),
+                history.requestedFilters.last(),
+            )
+        }
+
+    @Test
+    fun `a filter with no matches is not the empty history`() =
+        runTest {
+            history.emitSessions(listOf(session(1, LocalDate.of(2026, 11, 26))))
+            val viewModel = HistoryViewModel(history, SavedStateHandle(), clock)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+
+            viewModel.onAction(HistoryAction.ModeChanged(GameMode.MARATHON))
+            advanceUntilIdle()
+            assertEquals(emptyList(), assertIs<HistoryUiState.Content>(viewModel.uiState.value).items)
+
+            viewModel.onAction(HistoryAction.FiltersCleared)
+            advanceUntilIdle()
+            assertEquals(
+                1,
+                assertIs<HistoryUiState.Content>(viewModel.uiState.value).items.count { it is HistoryListItem.Session },
+            )
+        }
+
+    @Test
+    fun `the filter survives a new view model with the same saved state`() =
+        runTest {
+            val handle = SavedStateHandle()
+            HistoryViewModel(history, handle, clock).onAction(HistoryAction.SortChanged(HistorySort.FASTEST))
+            HistoryViewModel(history, handle, clock).onAction(HistoryAction.CategoryChanged(11))
+
+            val restored = HistoryViewModel(history, handle, clock)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { restored.uiState.collect() }
+            advanceUntilIdle()
+
+            assertEquals(HistoryFilter(11, null, HistorySort.FASTEST), history.requestedFilters.last())
+        }
+
     private fun session(
         id: Long,
         date: LocalDate,
+        mode: GameMode = GameMode.CLASSIC,
     ) = QuizSession(
         id = id,
-        config = QuizConfig(GameMode.CLASSIC, null, "", Difficulty.ANY, QuestionType.MULTIPLE_CHOICE),
+        config = QuizConfig(mode, null, "", Difficulty.ANY, QuestionType.MULTIPLE_CHOICE),
         startedAt = Instant.EPOCH,
         finishedAt = Instant.EPOCH,
         localDate = date,

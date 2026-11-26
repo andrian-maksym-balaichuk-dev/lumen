@@ -11,5 +11,5 @@ internal fun HistoryRoute(
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    HistoryScreen(state = state, onStartQuiz = onStartQuiz)
+    HistoryScreen(state = state, onAction = viewModel::onAction, onStartQuiz = onStartQuiz)
 }

@@ -6,6 +6,7 @@ import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
 import sk.mpage.lumen.core.domain.repository.SaveOutcome
+import sk.mpage.lumen.core.model.Category
 import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.EndReason
 import sk.mpage.lumen.core.model.FinishedGame
@@ -40,6 +41,8 @@ class SaveQuizResultUseCaseTest {
     private fun repository(result: AppResult<SaveOutcome>) =
         object : QuizHistoryRepository {
             override fun observeSessions(filter: HistoryFilter) = emptyFlow<List<QuizSession>>()
+
+            override fun observePlayedCategories() = emptyFlow<List<Category>>()
 
             override fun observeSessionDetail(sessionId: Long) = emptyFlow<QuizSessionDetail?>()
 

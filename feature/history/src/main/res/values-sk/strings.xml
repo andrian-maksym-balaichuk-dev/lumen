@@ -13,4 +13,16 @@
     <string name="history_empty_title">Zatiaľ žiadne kvízy</string>
     <string name="history_empty_body">Dohrané hry sa tu zobrazia so skóre a časom.</string>
     <string name="history_empty_action">Spustiť kvíz</string>
+    <string name="history_filter_open">Zoradiť a filtrovať</string>
+    <string name="history_sort">Zoradiť</string>
+    <string name="history_sort_newest">Najnovšie</string>
+    <string name="history_sort_best">Najlepšie skóre</string>
+    <string name="history_sort_fastest">Najrýchlejšie (celkový čas)</string>
+    <string name="history_filter_category">Kategória</string>
+    <string name="history_filter_mode">Režim</string>
+    <string name="history_mode_all">Všetky</string>
+    <string name="history_reset">Obnoviť</string>
+    <string name="history_no_matches">Žiadne výsledky</string>
+    <string name="history_no_matches_body">Týmto filtrom nezodpovedá žiadna hra.</string>
+    <string name="history_clear_filters">Zrušiť filtre</string>
 </resources>

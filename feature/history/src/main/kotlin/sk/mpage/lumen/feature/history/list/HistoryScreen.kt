@@ -11,16 +11,23 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -36,11 +43,14 @@ import sk.mpage.lumen.core.designsystem.theme.Lumora
 import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.EndReason
 import sk.mpage.lumen.core.model.GameMode
+import sk.mpage.lumen.core.model.HistoryFilter
 import sk.mpage.lumen.core.model.QuestionType
 import sk.mpage.lumen.core.model.QuizConfig
 import sk.mpage.lumen.core.model.QuizSession
 import sk.mpage.lumen.feature.history.R
+import sk.mpage.lumen.feature.history.component.FilterSortSheet
 import sk.mpage.lumen.feature.history.component.HistoryItem
+import sk.mpage.lumen.feature.history.component.ModeChips
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -50,14 +60,28 @@ import java.time.format.FormatStyle
 @Composable
 internal fun HistoryScreen(
     state: HistoryUiState,
+    onAction: (HistoryAction) -> Unit,
     onStartQuiz: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showSheet by rememberSaveable { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         modifier = modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = Color.Transparent,
-        topBar = { LumoraLargeTopBar(title = stringResource(R.string.history_title), scrollBehavior = scrollBehavior) },
+        topBar = {
+            LumoraLargeTopBar(
+                title = stringResource(R.string.history_title),
+                scrollBehavior = scrollBehavior,
+                actions = {
+                    if (state is HistoryUiState.Content) {
+                        IconButton(onClick = { showSheet = true }) {
+                            Icon(painterResource(LumoraIcons.Tune), stringResource(R.string.history_filter_open))
+                        }
+                    }
+                },
+            )
+        },
     ) { padding ->
         Box(Modifier.fillMaxSize()) {
             when (state) {
@@ -89,6 +113,24 @@ internal fun HistoryScreen(
                             ),
                         verticalArrangement = Arrangement.spacedBy(Lumora.spacing.sm),
                     ) {
+                        item {
+                            ModeChips(
+                                mode = state.filter.mode,
+                                onModeChanged = { onAction(HistoryAction.ModeChanged(it)) },
+                                modifier = Modifier.widthIn(max = Lumora.spacing.contentMaxWidth).fillMaxWidth(),
+                            )
+                        }
+                        if (state.items.isEmpty()) {
+                            item {
+                                EmptyState(
+                                    icon = LumoraIcons.Tune,
+                                    title = stringResource(R.string.history_no_matches),
+                                    body = stringResource(R.string.history_no_matches_body),
+                                    actionLabel = stringResource(R.string.history_clear_filters),
+                                    onAction = { onAction(HistoryAction.FiltersCleared) },
+                                )
+                            }
+                        }
                         state.items.forEach { item ->
                             when (item) {
                                 is HistoryListItem.DayHeader -> {
@@ -117,6 +159,17 @@ internal fun HistoryScreen(
                 }
             }
         }
+    }
+    if (showSheet && state is HistoryUiState.Content) {
+        FilterSortSheet(
+            filter = state.filter,
+            categories = state.categories,
+            onSortChanged = { onAction(HistoryAction.SortChanged(it)) },
+            onCategoryChanged = { onAction(HistoryAction.CategoryChanged(it)) },
+            onModeChanged = { onAction(HistoryAction.ModeChanged(it)) },
+            onReset = { onAction(HistoryAction.FiltersCleared) },
+            onDismiss = { showSheet = false },
+        )
     }
 }
 
@@ -148,14 +201,18 @@ private fun HistoryContentPreview() {
         HistoryScreen(
             state =
                 HistoryUiState.Content(
-                    listOf(
-                        HistoryListItem.DayHeader(LocalDate.of(2026, 11, 26), DayLabel.TODAY),
-                        HistoryListItem.Session(previewSession(1, GameMode.CLASSIC)),
-                        HistoryListItem.Session(previewSession(2, GameMode.MARATHON)),
-                        HistoryListItem.DayHeader(LocalDate.of(2026, 11, 25), DayLabel.YESTERDAY),
-                        HistoryListItem.Session(previewSession(3, GameMode.CLASSIC)),
-                    ),
+                    filter = HistoryFilter.Default,
+                    categories = emptyList(),
+                    items =
+                        listOf(
+                            HistoryListItem.DayHeader(LocalDate.of(2026, 11, 26), DayLabel.TODAY),
+                            HistoryListItem.Session(previewSession(1, GameMode.CLASSIC)),
+                            HistoryListItem.Session(previewSession(2, GameMode.MARATHON)),
+                            HistoryListItem.DayHeader(LocalDate.of(2026, 11, 25), DayLabel.YESTERDAY),
+                            HistoryListItem.Session(previewSession(3, GameMode.CLASSIC)),
+                        ),
                 ),
+            onAction = {},
             onStartQuiz = {},
         )
     }
@@ -165,7 +222,7 @@ private fun HistoryContentPreview() {
 @Composable
 private fun HistoryEmptyPreview() {
     PreviewSurface {
-        HistoryScreen(state = HistoryUiState.Empty, onStartQuiz = {})
+        HistoryScreen(state = HistoryUiState.Empty, onAction = {}, onStartQuiz = {})
     }
 }
 

@@ -138,6 +138,43 @@ class QuizSessionDaoTest {
             assertEquals(listOf(day3, day1), dao.observeQualifyingDays(minPercent = 80).first())
         }
 
+    @Test
+    fun `best score orders by percent then correct count then the faster game`() =
+        runTest {
+            dao.insertFinishedGame(session("low", percent = 50, correct = 5), emptyList())
+            dao.insertFinishedGame(session("slow", percent = 90, correct = 9).copy(durationSeconds = 300), emptyList())
+            dao.insertFinishedGame(session("fast", percent = 90, correct = 9).copy(durationSeconds = 60), emptyList())
+
+            assertEquals(listOf("fast", "slow", "low"), dao.observeBestScore(null, null).first().map { it.gameUuid })
+        }
+
+    @Test
+    fun `fastest uses the total duration, not the average answer time`() =
+        runTest {
+            dao.insertFinishedGame(session("short-total").copy(durationSeconds = 40, avgAnswerMs = 9_000), emptyList())
+            dao.insertFinishedGame(
+                session("quick-answers").copy(durationSeconds = 90, avgAnswerMs = 1_000),
+                emptyList(),
+            )
+
+            assertEquals(
+                listOf("short-total", "quick-answers"),
+                dao.observeFastest(null, null).first().map { it.gameUuid },
+            )
+        }
+
+    @Test
+    fun `category and mode filters narrow every sort`() =
+        runTest {
+            dao.insertFinishedGame(session("film").copy(categoryId = 11, categoryName = "Film"), emptyList())
+            dao.insertFinishedGame(session("marathon", mode = GameMode.MARATHON), emptyList())
+            dao.insertFinishedGame(session("classic"), emptyList())
+
+            assertEquals(listOf("film"), dao.observeNewest(11, null).first().map { it.gameUuid })
+            assertEquals(listOf("marathon"), dao.observeBestScore(null, GameMode.MARATHON).first().map { it.gameUuid })
+            assertEquals(listOf("classic"), dao.observeFastest(9, GameMode.CLASSIC).first().map { it.gameUuid })
+        }
+
     private fun attemptCount(): Int =
         database.openHelper.readableDatabase.query("SELECT COUNT(*) FROM question_attempt").use { cursor ->
             cursor.moveToFirst()

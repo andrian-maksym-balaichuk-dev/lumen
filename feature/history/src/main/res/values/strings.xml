@@ -13,4 +13,16 @@
     <string name="history_empty_title">No quizzes yet</string>
     <string name="history_empty_body">Finished games will show up here with their score and time.</string>
     <string name="history_empty_action">Start a quiz</string>
+    <string name="history_filter_open">Sort and filter</string>
+    <string name="history_sort">Sort</string>
+    <string name="history_sort_newest">Newest</string>
+    <string name="history_sort_best">Best score</string>
+    <string name="history_sort_fastest">Fastest (total time)</string>
+    <string name="history_filter_category">Category</string>
+    <string name="history_filter_mode">Mode</string>
+    <string name="history_mode_all">All</string>
+    <string name="history_reset">Reset</string>
+    <string name="history_no_matches">No matches</string>
+    <string name="history_no_matches_body">No games match these filters.</string>
+    <string name="history_clear_filters">Clear filters</string>
 </resources>

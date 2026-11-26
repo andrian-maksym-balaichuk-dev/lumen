@@ -8,6 +8,7 @@ import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
 import sk.mpage.lumen.core.domain.repository.SaveOutcome
+import sk.mpage.lumen.core.model.Category
 import sk.mpage.lumen.core.model.FinishedGame
 import sk.mpage.lumen.core.model.HistoryFilter
 import sk.mpage.lumen.core.model.QuizSession
@@ -34,8 +35,21 @@ public class FakeQuizHistoryRepository : QuizHistoryRepository {
 
     override fun observeSessions(filter: HistoryFilter): Flow<List<QuizSession>> {
         filters += filter
-        return sessions
+        return sessions.map { list ->
+            list.filter {
+                (filter.mode == null || it.config.mode == filter.mode) &&
+                    (filter.categoryId == null || it.config.categoryId == filter.categoryId)
+            }
+        }
     }
+
+    private val played = MutableStateFlow<List<Category>>(emptyList())
+
+    public fun emitPlayedCategories(value: List<Category>) {
+        played.value = value
+    }
+
+    override fun observePlayedCategories(): Flow<List<Category>> = played
 
     private val details = MutableStateFlow<Map<Long, QuizSessionDetail>>(emptyMap())
 

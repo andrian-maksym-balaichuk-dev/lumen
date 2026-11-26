@@ -16,6 +16,7 @@ import sk.mpage.lumen.core.data.mapper.toSessionEntity
 import sk.mpage.lumen.core.database.source.QuizHistoryLocalDataSource
 import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
 import sk.mpage.lumen.core.domain.repository.SaveOutcome
+import sk.mpage.lumen.core.model.Category
 import sk.mpage.lumen.core.model.FinishedGame
 import sk.mpage.lumen.core.model.HistoryFilter
 import sk.mpage.lumen.core.model.QuizSession
@@ -30,6 +31,9 @@ internal class RoomQuizHistoryRepository
     ) : QuizHistoryRepository {
         override fun observeSessions(filter: HistoryFilter): Flow<List<QuizSession>> =
             local.observeSessions(filter).map { sessions -> sessions.map { it.toSession() } }
+
+        override fun observePlayedCategories(): Flow<List<Category>> =
+            local.observePlayedCategories().map { played -> played.map { Category(it.id, it.name) } }
 
         override fun observeSessionDetail(sessionId: Long): Flow<QuizSessionDetail?> =
             local.observeSessionDetail(sessionId).map { it?.toDetail() }

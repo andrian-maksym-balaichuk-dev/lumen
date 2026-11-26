@@ -23,6 +23,8 @@ public object LumoraIcons {
 
     @DrawableRes public val TimerOff: Int = R.drawable.ic_timer_off
 
+    @DrawableRes public val Tune: Int = R.drawable.ic_tune
+
     @DrawableRes public val Flame: Int = R.drawable.ic_flame
 
     @DrawableRes public val CloudOff: Int = R.drawable.ic_cloud_off
