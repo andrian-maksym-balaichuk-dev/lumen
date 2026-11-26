@@ -6,9 +6,6 @@ plugins {
 
 android {
     namespace = "sk.mpage.lumen.core.database"
-    buildFeatures {
-        buildConfig = true
-    }
 }
 
 dependencies {
