@@ -13,6 +13,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +35,8 @@ public fun ErrorState(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
     @DrawableRes icon: Int = LumoraIcons.Error,
+    secondaryLabel: String? = null,
+    onSecondary: () -> Unit = {},
 ) {
     val colors = MaterialTheme.colorScheme
     Card(
@@ -60,12 +63,24 @@ public fun ErrorState(
                 )
             }
             Text(text = message, style = MaterialTheme.typography.bodyMedium)
-            Button(
-                onClick = onRetry,
+            Row(
                 modifier = Modifier.align(Alignment.End),
-                colors = ButtonDefaults.buttonColors(containerColor = colors.error, contentColor = colors.onError),
+                horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.sm),
             ) {
-                Text(retryLabel)
+                if (secondaryLabel != null) {
+                    TextButton(
+                        onClick = onSecondary,
+                        colors = ButtonDefaults.textButtonColors(contentColor = colors.onErrorContainer),
+                    ) {
+                        Text(secondaryLabel)
+                    }
+                }
+                Button(
+                    onClick = onRetry,
+                    colors = ButtonDefaults.buttonColors(containerColor = colors.error, contentColor = colors.onError),
+                ) {
+                    Text(retryLabel)
+                }
             }
         }
     }

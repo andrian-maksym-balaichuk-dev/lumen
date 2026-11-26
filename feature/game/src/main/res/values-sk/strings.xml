@@ -2,7 +2,6 @@
     <string name="game_close">Zavrieť hru</string>
     <string name="game_progress">%1$d / %2$d</string>
     <string name="game_progress_description">Otázka %1$d z %2$d</string>
-    <string name="game_progress_marathon">#%1$d</string>
     <string name="game_progress_marathon_description">Otázka %1$d</string>
     <string name="game_option_description">Možnosť %1$s, %2$s</string>
     <string name="game_option_correct">Vaša odpoveď, správna</string>
@@ -54,4 +53,13 @@
     <string name="game_quit_message">Táto hra sa neuloží.</string>
     <string name="game_quit_confirm">Ukončiť</string>
     <string name="game_quit_dismiss">Hrať ďalej</string>
+    <plurals name="result_in_a_row">
+        <item quantity="one">%d správna za sebou</item>
+        <item quantity="few">%d správne za sebou</item>
+        <item quantity="many">%d správnej za sebou</item>
+        <item quantity="other">%d správnych za sebou</item>
+    </plurals>
+    <string name="game_waiting">Načítavajú sa ďalšie otázky…</string>
+    <string name="game_stalled">Spojenie sa prerušilo</string>
+    <string name="game_quit_discard">Ukončiť a zahodiť</string>
 </resources>

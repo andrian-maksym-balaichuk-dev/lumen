@@ -2,7 +2,6 @@
     <string name="game_close">Close game</string>
     <string name="game_progress">%1$d / %2$d</string>
     <string name="game_progress_description">Question %1$d of %2$d</string>
-    <string name="game_progress_marathon">#%1$d</string>
     <string name="game_progress_marathon_description">Question %1$d</string>
     <string name="game_option_description">Option %1$s, %2$s</string>
     <string name="game_option_correct">Your answer, correct</string>
@@ -50,4 +49,11 @@
     <string name="game_quit_message">This game will not be saved.</string>
     <string name="game_quit_confirm">Quit</string>
     <string name="game_quit_dismiss">Keep playing</string>
+    <plurals name="result_in_a_row">
+        <item quantity="one">%d correct in a row</item>
+        <item quantity="other">%d correct in a row</item>
+    </plurals>
+    <string name="game_waiting">Loading more questions…</string>
+    <string name="game_stalled">Connection lost</string>
+    <string name="game_quit_discard">Quit and discard</string>
 </resources>

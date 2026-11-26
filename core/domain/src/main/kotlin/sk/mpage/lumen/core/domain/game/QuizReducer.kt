@@ -8,6 +8,8 @@ import sk.mpage.lumen.core.domain.game.QuizPhase.Loading
 import sk.mpage.lumen.core.domain.game.QuizPhase.Presenting
 import sk.mpage.lumen.core.domain.game.QuizPhase.Reveal
 import sk.mpage.lumen.core.domain.game.QuizPhase.Saving
+import sk.mpage.lumen.core.domain.game.QuizPhase.Stalled
+import sk.mpage.lumen.core.domain.game.QuizPhase.Waiting
 import sk.mpage.lumen.core.model.EndReason
 import sk.mpage.lumen.core.model.FinishedGame
 import sk.mpage.lumen.core.model.GameMode
@@ -22,7 +24,7 @@ public object QuizReducer {
         val phase = state.phase
         return when (action) {
             is QuizAction.QuestionLoaded -> {
-                if (phase !is Loading) return state
+                if (phase !is Loading && phase !is Waiting) return state
                 state.copy(phase = Presenting(action.question, action.presentationId))
             }
 
@@ -58,17 +60,22 @@ public object QuizReducer {
 
             QuizAction.Next -> {
                 if (phase !is Reveal) return state
-                state.copy(phase = phase.finished?.let(::Saving) ?: Loading)
+                val next = if (state.config.mode == GameMode.MARATHON) Waiting else Loading
+                state.copy(phase = phase.finished?.let(::Saving) ?: next)
             }
 
             is QuizAction.FeedFailed -> {
-                if (phase !is Loading) return state
-                state.copy(phase = LoadFailed(action.error))
+                when (phase) {
+                    Loading -> state.copy(phase = LoadFailed(action.error))
+                    Waiting -> state.copy(phase = Stalled(action.error))
+                    else -> state
+                }
             }
 
             QuizAction.Retry -> {
                 when (phase) {
                     is LoadFailed -> state.copy(phase = Loading)
+                    is Stalled -> state.copy(phase = Waiting)
                     is QuizPhase.SaveFailed -> state.copy(phase = Saving(phase.game))
                     else -> state
                 }
@@ -76,7 +83,8 @@ public object QuizReducer {
 
             QuizAction.QuitConfirmed -> {
                 val canQuit =
-                    phase is Loading || phase is LoadFailed || phase is Presenting || phase is Answering ||
+                    phase is Loading || phase is LoadFailed || phase is Waiting || phase is Stalled ||
+                        phase is Presenting || phase is Answering ||
                         (phase is Reveal && phase.finished == null)
                 if (canQuit) state.copy(phase = Abandoned) else state
             }
@@ -116,8 +124,12 @@ public object QuizReducer {
                 answeredAt = now.toInstant(),
             )
         val attempts = state.attempts + attempt
+        if (state.config.mode == GameMode.MARATHON && !attempt.isCorrect) {
+            val reason = if (selected == null) EndReason.TIMEOUT else EndReason.WRONG_ANSWER
+            return state.copy(attempts = attempts, phase = Saving(finish(state, attempts, nowMs, now, reason)))
+        }
         val isLast = state.config.mode == GameMode.CLASSIC && attempts.size == GameRules.CLASSIC_QUESTION_COUNT
-        val finished = if (isLast) finish(state, attempts, nowMs, now) else null
+        val finished = if (isLast) finish(state, attempts, nowMs, now, EndReason.COMPLETED) else null
         return state.copy(attempts = attempts, phase = Reveal(attempt, finished))
     }
 
@@ -126,6 +138,7 @@ public object QuizReducer {
         attempts: List<QuestionAttempt>,
         nowMs: Long,
         now: ZonedDateTime,
+        endReason: EndReason,
     ): FinishedGame {
         val elapsedMs = nowMs - (state.firstShownAtMs ?: nowMs)
         val finishedAt = now.toInstant()
@@ -137,7 +150,7 @@ public object QuizReducer {
             finishedAt = finishedAt,
             localDate = now.toLocalDate(),
             durationSeconds = elapsedMs / 1_000,
-            endReason = EndReason.COMPLETED,
+            endReason = endReason,
         )
     }
 }

@@ -126,7 +126,7 @@ internal class GameViewModel
             phaseJob?.cancel()
             phaseJob =
                 when (val phase = state.phase) {
-                    QuizPhase.Loading -> {
+                    QuizPhase.Loading, QuizPhase.Waiting -> {
                         viewModelScope.launch {
                             when (val result = feed.next()) {
                                 is FeedResult.Next -> {

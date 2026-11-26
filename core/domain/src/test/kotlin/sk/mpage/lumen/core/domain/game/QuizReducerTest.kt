@@ -246,6 +246,74 @@ class QuizReducerTest {
         assertEquals(state, Json.decodeFromString(QuizState.serializer(), json))
     }
 
+    @Test
+    fun `a wrong marathon answer saves immediately without a reveal`() {
+        val marathon = QuizState(config = CONFIG.copy(mode = GameMode.MARATHON), gameUuid = "m")
+        val state =
+            marathon.reduce(
+                QuizAction.QuestionLoaded(question(1), 1),
+                QuizAction.QuestionReady(1, 1_000),
+                QuizAction.AnswerSelected(WRONG, 1, 4_000, NOW),
+            )
+
+        val game = assertIs<Saving>(state.phase).game
+        assertEquals(EndReason.WRONG_ANSWER, game.endReason)
+        assertEquals(3, game.durationSeconds)
+        assertEquals(1, game.attempts.size)
+        assertSame(state, state.reduce(QuizAction.Next))
+        assertSame(state, state.reduce(QuizAction.QuitConfirmed))
+    }
+
+    @Test
+    fun `a marathon timeout ends the run`() {
+        val marathon = QuizState(config = CONFIG.copy(mode = GameMode.MARATHON), gameUuid = "m")
+        val state =
+            marathon.reduce(
+                QuizAction.QuestionLoaded(question(1), 1),
+                QuizAction.QuestionReady(1, 1_000),
+                QuizAction.TimeUp(1, 16_000, NOW),
+            )
+
+        assertEquals(EndReason.TIMEOUT, assertIs<Saving>(state.phase).game.endReason)
+    }
+
+    @Test
+    fun `a marathon keeps going past the classic length while answers are correct`() {
+        val marathon = QuizState(config = CONFIG.copy(mode = GameMode.MARATHON), gameUuid = "m")
+        val state =
+            (1..60).fold(marathon) { current, id ->
+                val loaded = if (id == 1) current else current.reduce(QuizAction.Next)
+                loaded.reduce(
+                    QuizAction.QuestionLoaded(question(id), id),
+                    QuizAction.QuestionReady(id, id * 10_000L),
+                    QuizAction.AnswerSelected(CORRECT, id, id * 10_000L + 1_000, NOW),
+                )
+            }
+
+        assertEquals(60, state.attempts.size)
+        assertNull(assertIs<Reveal>(state.phase).finished)
+    }
+
+    @Test
+    fun `a dry marathon buffer waits, stalls on failure and can retry or quit`() {
+        val marathon = QuizState(config = CONFIG.copy(mode = GameMode.MARATHON), gameUuid = "m")
+        val waiting =
+            marathon.reduce(
+                QuizAction.QuestionLoaded(question(1), 1),
+                QuizAction.QuestionReady(1, 1_000),
+                QuizAction.AnswerSelected(CORRECT, 1, 2_000, NOW),
+                QuizAction.Next,
+            )
+        assertEquals(QuizPhase.Waiting, waiting.phase)
+
+        val stalled = waiting.reduce(QuizAction.FeedFailed(DataError.NoInternet))
+        assertEquals(QuizPhase.Stalled(DataError.NoInternet), stalled.phase)
+        assertEquals(QuizPhase.Waiting, stalled.reduce(QuizAction.Retry).phase)
+        assertEquals(Abandoned, stalled.reduce(QuizAction.QuitConfirmed).phase)
+        assertIs<Presenting>(waiting.reduce(QuizAction.QuestionLoaded(question(2), 2)).phase)
+        assertEquals(1, stalled.attempts.size)
+    }
+
     private fun playClassic(
         answers: Int,
         lastNowMs: Long,

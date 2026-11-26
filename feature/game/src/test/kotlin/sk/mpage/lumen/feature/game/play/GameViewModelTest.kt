@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.domain.usecase.SaveQuizResultUseCase
+import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.testing.MainDispatcherRule
 import sk.mpage.lumen.core.testing.TestMonotonicClock
 import sk.mpage.lumen.core.testing.data.TestData
@@ -203,5 +204,35 @@ class GameViewModelTest {
             }
             assertTrue(history.saved.isEmpty())
             assertTrue(feed.closed)
+        }
+
+    @Test
+    fun `a marathon that runs dry stalls without a timer and can be discarded`() =
+        runTest {
+            val marathonFeed = FakeQuestionFeed(TestData.questions(1))
+            val viewModel =
+                GameViewModel(
+                    config = TestData.classicConfig.copy(mode = GameMode.MARATHON),
+                    questions = FakeQuestionRepository(marathonFeed),
+                    saveResult = SaveQuizResultUseCase(history),
+                    monotonicClock = TestMonotonicClock(testScheduler),
+                    clock = Clock.fixed(Instant.parse("2026-11-26T12:00:00Z"), ZoneOffset.UTC),
+                )
+            runCurrent()
+            show(viewModel)
+            marathonFeed.failNext(DataError.NoInternet)
+            viewModel.onAction(GameAction.OptionTapped("Right 1", 1))
+            advanceTimeBy(1_201)
+            runCurrent()
+
+            assertEquals(GameUiState.Stalled(DataError.NoInternet), viewModel.uiState.value)
+            val left = viewModel.remainingMs.value
+            advanceTimeBy(30_000)
+            runCurrent()
+            assertEquals(left, viewModel.remainingMs.value)
+
+            viewModel.onAction(GameAction.QuitConfirmed)
+            runCurrent()
+            assertTrue(history.saved.isEmpty())
         }
 }

@@ -112,10 +112,22 @@ private fun ScoreBlock(state: ResultUiState.Content) {
     ) {
         ProfileAvatar(avatar = state.avatar, contentDescription = null, size = Lumora.sizes.xxl)
         Text(
-            text = stringResource(R.string.result_score, state.correct, state.total),
+            text =
+                if (state.config.mode == GameMode.MARATHON) {
+                    state.correct.toString()
+                } else {
+                    stringResource(R.string.result_score, state.correct, state.total)
+                },
             style = MaterialTheme.typography.displayLarge,
             color = MaterialTheme.colorScheme.onBackground,
         )
+        if (state.config.mode == GameMode.MARATHON) {
+            Text(
+                text = pluralStringResource(R.plurals.result_in_a_row, state.correct, state.correct),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         Text(
             text =
                 stringResource(

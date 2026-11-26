@@ -20,6 +20,14 @@ internal object QuizStateMapper {
                 GameUiState.LoadFailed(phase.error)
             }
 
+            QuizPhase.Waiting -> {
+                GameUiState.Waiting
+            }
+
+            is QuizPhase.Stalled -> {
+                GameUiState.Stalled(phase.error)
+            }
+
             is QuizPhase.Presenting -> {
                 playing(state, phase.question, phase.presentationId, null, accepts = false)
             }

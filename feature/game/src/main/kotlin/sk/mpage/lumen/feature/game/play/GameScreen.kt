@@ -10,10 +10,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.delay
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.designsystem.component.AnswerState
 import sk.mpage.lumen.core.designsystem.component.ErrorState
@@ -53,6 +59,28 @@ internal fun GameScreen(
 
                 GameUiState.Saving -> {
                     Waiting(stringResource(R.string.game_saving))
+                }
+
+                GameUiState.Waiting -> {
+                    var showSpinner by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) {
+                        delay(WAITING_SPINNER_DELAY_MS)
+                        showSpinner = true
+                    }
+                    if (showSpinner) Waiting(stringResource(R.string.game_waiting))
+                }
+
+                is GameUiState.Stalled -> {
+                    ErrorState(
+                        title = stringResource(R.string.game_stalled),
+                        message = state.error.toUiText().asString(),
+                        retryLabel = stringResource(R.string.game_retry),
+                        onRetry = { onAction(GameAction.RetryTapped) },
+                        icon = if (state.error == DataError.NoInternet) LumoraIcons.CloudOff else LumoraIcons.Error,
+                        secondaryLabel = stringResource(R.string.game_quit_discard),
+                        onSecondary = { onAction(GameAction.QuitConfirmed) },
+                        modifier = Modifier.align(Alignment.Center).padding(Lumora.spacing.gutterCompact),
+                    )
                 }
 
                 is GameUiState.SaveFailed -> {
@@ -145,6 +173,16 @@ private fun GameLoadFailedPreview() {
         )
     }
 }
+
+@LumoraPreviews
+@Composable
+private fun GameStalledPreview() {
+    PreviewSurface {
+        GameScreen(state = GameUiState.Stalled(DataError.NoInternet), remainingMs = { 0 }, onAction = {}, onClose = {})
+    }
+}
+
+private const val WAITING_SPINNER_DELAY_MS = 400L
 
 private val PreviewPlaying =
     GameUiState.Playing(

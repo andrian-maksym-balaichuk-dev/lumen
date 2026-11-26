@@ -27,6 +27,14 @@ public sealed interface QuizPhase {
     ) : QuizPhase
 
     @Serializable
+    public data object Waiting : QuizPhase
+
+    @Serializable
+    public data class Stalled(
+        val error: DataError,
+    ) : QuizPhase
+
+    @Serializable
     public data class Presenting(
         val question: Question,
         val presentationId: Int,

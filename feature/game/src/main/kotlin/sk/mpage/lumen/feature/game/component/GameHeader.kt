@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import sk.mpage.lumen.core.designsystem.component.MarathonProgressPill
 import sk.mpage.lumen.core.designsystem.component.ProgressPill
 import sk.mpage.lumen.core.designsystem.component.TimerRing
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
@@ -31,22 +32,20 @@ internal fun GameHeader(
             Icon(painterResource(LumoraIcons.Close), contentDescription = stringResource(R.string.game_close))
         }
         if (position != null) {
-            ProgressPill(
-                progress = if (total != null) position.toFloat() / total else 1f,
-                label =
-                    if (total != null) {
-                        stringResource(R.string.game_progress, position, total)
-                    } else {
-                        stringResource(R.string.game_progress_marathon, position)
-                    },
-                description =
-                    if (total != null) {
-                        stringResource(R.string.game_progress_description, position, total)
-                    } else {
-                        stringResource(R.string.game_progress_marathon_description, position)
-                    },
-                modifier = Modifier.align(Alignment.Center),
-            )
+            if (total != null) {
+                ProgressPill(
+                    progress = position.toFloat() / total,
+                    label = stringResource(R.string.game_progress, position, total),
+                    description = stringResource(R.string.game_progress_description, position, total),
+                    modifier = Modifier.align(Alignment.Center),
+                )
+            } else {
+                MarathonProgressPill(
+                    count = position,
+                    description = stringResource(R.string.game_progress_marathon_description, position),
+                    modifier = Modifier.align(Alignment.Center),
+                )
+            }
             TimerRing(
                 remainingMs = remainingMs,
                 totalMs = GameRules.QUESTION_TIME_LIMIT_MS,

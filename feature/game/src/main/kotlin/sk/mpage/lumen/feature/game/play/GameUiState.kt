@@ -13,6 +13,12 @@ internal sealed interface GameUiState {
         val error: DataError,
     ) : GameUiState
 
+    data object Waiting : GameUiState
+
+    data class Stalled(
+        val error: DataError,
+    ) : GameUiState
+
     data class Playing(
         val position: Int,
         val total: Int?,
