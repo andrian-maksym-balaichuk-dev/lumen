@@ -11,6 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import dev.chrisbanes.haze.rememberHazeState
+import sk.mpage.lumen.R
 import sk.mpage.lumen.core.designsystem.component.AuraBackground
 import sk.mpage.lumen.core.designsystem.component.LocalHazeState
 import sk.mpage.lumen.core.designsystem.component.LumoraDock
@@ -22,6 +23,7 @@ import sk.mpage.lumen.ui.navigation.Navigator
 @Composable
 internal fun LumenRoot(
     startKey: NavKey,
+    streakAtRisk: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val backStack = rememberNavBackStack(startKey)
@@ -37,7 +39,13 @@ internal fun LumenRoot(
                 LumoraDock(
                     items =
                         TopLevelDestination.entries.map { destination ->
-                            LumoraDockItem(stringResource(destination.labelRes), destination.iconRes)
+                            LumoraDockItem(
+                                label = stringResource(destination.labelRes),
+                                iconRes = destination.iconRes,
+                                badgeDescription =
+                                    stringResource(R.string.awards_streak_at_risk)
+                                        .takeIf { streakAtRisk && destination == TopLevelDestination.AWARDS },
+                            )
                         },
                     selectedIndex = TopLevelDestination.entries.indexOf(current),
                     onItemSelected = { navigator.selectTab(TopLevelDestination.entries[it]) },

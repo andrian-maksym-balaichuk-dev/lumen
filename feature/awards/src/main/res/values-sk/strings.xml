@@ -1,0 +1,13 @@
+<resources>
+    <string name="awards_title">Ocenenia</string>
+    <string name="awards_marathon_best">Rekord v maratóne</string>
+    <string name="awards_best_streak">Najdlhšia séria</string>
+    <string name="awards_challenges_done">Splnené výzvy</string>
+    <string name="awards_games_played">Odohrané hry</string>
+    <plurals name="awards_days">
+        <item quantity="one">%d deň</item>
+        <item quantity="few">%d dni</item>
+        <item quantity="many">%d dňa</item>
+        <item quantity="other">%d dní</item>
+    </plurals>
+</resources>

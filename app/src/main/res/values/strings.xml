@@ -4,4 +4,5 @@
     <string name="tab_history">History</string>
     <string name="tab_awards">Awards</string>
     <string name="tab_profile">Profile</string>
+    <string name="awards_streak_at_risk">Streak at risk</string>
 </resources>

@@ -44,4 +44,15 @@
     <string name="share_difficulty_easy">Easy</string>
     <string name="share_difficulty_medium">Medium</string>
     <string name="share_difficulty_hard">Hard</string>
+    <string name="streak_title">7 in a row</string>
+    <plurals name="streak_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <string name="streak_summary">Streak %1$d of 7 days. %2$s</string>
+    <string name="streak_today_played">Today played.</string>
+    <string name="streak_today_not_played">Today not yet played.</string>
+    <string name="streak_hint_pending" formatted="false">Play today with 80 % or more</string>
+    <string name="streak_hint_at_risk" formatted="false">Play today with 80 % or more to keep your streak</string>
+    <string name="streak_hint_done">Today counts. Come back tomorrow.</string>
 </resources>

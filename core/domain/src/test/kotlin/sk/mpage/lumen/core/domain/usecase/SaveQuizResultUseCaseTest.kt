@@ -48,6 +48,10 @@ class SaveQuizResultUseCaseTest {
 
             override fun observeQualifyingDays() = emptyFlow<List<LocalDate>>()
 
+            override fun observeMarathonBest() = emptyFlow<Int?>()
+
+            override fun observeGameCount() = emptyFlow<Int>()
+
             override suspend fun save(game: FinishedGame) = result
         }
 

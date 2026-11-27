@@ -19,6 +19,7 @@ dependencies {
     implementation(projects.core.data)
     implementation(projects.core.designsystem)
     implementation(projects.core.domain)
+    implementation(projects.feature.awards)
     implementation(projects.feature.game)
     implementation(projects.feature.history)
     implementation(projects.feature.lobby)

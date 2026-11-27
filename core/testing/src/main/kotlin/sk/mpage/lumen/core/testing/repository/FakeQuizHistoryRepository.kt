@@ -68,6 +68,16 @@ public class FakeQuizHistoryRepository : QuizHistoryRepository {
 
     override fun observeQualifyingDays(): Flow<List<LocalDate>> = qualifyingDays
 
+    private val marathonBest = MutableStateFlow<Int?>(null)
+
+    public fun emitMarathonBest(value: Int?) {
+        marathonBest.value = value
+    }
+
+    override fun observeMarathonBest(): Flow<Int?> = marathonBest
+
+    override fun observeGameCount(): Flow<Int> = sessions.map { it.size }
+
     override suspend fun save(game: FinishedGame): AppResult<SaveOutcome> {
         failures.removeFirstOrNull()?.let { return AppResult.Failure(it) }
         val existing = games.indexOfFirst { it.gameUuid == game.gameUuid }

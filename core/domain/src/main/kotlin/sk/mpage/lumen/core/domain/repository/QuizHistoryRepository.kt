@@ -18,6 +18,10 @@ public interface QuizHistoryRepository {
 
     public fun observeQualifyingDays(): Flow<List<LocalDate>>
 
+    public fun observeMarathonBest(): Flow<Int?>
+
+    public fun observeGameCount(): Flow<Int>
+
     public suspend fun save(game: FinishedGame): AppResult<SaveOutcome>
 }
 

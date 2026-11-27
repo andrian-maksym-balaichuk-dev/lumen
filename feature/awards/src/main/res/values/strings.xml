@@ -1,0 +1,12 @@
+<resources>
+    <string name="awards_title">Awards</string>
+    <string name="awards_marathon_best">Marathon best</string>
+    <string name="awards_no_record" translatable="false">–</string>
+    <string name="awards_best_streak">Best streak</string>
+    <string name="awards_challenges_done">Challenges done</string>
+    <string name="awards_games_played">Games played</string>
+    <plurals name="awards_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+</resources>

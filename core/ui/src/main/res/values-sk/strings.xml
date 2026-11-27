@@ -46,4 +46,17 @@
     <string name="share_difficulty_easy">Ľahká</string>
     <string name="share_difficulty_medium">Stredná</string>
     <string name="share_difficulty_hard">Ťažká</string>
+    <string name="streak_title">7 v rade</string>
+    <plurals name="streak_days">
+        <item quantity="one">%d deň</item>
+        <item quantity="few">%d dni</item>
+        <item quantity="many">%d dňa</item>
+        <item quantity="other">%d dní</item>
+    </plurals>
+    <string name="streak_summary">Séria %1$d zo 7 dní. %2$s</string>
+    <string name="streak_today_played">Dnes odohraté.</string>
+    <string name="streak_today_not_played">Dnes ešte neodohraté.</string>
+    <string name="streak_hint_pending" formatted="false">Zahraj si dnes s úspešnosťou aspoň 80 %</string>
+    <string name="streak_hint_at_risk" formatted="false">Zahraj si dnes aspoň na 80 %, nech neprídeš o sériu</string>
+    <string name="streak_hint_done">Dnešok sa počíta. Vráť sa zajtra.</string>
 </resources>

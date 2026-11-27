@@ -25,11 +25,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val startup by viewModel.uiState.collectAsStateWithLifecycle()
+            val streakAtRisk by viewModel.streakAtRisk.collectAsStateWithLifecycle()
             LumoraTheme {
                 when (startup) {
                     StartupUiState.Loading -> Unit
-                    StartupUiState.NeedsOnboarding -> LumenRoot(startKey = OnboardingKey)
-                    StartupUiState.Ready -> LumenRoot(startKey = LobbyKey)
+                    StartupUiState.NeedsOnboarding -> LumenRoot(startKey = OnboardingKey, streakAtRisk = streakAtRisk)
+                    StartupUiState.Ready -> LumenRoot(startKey = LobbyKey, streakAtRisk = streakAtRisk)
                 }
             }
         }

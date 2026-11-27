@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -56,6 +58,7 @@ import sk.mpage.lumen.core.designsystem.theme.Lumora
 public data class LumoraDockItem(
     val label: String,
     @param:DrawableRes val iconRes: Int,
+    val badgeDescription: String? = null,
 )
 
 /** Floating navigation chrome. Selection and navigation remain owned by the caller. */
@@ -129,16 +132,28 @@ public fun LumoraDock(
                             colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent),
                             icon = {
                                 Column(
-                                    modifier = Modifier.clearAndSetSemantics { contentDescription = item.label },
+                                    modifier =
+                                        Modifier.clearAndSetSemantics {
+                                            contentDescription =
+                                                listOfNotNull(item.label, item.badgeDescription).joinToString()
+                                        },
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.spacedBy(spacing.xxs),
                                 ) {
-                                    Icon(
-                                        painter = painterResource(item.iconRes),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(Lumora.sizes.xs),
-                                        tint = color,
-                                    )
+                                    BadgedBox(
+                                        badge = {
+                                            if (item.badgeDescription != null) {
+                                                Badge(containerColor = Lumora.colors.streakFlame)
+                                            }
+                                        },
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(item.iconRes),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(Lumora.sizes.xs),
+                                            tint = color,
+                                        )
+                                    }
                                     if (showLabels) {
                                         Text(
                                             text = item.label,
@@ -174,7 +189,7 @@ private fun LumoraDockPreview() {
                     listOf(
                         LumoraDockItem("Play", LumoraIcons.Play),
                         LumoraDockItem("History", LumoraIcons.History),
-                        LumoraDockItem("Awards", LumoraIcons.Awards),
+                        LumoraDockItem("Awards", LumoraIcons.Awards, badgeDescription = "Streak at risk"),
                         LumoraDockItem("Profile", LumoraIcons.Profile),
                     ),
                 selectedIndex = selectedIndex,

@@ -17,6 +17,8 @@ public object LumoraIcons {
 
     @DrawableRes public val CheckCircle: Int = R.drawable.ic_check_circle
 
+    @DrawableRes public val Check: Int = R.drawable.ic_check
+
     @DrawableRes public val Cancel: Int = R.drawable.ic_cancel
 
     @DrawableRes public val ArrowForward: Int = R.drawable.ic_arrow_forward

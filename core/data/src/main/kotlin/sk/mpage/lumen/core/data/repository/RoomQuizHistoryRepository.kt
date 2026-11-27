@@ -43,6 +43,10 @@ internal class RoomQuizHistoryRepository
         override fun observeQualifyingDays(): Flow<List<LocalDate>> =
             local.observeQualifyingDays(GameRules.QUALIFYING_PERCENT)
 
+        override fun observeMarathonBest(): Flow<Int?> = local.observeMarathonBest()
+
+        override fun observeGameCount(): Flow<Int> = local.observeCount()
+
         override suspend fun save(game: FinishedGame): AppResult<SaveOutcome> =
             withContext(io) {
                 try {
