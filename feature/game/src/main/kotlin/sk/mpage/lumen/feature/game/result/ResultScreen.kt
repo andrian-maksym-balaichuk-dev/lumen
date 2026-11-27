@@ -3,7 +3,9 @@ package sk.mpage.lumen.feature.game.result
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -164,8 +166,15 @@ private fun Stats(
 ) {
     val locale = LocalConfiguration.current.locales[0]
     Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.sm)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.sm)) {
-            StatTile(stringResource(R.string.result_correct), state.correct.toString(), Modifier.weight(1f))
+        Row(
+            modifier = Modifier.height(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.sm),
+        ) {
+            StatTile(
+                stringResource(R.string.result_correct),
+                state.correct.toString(),
+                Modifier.weight(1f).fillMaxHeight(),
+            )
             StatTile(
                 label = stringResource(R.string.result_wrong),
                 value = state.wrong.toString(),
@@ -175,20 +184,27 @@ private fun Stats(
                     } else {
                         null
                     },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
             )
-            StatTile(stringResource(R.string.result_accuracy), "${state.percent} %", Modifier.weight(1f))
+            StatTile(
+                stringResource(R.string.result_accuracy),
+                "${state.percent} %",
+                Modifier.weight(1f).fillMaxHeight(),
+            )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.sm)) {
+        Row(
+            modifier = Modifier.height(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.sm),
+        ) {
             StatTile(
                 stringResource(R.string.result_total_time),
                 formatDuration(state.durationSeconds),
-                Modifier.weight(1f),
+                Modifier.weight(1f).fillMaxHeight(),
             )
             StatTile(
                 stringResource(R.string.result_average_time),
                 stringResource(R.string.result_seconds, formatSeconds(state.averageAnswerMs, locale)),
-                Modifier.weight(1f),
+                Modifier.weight(1f).fillMaxHeight(),
             )
         }
         Text(
