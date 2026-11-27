@@ -14,12 +14,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import sk.mpage.lumen.core.domain.port.TodayProvider
 import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
 import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.model.HistoryFilter
 import sk.mpage.lumen.core.model.HistorySort
 import sk.mpage.lumen.core.model.QuizSession
-import java.time.Clock
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -29,7 +29,7 @@ internal class HistoryViewModel
     constructor(
         history: QuizHistoryRepository,
         private val savedStateHandle: SavedStateHandle,
-        private val clock: Clock,
+        todayProvider: TodayProvider,
     ) : ViewModel() {
         private val filter = MutableStateFlow(restoreFilter())
 
@@ -37,11 +37,19 @@ internal class HistoryViewModel
         val uiState: StateFlow<HistoryUiState> =
             filter
                 .flatMapLatest { current ->
-                    combine(history.observeSessions(current), history.observePlayedCategories()) { sessions, played ->
+                    combine(
+                        history.observeSessions(current),
+                        history.observePlayedCategories(),
+                        todayProvider.today,
+                    ) { sessions, played, today ->
                         if (sessions.isEmpty() && current == HistoryFilter.Default) {
                             HistoryUiState.Empty
                         } else {
-                            HistoryUiState.Content(current, played.toImmutableList(), items(sessions, current.sort))
+                            HistoryUiState.Content(
+                                current,
+                                played.toImmutableList(),
+                                items(sessions, current.sort, today),
+                            )
                         }
                     }
                 }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HistoryUiState.Loading)
@@ -77,9 +85,9 @@ internal class HistoryViewModel
         private fun items(
             sessions: List<QuizSession>,
             sort: HistorySort,
+            today: LocalDate,
         ): ImmutableList<HistoryListItem> {
             if (sort != HistorySort.NEWEST) return sessions.map(HistoryListItem::Session).toImmutableList()
-            val today = LocalDate.now(clock)
             return sessions
                 .groupBy { it.localDate }
                 .flatMap { (date, daySessions) ->
