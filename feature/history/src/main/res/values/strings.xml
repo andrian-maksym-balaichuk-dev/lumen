@@ -17,7 +17,8 @@
     <string name="history_sort">Sort</string>
     <string name="history_sort_newest">Newest</string>
     <string name="history_sort_best">Best score</string>
-    <string name="history_sort_fastest">Fastest (total time)</string>
+    <string name="history_sort_fastest">Fastest</string>
+    <string name="history_sort_fastest_info">By total game time, from start to the last answer.</string>
     <string name="history_filter_category">Category</string>
     <string name="history_filter_mode">Mode</string>
     <string name="history_mode_all">All</string>

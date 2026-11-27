@@ -50,7 +50,7 @@ import sk.mpage.lumen.core.model.QuizSession
 import sk.mpage.lumen.feature.history.R
 import sk.mpage.lumen.feature.history.component.FilterSortSheet
 import sk.mpage.lumen.feature.history.component.HistoryItem
-import sk.mpage.lumen.feature.history.component.ModeChips
+import sk.mpage.lumen.feature.history.component.ModeSelector
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -114,7 +114,7 @@ internal fun HistoryScreen(
                         verticalArrangement = Arrangement.spacedBy(Lumora.spacing.sm),
                     ) {
                         item {
-                            ModeChips(
+                            ModeSelector(
                                 mode = state.filter.mode,
                                 onModeChanged = { onAction(HistoryAction.ModeChanged(it)) },
                                 modifier = Modifier.widthIn(max = Lumora.spacing.contentMaxWidth).fillMaxWidth(),

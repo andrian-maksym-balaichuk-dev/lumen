@@ -96,7 +96,8 @@ public fun AnswerOptionCard(
                 Box(contentAlignment = Alignment.Center) {
                     Text(
                         text = letter,
-                        style = if (compact) MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelLarge,
+                        style =
+                            if (compact) MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelLarge,
                     )
                 }
             }
@@ -107,7 +108,11 @@ public fun AnswerOptionCard(
             )
             Box(Modifier.size(Lumora.sizes.xs)) {
                 if (style.icon != null) {
-                    Icon(painterResource(style.icon), contentDescription = null, modifier = Modifier.size(Lumora.sizes.xs))
+                    Icon(
+                        painterResource(style.icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(Lumora.sizes.xs),
+                    )
                 }
             }
         }

@@ -25,8 +25,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -131,7 +131,8 @@ internal fun LobbyScreen(
                             top = topPadding,
                             start = padding.calculateStartPadding(layoutDirection),
                             end = padding.calculateEndPadding(layoutDirection),
-                            bottom = padding.calculateBottomPadding() + if (compactHeight) LumoraDockClearance else 0.dp,
+                            bottom =
+                                padding.calculateBottomPadding() + if (compactHeight) LumoraDockClearance else 0.dp,
                         ),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -139,34 +140,34 @@ internal fun LobbyScreen(
                     visible = state.isOffline,
                     modifier = Modifier.padding(horizontal = Lumora.spacing.gutterCompact),
                 )
-                    LumoraFlex(
-                        itemsFor = { columns ->
-                            val mode: @Composable () -> Unit = { ModeSection(state, onAction) }
-                            val difficulty: @Composable () -> Unit = { DifficultySection(state, onAction) }
-                            val type: @Composable () -> Unit = { TypeSection(state, onAction) }
-                            val category: @Composable () -> Unit = { CategorySection(state, onAction) }
-                            val start: @Composable () -> Unit = { StartButton(state, onAction) }
-                            if (columns >= 2) {
-                                listOf(
-                                    {
-                                        Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xxl)) {
-                                            mode()
-                                            difficulty()
-                                            type()
-                                            if (compactHeight) start()
-                                        }
-                                    },
-                                    category,
-                                )
-                            } else {
-                                listOfNotNull(mode, difficulty, type, category, start.takeIf { compactHeight })
-                            }
-                        },
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.lg),
-                    )
+                LumoraFlex(
+                    itemsFor = { columns ->
+                        val mode: @Composable () -> Unit = { ModeSection(state, onAction) }
+                        val difficulty: @Composable () -> Unit = { DifficultySection(state, onAction) }
+                        val type: @Composable () -> Unit = { TypeSection(state, onAction) }
+                        val category: @Composable () -> Unit = { CategorySection(state, onAction) }
+                        val start: @Composable () -> Unit = { StartButton(state, onAction) }
+                        if (columns >= 2) {
+                            listOf(
+                                {
+                                    Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xxl)) {
+                                        mode()
+                                        difficulty()
+                                        type()
+                                        if (compactHeight) start()
+                                    }
+                                },
+                                category,
+                            )
+                        } else {
+                            listOfNotNull(mode, difficulty, type, category, start.takeIf { compactHeight })
+                        }
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.lg),
+                )
             }
         }
     }

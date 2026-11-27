@@ -17,7 +17,8 @@
     <string name="history_sort">Zoradiť</string>
     <string name="history_sort_newest">Najnovšie</string>
     <string name="history_sort_best">Najlepšie skóre</string>
-    <string name="history_sort_fastest">Najrýchlejšie (celkový čas)</string>
+    <string name="history_sort_fastest">Najrýchlejšie</string>
+    <string name="history_sort_fastest_info">Podľa celkového času hry, od začiatku po poslednú odpoveď.</string>
     <string name="history_filter_category">Kategória</string>
     <string name="history_filter_mode">Režim</string>
     <string name="history_mode_all">Všetky</string>
