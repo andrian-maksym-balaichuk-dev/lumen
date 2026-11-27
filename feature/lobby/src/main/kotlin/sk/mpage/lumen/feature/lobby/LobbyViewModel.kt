@@ -21,8 +21,10 @@ import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.domain.port.NetworkMonitor
 import sk.mpage.lumen.core.domain.repository.CategoryRepository
+import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
 import sk.mpage.lumen.core.domain.repository.SettingsRepository
 import sk.mpage.lumen.core.domain.repository.UserProfileRepository
+import sk.mpage.lumen.core.domain.usecase.ObserveStreakUseCase
 import sk.mpage.lumen.core.model.Category
 import sk.mpage.lumen.core.model.QuizConfig
 import sk.mpage.lumen.core.ui.toUiText
@@ -38,6 +40,8 @@ internal class LobbyViewModel
         private val categories: CategoryRepository,
         network: NetworkMonitor,
         private val settings: SettingsRepository,
+        observeStreak: ObserveStreakUseCase,
+        history: QuizHistoryRepository,
         clock: Clock,
     ) : ViewModel() {
         private val selection = MutableStateFlow(LobbyUiState(greeting = Greeting.at(LocalTime.now(clock))))
@@ -64,6 +68,8 @@ internal class LobbyViewModel
                     isRefreshing = refreshState.isRunning && list.isNotEmpty(),
                     isOffline = !isOnline,
                 )
+            }.combine(combine(observeStreak(), history.observeMarathonBest(), ::Pair)) { state, (streak, best) ->
+                state.copy(streak = streak, marathonBest = best)
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), selection.value)
 
         init {

@@ -10,6 +10,7 @@ import sk.mpage.lumen.feature.lobby.R
 @Composable
 internal fun ModeSelector(
     mode: GameMode,
+    marathonBest: Int?,
     onSelect: (GameMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -21,6 +22,7 @@ internal fun ModeSelector(
                 GameMode.MARATHON -> stringResource(R.string.lobby_mode_marathon_info)
             },
         modifier = modifier,
+        trailing = { if (marathonBest != null) PersonalBestBadge(marathonBest) },
     ) {
         LumoraSegmented(
             options = GameMode.entries,

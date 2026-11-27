@@ -8,6 +8,7 @@ import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.model.QuestionType
 import sk.mpage.lumen.core.model.QuizConfig
+import sk.mpage.lumen.core.model.StreakState
 import sk.mpage.lumen.core.ui.UiText
 import java.time.LocalTime
 
@@ -52,6 +53,8 @@ internal data class LobbyUiState(
     val categories: CategoriesUiState = CategoriesUiState.Loading,
     val isRefreshing: Boolean = false,
     val isOffline: Boolean = false,
+    val streak: StreakState? = null,
+    val marathonBest: Int? = null,
 )
 
 internal sealed interface LobbyAction {

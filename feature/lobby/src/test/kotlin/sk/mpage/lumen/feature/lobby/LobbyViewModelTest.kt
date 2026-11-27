@@ -11,6 +11,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import sk.mpage.lumen.core.common.result.DataError
+import sk.mpage.lumen.core.domain.usecase.CalculateStreakUseCase
+import sk.mpage.lumen.core.domain.usecase.ObserveStreakUseCase
 import sk.mpage.lumen.core.model.AppSettings
 import sk.mpage.lumen.core.model.Avatar
 import sk.mpage.lumen.core.model.Category
@@ -22,10 +24,13 @@ import sk.mpage.lumen.core.model.UserProfile
 import sk.mpage.lumen.core.testing.MainDispatcherRule
 import sk.mpage.lumen.core.testing.port.FakeNetworkMonitor
 import sk.mpage.lumen.core.testing.repository.FakeCategoryRepository
+import sk.mpage.lumen.core.testing.repository.FakeQuizHistoryRepository
 import sk.mpage.lumen.core.testing.repository.FakeSettingsRepository
 import sk.mpage.lumen.core.testing.repository.FakeUserProfileRepository
+import sk.mpage.lumen.core.testing.time.FakeTodayProvider
 import sk.mpage.lumen.core.ui.toUiText
 import java.time.Clock
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
@@ -47,10 +52,36 @@ class LobbyViewModelTest {
 
     private var categories = FakeCategoryRepository(cached = listOf(GENERAL, BOOKS))
 
+    private val history = FakeQuizHistoryRepository()
+
+    private val today = LocalDate.of(2026, 11, 25)
+
     private fun viewModel(at: LocalTime = LocalTime.NOON): LobbyViewModel {
         val instant = LocalDateTime.of(2026, 11, 25, at.hour, at.minute).toInstant(ZoneOffset.UTC)
-        return LobbyViewModel(profiles, categories, network, settings, Clock.fixed(instant, ZoneOffset.UTC))
+        val streak = ObserveStreakUseCase(history, FakeTodayProvider(today), CalculateStreakUseCase())
+        return LobbyViewModel(
+            profiles,
+            categories,
+            network,
+            settings,
+            streak,
+            history,
+            Clock.fixed(instant, ZoneOffset.UTC),
+        )
     }
+
+    @Test
+    fun `the lobby shows the streak and the marathon personal best`() =
+        runTest {
+            history.emitQualifyingDays(listOf(today.minusDays(1), today.minusDays(2)))
+            history.emitMarathonBest(23)
+            val viewModel = started(viewModel())
+
+            val state = viewModel.uiState.value
+            assertEquals(2, state.streak?.current)
+            assertEquals(true, state.streak?.atRisk)
+            assertEquals(23, state.marathonBest)
+        }
 
     private fun TestScope.started(viewModel: LobbyViewModel): LobbyViewModel {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }

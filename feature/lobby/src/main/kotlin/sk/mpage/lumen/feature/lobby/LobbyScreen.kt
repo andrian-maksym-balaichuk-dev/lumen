@@ -53,6 +53,7 @@ import sk.mpage.lumen.core.model.Category
 import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.QuestionType
 import sk.mpage.lumen.core.ui.ProfileAvatar
+import sk.mpage.lumen.core.ui.StreakCard
 import sk.mpage.lumen.feature.lobby.component.CategorySelector
 import sk.mpage.lumen.feature.lobby.component.DifficultySelector
 import sk.mpage.lumen.feature.lobby.component.ModeSelector
@@ -140,6 +141,16 @@ internal fun LobbyScreen(
                     visible = state.isOffline,
                     modifier = Modifier.padding(horizontal = Lumora.spacing.gutterCompact),
                 )
+                if (state.streak != null) {
+                    StreakCard(
+                        streak = state.streak,
+                        modifier =
+                            Modifier
+                                .padding(horizontal = Lumora.spacing.gutterCompact)
+                                .padding(top = Lumora.spacing.lg)
+                                .widthIn(max = Lumora.spacing.contentMaxWidth),
+                    )
+                }
                 LumoraFlex(
                     itemsFor = { columns ->
                         val mode: @Composable () -> Unit = { ModeSection(state, onAction) }
@@ -192,7 +203,7 @@ private fun ModeSection(
     state: LobbyUiState,
     onAction: (LobbyAction) -> Unit,
 ) {
-    ModeSelector(state.mode, onSelect = { onAction(LobbyAction.ModeSelected(it)) })
+    ModeSelector(state.mode, state.marathonBest, onSelect = { onAction(LobbyAction.ModeSelected(it)) })
 }
 
 @Composable

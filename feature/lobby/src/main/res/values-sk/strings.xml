@@ -24,4 +24,6 @@
     <string name="lobby_offline_title">Ste offline</string>
     <string name="lobby_offline_body">Kvízy potrebujú pripojenie. Uložené kategórie zostávajú dostupné.</string>
     <string name="lobby_start">Štart</string>
+    <string name="lobby_personal_best">Rekord %1$d</string>
+    <string name="lobby_personal_best_description">Osobný rekord v maratóne: %1$d</string>
 </resources>

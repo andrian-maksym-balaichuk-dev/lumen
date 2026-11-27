@@ -24,4 +24,6 @@
     <string name="lobby_offline_title">You\'re offline</string>
     <string name="lobby_offline_body">Quizzes need a connection. Cached categories stay available.</string>
     <string name="lobby_start">Start</string>
+    <string name="lobby_personal_best">PB %1$d</string>
+    <string name="lobby_personal_best_description">Marathon personal best: %1$d</string>
 </resources>
