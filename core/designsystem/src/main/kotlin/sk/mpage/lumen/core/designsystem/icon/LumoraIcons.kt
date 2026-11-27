@@ -21,6 +21,8 @@ public object LumoraIcons {
 
     @DrawableRes public val ArrowForward: Int = R.drawable.ic_arrow_forward
 
+    @DrawableRes public val ArrowBack: Int = R.drawable.ic_arrow_back
+
     @DrawableRes public val TimerOff: Int = R.drawable.ic_timer_off
 
     @DrawableRes public val Tune: Int = R.drawable.ic_tune

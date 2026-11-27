@@ -35,6 +35,7 @@
     <string name="result_average_time">Priemerná odpoveď</string>
     <string name="result_seconds">%1$s s</string>
     <string name="result_play_again">Hrať znova</string>
+    <string name="result_review">Prezrieť odpovede</string>
     <string name="result_any_category">Ľubovoľná kategória</string>
     <string name="result_any_difficulty">Ľubovoľná obtiažnosť</string>
     <string name="result_mode_classic">Klasika</string>

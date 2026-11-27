@@ -54,6 +54,7 @@ internal fun ResultScreen(
     onClose: () -> Unit,
     onPlayAgain: (QuizConfig) -> Unit,
     onShare: () -> Unit,
+    onReview: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier.fillMaxSize().safeDrawingPadding()) {
@@ -71,7 +72,7 @@ internal fun ResultScreen(
             }
 
             is ResultUiState.Content -> {
-                ResultContent(state, onPlayAgain, onShare)
+                ResultContent(state, onPlayAgain, onShare, onReview)
             }
         }
         IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).padding(Lumora.spacing.sm)) {
@@ -85,9 +86,10 @@ private fun ResultContent(
     state: ResultUiState.Content,
     onPlayAgain: (QuizConfig) -> Unit,
     onShare: () -> Unit,
+    onReview: () -> Unit,
 ) {
     LumoraFlex(
-        items = listOf({ ScoreBlock(state) }, { Stats(state, onPlayAgain, onShare) }),
+        items = listOf({ ScoreBlock(state) }, { Stats(state, onPlayAgain, onShare, onReview) }),
         modifier =
             Modifier
                 .fillMaxSize()
@@ -158,6 +160,7 @@ private fun Stats(
     state: ResultUiState.Content,
     onPlayAgain: (QuizConfig) -> Unit,
     onShare: () -> Unit,
+    onReview: () -> Unit,
 ) {
     val locale = LocalConfiguration.current.locales[0]
     Column(verticalArrangement = Arrangement.spacedBy(Lumora.spacing.sm)) {
@@ -195,11 +198,16 @@ private fun Stats(
             modifier = Modifier.padding(vertical = Lumora.spacing.sm),
         )
         LumoraPrimaryButton(text = stringResource(R.string.result_share), onClick = onShare)
-        FilledTonalButton(
-            onClick = { onPlayAgain(state.config) },
-            modifier = Modifier.fillMaxWidth().height(Lumora.sizes.lg),
-        ) {
-            Text(stringResource(R.string.result_play_again))
+        Row(horizontalArrangement = Arrangement.spacedBy(Lumora.spacing.sm)) {
+            FilledTonalButton(onClick = onReview, modifier = Modifier.weight(1f).height(Lumora.sizes.lg)) {
+                Text(stringResource(R.string.result_review))
+            }
+            FilledTonalButton(
+                onClick = { onPlayAgain(state.config) },
+                modifier = Modifier.weight(1f).height(Lumora.sizes.lg),
+            ) {
+                Text(stringResource(R.string.result_play_again))
+            }
         }
     }
 }
@@ -256,6 +264,7 @@ private fun ResultPreview() {
             onClose = {},
             onPlayAgain = {},
             onShare = {},
+            onReview = {},
         )
     }
 }

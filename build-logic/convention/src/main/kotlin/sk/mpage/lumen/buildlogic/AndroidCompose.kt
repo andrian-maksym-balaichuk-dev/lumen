@@ -2,12 +2,18 @@ package sk.mpage.lumen.buildlogic
 
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 
 internal fun Project.configureAndroidCompose(commonExtension: CommonExtension) {
     pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
     commonExtension.buildFeatures.compose = true
+
+    extensions.configure<ComposeCompilerGradlePluginExtension> {
+        stabilityConfigurationFiles.add(rootProject.layout.projectDirectory.file("compose_compiler_config.conf"))
+    }
 
     dependencies {
         val bom = libs.findLibrary("androidx-compose-bom").get()

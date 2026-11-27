@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -39,7 +41,7 @@ internal class HistoryViewModel
                         if (sessions.isEmpty() && current == HistoryFilter.Default) {
                             HistoryUiState.Empty
                         } else {
-                            HistoryUiState.Content(current, played, items(sessions, current.sort))
+                            HistoryUiState.Content(current, played.toImmutableList(), items(sessions, current.sort))
                         }
                     }
                 }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HistoryUiState.Loading)
@@ -75,18 +77,20 @@ internal class HistoryViewModel
         private fun items(
             sessions: List<QuizSession>,
             sort: HistorySort,
-        ): List<HistoryListItem> {
-            if (sort != HistorySort.NEWEST) return sessions.map(HistoryListItem::Session)
+        ): ImmutableList<HistoryListItem> {
+            if (sort != HistorySort.NEWEST) return sessions.map(HistoryListItem::Session).toImmutableList()
             val today = LocalDate.now(clock)
-            return sessions.groupBy { it.localDate }.flatMap { (date, daySessions) ->
-                val label =
-                    when (date) {
-                        today -> DayLabel.TODAY
-                        today.minusDays(1) -> DayLabel.YESTERDAY
-                        else -> DayLabel.DATE
-                    }
-                listOf(HistoryListItem.DayHeader(date, label)) + daySessions.map(HistoryListItem::Session)
-            }
+            return sessions
+                .groupBy { it.localDate }
+                .flatMap { (date, daySessions) ->
+                    val label =
+                        when (date) {
+                            today -> DayLabel.TODAY
+                            today.minusDays(1) -> DayLabel.YESTERDAY
+                            else -> DayLabel.DATE
+                        }
+                    listOf(HistoryListItem.DayHeader(date, label)) + daySessions.map(HistoryListItem::Session)
+                }.toImmutableList()
         }
 
         private companion object {

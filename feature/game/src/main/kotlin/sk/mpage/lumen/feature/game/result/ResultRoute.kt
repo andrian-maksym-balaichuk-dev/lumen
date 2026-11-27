@@ -17,6 +17,7 @@ internal fun ResultRoute(
     sessionId: Long,
     onClose: () -> Unit,
     onPlayAgain: (QuizConfig) -> Unit,
+    onReview: (sessionId: Long) -> Unit,
     viewModel: ResultViewModel =
         hiltViewModel<ResultViewModel, ResultViewModel.Factory>(creationCallback = { it.create(sessionId) }),
 ) {
@@ -33,5 +34,11 @@ internal fun ResultRoute(
             }
         }
     }
-    ResultScreen(state = state, onClose = onClose, onPlayAgain = onPlayAgain, onShare = viewModel::onShareTapped)
+    ResultScreen(
+        state = state,
+        onClose = onClose,
+        onPlayAgain = onPlayAgain,
+        onShare = viewModel::onShareTapped,
+        onReview = { onReview(sessionId) },
+    )
 }

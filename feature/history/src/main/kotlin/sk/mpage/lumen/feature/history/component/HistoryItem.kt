@@ -23,6 +23,7 @@ import sk.mpage.lumen.core.designsystem.theme.Lumora
 import sk.mpage.lumen.core.model.Category
 import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.GameMode
+import sk.mpage.lumen.core.model.QuizConfig
 import sk.mpage.lumen.core.model.QuizSession
 import sk.mpage.lumen.core.ui.categoryIcon
 import sk.mpage.lumen.core.ui.displayName
@@ -35,18 +36,16 @@ import java.time.format.FormatStyle
 @Composable
 internal fun HistoryItem(
     session: QuizSession,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val config = session.config
-    val resources = LocalResources.current
-    val category =
-        config.categoryId?.let { Category(it, config.categoryName).displayName(resources) }
-            ?: stringResource(R.string.history_any_category)
     val time =
         DateTimeFormatter
             .ofLocalizedTime(FormatStyle.SHORT)
             .format(session.finishedAt.atZone(ZoneId.systemDefault()))
     Card(
+        onClick = onClick,
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = Lumora.glass.frost.tint),
@@ -60,7 +59,7 @@ internal fun HistoryItem(
                     tint = MaterialTheme.colorScheme.primary,
                 )
             },
-            headlineContent = { Text("$category · ${difficultyLabel(config.difficulty)}") },
+            headlineContent = { Text(sessionTitle(config)) },
             supportingContent = {
                 Text("${modeLabel(config.mode)} · ${formatDuration(session.durationSeconds)} · $time")
             },
@@ -97,7 +96,18 @@ private fun Score(session: QuizSession) {
 }
 
 @Composable
-private fun difficultyLabel(difficulty: Difficulty): String =
+internal fun sessionTitle(config: QuizConfig): String =
+    "${categoryLabel(config)} · ${difficultyLabel(config.difficulty)}"
+
+@Composable
+internal fun categoryLabel(config: QuizConfig): String {
+    val resources = LocalResources.current
+    return config.categoryId?.let { Category(it, config.categoryName).displayName(resources) }
+        ?: stringResource(R.string.history_any_category)
+}
+
+@Composable
+internal fun difficultyLabel(difficulty: Difficulty): String =
     stringResource(
         when (difficulty) {
             Difficulty.ANY -> R.string.history_difficulty_any
@@ -108,5 +118,5 @@ private fun difficultyLabel(difficulty: Difficulty): String =
     )
 
 @Composable
-private fun modeLabel(mode: GameMode): String =
+internal fun modeLabel(mode: GameMode): String =
     stringResource(if (mode == GameMode.CLASSIC) R.string.history_mode_classic else R.string.history_mode_marathon)

@@ -8,8 +8,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 internal fun HistoryRoute(
     onStartQuiz: () -> Unit,
+    onOpenSession: (Long) -> Unit,
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    HistoryScreen(state = state, onAction = viewModel::onAction, onStartQuiz = onStartQuiz)
+    HistoryScreen(
+        state = state,
+        onAction = viewModel::onAction,
+        onStartQuiz = onStartQuiz,
+        onOpenSession = onOpenSession,
+    )
 }

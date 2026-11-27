@@ -26,4 +26,21 @@
     <string name="history_no_matches">Žiadne výsledky</string>
     <string name="history_no_matches_body">Týmto filtrom nezodpovedá žiadna hra.</string>
     <string name="history_clear_filters">Zrušiť filtre</string>
+    <string name="detail_back">Späť</string>
+    <string name="detail_not_found">Hra sa nenašla</string>
+    <string name="detail_not_found_body">Táto hra už nie je v histórii.</string>
+    <string name="detail_score">Skóre</string>
+    <string name="detail_time">Čas</string>
+    <string name="detail_average">Priem. odpoveď</string>
+    <string name="detail_question_number">O%1$d</string>
+    <string name="detail_correct">Správne</string>
+    <string name="detail_wrong">Nesprávne</string>
+    <string name="detail_timed_out">Bez odpovede</string>
+    <string name="detail_seconds">%1$s s</string>
+    <string name="detail_correct_answer">Správna odpoveď</string>
+    <string name="detail_your_answer">Tvoja odpoveď</string>
+    <string name="detail_a11y_question">Otázka %1$d: %2$s. %3$s, %4$s sekundy.</string>
+    <string name="detail_a11y_your_answer">Tvoja odpoveď: %1$s.</string>
+    <string name="detail_a11y_no_answer">Bez odpovede.</string>
+    <string name="detail_a11y_correct_answer">Správna odpoveď: %1$s.</string>
 </resources>

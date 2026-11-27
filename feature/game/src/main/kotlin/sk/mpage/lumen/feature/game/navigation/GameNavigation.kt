@@ -21,7 +21,10 @@ public fun EntryProviderScope<NavKey>.gameEntries(
     onClose: () -> Unit,
     onShowResults: (sessionId: Long) -> Unit,
     onPlayAgain: (QuizConfig) -> Unit,
+    onReview: (sessionId: Long) -> Unit,
 ) {
     entry<GameKey> { key -> GameRoute(config = key.config, onClose = onClose, onShowResults = onShowResults) }
-    entry<ResultKey> { key -> ResultRoute(sessionId = key.sessionId, onClose = onClose, onPlayAgain = onPlayAgain) }
+    entry<ResultKey> { key ->
+        ResultRoute(sessionId = key.sessionId, onClose = onClose, onPlayAgain = onPlayAgain, onReview = onReview)
+    }
 }

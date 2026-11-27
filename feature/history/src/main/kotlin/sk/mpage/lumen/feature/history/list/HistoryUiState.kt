@@ -1,5 +1,6 @@
 package sk.mpage.lumen.feature.history.list
 
+import kotlinx.collections.immutable.ImmutableList
 import sk.mpage.lumen.core.model.Category
 import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.model.HistoryFilter
@@ -14,8 +15,8 @@ internal sealed interface HistoryUiState {
 
     data class Content(
         val filter: HistoryFilter,
-        val categories: List<Category>,
-        val items: List<HistoryListItem>,
+        val categories: ImmutableList<Category>,
+        val items: ImmutableList<HistoryListItem>,
     ) : HistoryUiState
 }
 
@@ -42,12 +43,18 @@ internal enum class DayLabel {
 }
 
 internal sealed interface HistoryListItem {
+    val key: String
+
     data class DayHeader(
         val date: LocalDate,
         val label: DayLabel,
-    ) : HistoryListItem
+    ) : HistoryListItem {
+        override val key: String get() = "day-$date"
+    }
 
     data class Session(
         val session: QuizSession,
-    ) : HistoryListItem
+    ) : HistoryListItem {
+        override val key: String get() = "session-${session.id}"
+    }
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -46,7 +47,17 @@ public fun StatTile(
             verticalArrangement = Arrangement.spacedBy(Lumora.spacing.xs),
         ) {
             Text(label, style = MaterialTheme.typography.labelMedium)
-            Text(value, style = MaterialTheme.typography.titleLarge)
+            val valueStyle = MaterialTheme.typography.titleLarge
+            Text(
+                text = value,
+                style = valueStyle,
+                maxLines = 1,
+                autoSize =
+                    TextAutoSize.StepBased(
+                        minFontSize = MaterialTheme.typography.labelMedium.fontSize,
+                        maxFontSize = valueStyle.fontSize,
+                    ),
+            )
             if (supporting != null) Text(supporting, style = MaterialTheme.typography.bodySmall)
         }
     }

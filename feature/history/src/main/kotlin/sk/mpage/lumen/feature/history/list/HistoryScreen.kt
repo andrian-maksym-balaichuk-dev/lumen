@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -19,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -31,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import kotlinx.collections.immutable.persistentListOf
 import sk.mpage.lumen.core.designsystem.component.EmptyState
 import sk.mpage.lumen.core.designsystem.component.LocalHazeState
 import sk.mpage.lumen.core.designsystem.component.LumoraDockClearance
@@ -62,9 +65,18 @@ internal fun HistoryScreen(
     state: HistoryUiState,
     onAction: (HistoryAction) -> Unit,
     onStartQuiz: () -> Unit,
+    onOpenSession: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showSheet by rememberSaveable { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    val sort = (state as? HistoryUiState.Content)?.filter?.sort
+    var shownSort by rememberSaveable { mutableStateOf(sort) }
+    LaunchedEffect(sort) {
+        if (sort == null || sort == shownSort) return@LaunchedEffect
+        if (shownSort != null) listState.scrollToItem(0)
+        shownSort = sort
+    }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         modifier = modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -102,6 +114,7 @@ internal fun HistoryScreen(
 
                 is HistoryUiState.Content -> {
                     LazyColumn(
+                        state = listState,
                         modifier = Modifier.fillMaxSize().hazeContent(LocalHazeState.current),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         contentPadding =
@@ -113,7 +126,7 @@ internal fun HistoryScreen(
                             ),
                         verticalArrangement = Arrangement.spacedBy(Lumora.spacing.sm),
                     ) {
-                        item {
+                        item(key = KEY_MODES) {
                             ModeSelector(
                                 mode = state.filter.mode,
                                 onModeChanged = { onAction(HistoryAction.ModeChanged(it)) },
@@ -121,7 +134,7 @@ internal fun HistoryScreen(
                             )
                         }
                         if (state.items.isEmpty()) {
-                            item {
+                            item(key = KEY_NO_MATCHES) {
                                 EmptyState(
                                     icon = LumoraIcons.Tune,
                                     title = stringResource(R.string.history_no_matches),
@@ -134,7 +147,7 @@ internal fun HistoryScreen(
                         state.items.forEach { item ->
                             when (item) {
                                 is HistoryListItem.DayHeader -> {
-                                    stickyHeader {
+                                    stickyHeader(key = item.key, contentType = CONTENT_TYPE_DAY) {
                                         Box(Modifier.widthIn(max = Lumora.spacing.contentMaxWidth).fillMaxWidth()) {
                                             DayHeader(item)
                                         }
@@ -142,9 +155,10 @@ internal fun HistoryScreen(
                                 }
 
                                 is HistoryListItem.Session -> {
-                                    item {
+                                    item(key = item.key, contentType = CONTENT_TYPE_SESSION) {
                                         HistoryItem(
                                             session = item.session,
+                                            onClick = { onOpenSession(item.session.id) },
                                             modifier =
                                                 Modifier
                                                     .widthIn(
@@ -172,6 +186,11 @@ internal fun HistoryScreen(
         )
     }
 }
+
+private const val CONTENT_TYPE_DAY = "day"
+private const val CONTENT_TYPE_SESSION = "session"
+private const val KEY_MODES = "modes"
+private const val KEY_NO_MATCHES = "no-matches"
 
 @Composable
 private fun DayHeader(header: HistoryListItem.DayHeader) {
@@ -202,9 +221,9 @@ private fun HistoryContentPreview() {
             state =
                 HistoryUiState.Content(
                     filter = HistoryFilter.Default,
-                    categories = emptyList(),
+                    categories = persistentListOf(),
                     items =
-                        listOf(
+                        persistentListOf(
                             HistoryListItem.DayHeader(LocalDate.of(2026, 11, 26), DayLabel.TODAY),
                             HistoryListItem.Session(previewSession(1, GameMode.CLASSIC)),
                             HistoryListItem.Session(previewSession(2, GameMode.MARATHON)),
@@ -214,6 +233,7 @@ private fun HistoryContentPreview() {
                 ),
             onAction = {},
             onStartQuiz = {},
+            onOpenSession = {},
         )
     }
 }
@@ -222,7 +242,7 @@ private fun HistoryContentPreview() {
 @Composable
 private fun HistoryEmptyPreview() {
     PreviewSurface {
-        HistoryScreen(state = HistoryUiState.Empty, onAction = {}, onStartQuiz = {})
+        HistoryScreen(state = HistoryUiState.Empty, onAction = {}, onStartQuiz = {}, onOpenSession = {})
     }
 }
 

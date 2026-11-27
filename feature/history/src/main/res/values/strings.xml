@@ -26,4 +26,21 @@
     <string name="history_no_matches">No matches</string>
     <string name="history_no_matches_body">No games match these filters.</string>
     <string name="history_clear_filters">Clear filters</string>
+    <string name="detail_back">Back</string>
+    <string name="detail_not_found">Game not found</string>
+    <string name="detail_not_found_body">This game is no longer in your history.</string>
+    <string name="detail_score">Score</string>
+    <string name="detail_time">Time</string>
+    <string name="detail_average">Avg answer</string>
+    <string name="detail_question_number">Q%1$d</string>
+    <string name="detail_correct">Correct</string>
+    <string name="detail_wrong">Wrong</string>
+    <string name="detail_timed_out">No answer</string>
+    <string name="detail_seconds">%1$s s</string>
+    <string name="detail_correct_answer">Correct answer</string>
+    <string name="detail_your_answer">Your answer</string>
+    <string name="detail_a11y_question">Question %1$d: %2$s. %3$s, %4$s seconds.</string>
+    <string name="detail_a11y_your_answer">Your answer: %1$s.</string>
+    <string name="detail_a11y_no_answer">No answer.</string>
+    <string name="detail_a11y_correct_answer">Correct answer: %1$s.</string>
 </resources>

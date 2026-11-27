@@ -33,6 +33,7 @@ public fun LumoraLargeTopBar(
     title: String,
     scrollBehavior: TopAppBarScrollBehavior,
     modifier: Modifier = Modifier,
+    navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     val colors =
@@ -55,9 +56,21 @@ public fun LumoraLargeTopBar(
             shape = RectangleShape,
         ) {}
         if (LumoraWindow.isCompactHeight) {
-            TopAppBar(title = titleText, actions = actions, colors = colors, scrollBehavior = scrollBehavior)
+            TopAppBar(
+                title = titleText,
+                navigationIcon = navigationIcon,
+                actions = actions,
+                colors = colors,
+                scrollBehavior = scrollBehavior,
+            )
         } else {
-            LargeTopAppBar(title = titleText, actions = actions, colors = colors, scrollBehavior = scrollBehavior)
+            LargeTopAppBar(
+                title = titleText,
+                navigationIcon = navigationIcon,
+                actions = actions,
+                colors = colors,
+                scrollBehavior = scrollBehavior,
+            )
         }
     }
 }

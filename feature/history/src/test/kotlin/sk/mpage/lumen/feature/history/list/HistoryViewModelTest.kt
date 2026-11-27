@@ -1,6 +1,7 @@
 package sk.mpage.lumen.feature.history.list
 
 import androidx.lifecycle.SavedStateHandle
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -56,8 +57,8 @@ class HistoryViewModelTest {
             assertEquals(
                 HistoryUiState.Content(
                     HistoryFilter.Default,
-                    emptyList(),
-                    listOf(
+                    persistentListOf(),
+                    persistentListOf(
                         HistoryListItem.DayHeader(today.localDate, DayLabel.TODAY),
                         HistoryListItem.Session(today),
                         HistoryListItem.DayHeader(yesterday.localDate, DayLabel.YESTERDAY),
@@ -84,11 +85,44 @@ class HistoryViewModelTest {
             advanceUntilIdle()
 
             val content = assertIs<HistoryUiState.Content>(viewModel.uiState.value)
-            assertEquals(listOf(HistoryListItem.Session(marathon)), content.items)
+            assertEquals<List<HistoryListItem>>(listOf(HistoryListItem.Session(marathon)), content.items)
             assertEquals(
                 HistoryFilter(null, GameMode.MARATHON, HistorySort.BEST_SCORE),
                 history.requestedFilters.last(),
             )
+        }
+
+    @Test
+    fun `a new sort order is emitted with the content`() =
+        runTest {
+            history.emitSessions(listOf(session(1, LocalDate.of(2026, 11, 26))))
+            val viewModel = HistoryViewModel(history, SavedStateHandle(), clock)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+            advanceUntilIdle()
+            assertEquals(HistorySort.NEWEST, assertIs<HistoryUiState.Content>(viewModel.uiState.value).filter.sort)
+
+            viewModel.onAction(HistoryAction.SortChanged(HistorySort.FASTEST))
+            advanceUntilIdle()
+
+            assertEquals(HistorySort.FASTEST, assertIs<HistoryUiState.Content>(viewModel.uiState.value).filter.sort)
+        }
+
+    @Test
+    fun `every list item has its own stable key`() =
+        runTest {
+            history.emitSessions(
+                listOf(
+                    session(3, LocalDate.of(2026, 11, 26)),
+                    session(2, LocalDate.of(2026, 11, 26)),
+                    session(1, LocalDate.of(2026, 11, 25)),
+                ),
+            )
+            val viewModel = HistoryViewModel(history, SavedStateHandle(), clock)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
+            advanceUntilIdle()
+
+            val keys = assertIs<HistoryUiState.Content>(viewModel.uiState.value).items.map { it.key }
+            assertEquals(listOf("day-2026-11-26", "session-3", "session-2", "day-2026-11-25", "session-1"), keys)
         }
 
     @Test
@@ -100,7 +134,7 @@ class HistoryViewModelTest {
 
             viewModel.onAction(HistoryAction.ModeChanged(GameMode.MARATHON))
             advanceUntilIdle()
-            assertEquals(emptyList(), assertIs<HistoryUiState.Content>(viewModel.uiState.value).items)
+            assertEquals(0, assertIs<HistoryUiState.Content>(viewModel.uiState.value).items.size)
 
             viewModel.onAction(HistoryAction.FiltersCleared)
             advanceUntilIdle()

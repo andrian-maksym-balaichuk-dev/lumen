@@ -33,6 +33,7 @@
     <string name="result_average_time">Average answer</string>
     <string name="result_seconds">%1$s s</string>
     <string name="result_play_again">Play again</string>
+    <string name="result_review">Review answers</string>
     <string name="result_any_category">Any category</string>
     <string name="result_any_difficulty">Any difficulty</string>
     <string name="result_mode_classic">Classic</string>

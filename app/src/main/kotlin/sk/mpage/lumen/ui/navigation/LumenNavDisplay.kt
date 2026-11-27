@@ -19,6 +19,7 @@ import sk.mpage.lumen.core.designsystem.theme.Lumora
 import sk.mpage.lumen.feature.game.navigation.GameKey
 import sk.mpage.lumen.feature.game.navigation.ResultKey
 import sk.mpage.lumen.feature.game.navigation.gameEntries
+import sk.mpage.lumen.feature.history.navigation.SessionDetailKey
 import sk.mpage.lumen.feature.history.navigation.historyEntries
 import sk.mpage.lumen.feature.lobby.navigation.LobbyKey
 import sk.mpage.lumen.feature.lobby.navigation.lobbyEntries
@@ -51,8 +52,13 @@ internal fun LumenNavDisplay(
                     onClose = navigator::back,
                     onShowResults = { sessionId -> navigator.replaceTop(ResultKey(sessionId)) },
                     onPlayAgain = { config -> navigator.replaceTop(GameKey(config)) },
+                    onReview = { sessionId -> navigator.push(SessionDetailKey(sessionId)) },
                 )
-                historyEntries(onStartQuiz = { navigator.selectTab(TopLevelDestination.PLAY) })
+                historyEntries(
+                    onStartQuiz = { navigator.selectTab(TopLevelDestination.PLAY) },
+                    onOpenSession = { sessionId -> navigator.push(SessionDetailKey(sessionId)) },
+                    onBack = navigator::back,
+                )
                 TopLevelDestination.entries
                     .filter { it != TopLevelDestination.PLAY && it != TopLevelDestination.HISTORY }
                     .forEach { destination ->
