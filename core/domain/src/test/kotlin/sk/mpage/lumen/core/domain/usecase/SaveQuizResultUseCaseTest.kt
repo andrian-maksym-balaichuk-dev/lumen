@@ -46,6 +46,8 @@ class SaveQuizResultUseCaseTest {
 
             override fun observeSessionDetail(sessionId: Long) = emptyFlow<QuizSessionDetail?>()
 
+            override fun observeQualifyingDays() = emptyFlow<List<LocalDate>>()
+
             override suspend fun save(game: FinishedGame) = result
         }
 

@@ -13,6 +13,7 @@ import sk.mpage.lumen.core.model.FinishedGame
 import sk.mpage.lumen.core.model.HistoryFilter
 import sk.mpage.lumen.core.model.QuizSession
 import sk.mpage.lumen.core.model.QuizSessionDetail
+import java.time.LocalDate
 
 public class FakeQuizHistoryRepository : QuizHistoryRepository {
     private val failures = ArrayDeque<DataError>()
@@ -58,6 +59,14 @@ public class FakeQuizHistoryRepository : QuizHistoryRepository {
     }
 
     override fun observeSessionDetail(sessionId: Long): Flow<QuizSessionDetail?> = details.map { it[sessionId] }
+
+    private val qualifyingDays = MutableStateFlow<List<LocalDate>>(emptyList())
+
+    public fun emitQualifyingDays(value: List<LocalDate>) {
+        qualifyingDays.value = value
+    }
+
+    override fun observeQualifyingDays(): Flow<List<LocalDate>> = qualifyingDays
 
     override suspend fun save(game: FinishedGame): AppResult<SaveOutcome> {
         failures.removeFirstOrNull()?.let { return AppResult.Failure(it) }

@@ -14,6 +14,7 @@ import sk.mpage.lumen.core.data.mapper.toEntity
 import sk.mpage.lumen.core.data.mapper.toSession
 import sk.mpage.lumen.core.data.mapper.toSessionEntity
 import sk.mpage.lumen.core.database.source.QuizHistoryLocalDataSource
+import sk.mpage.lumen.core.domain.game.GameRules
 import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
 import sk.mpage.lumen.core.domain.repository.SaveOutcome
 import sk.mpage.lumen.core.model.Category
@@ -21,6 +22,7 @@ import sk.mpage.lumen.core.model.FinishedGame
 import sk.mpage.lumen.core.model.HistoryFilter
 import sk.mpage.lumen.core.model.QuizSession
 import sk.mpage.lumen.core.model.QuizSessionDetail
+import java.time.LocalDate
 import javax.inject.Inject
 
 internal class RoomQuizHistoryRepository
@@ -37,6 +39,9 @@ internal class RoomQuizHistoryRepository
 
         override fun observeSessionDetail(sessionId: Long): Flow<QuizSessionDetail?> =
             local.observeSessionDetail(sessionId).map { it?.toDetail() }
+
+        override fun observeQualifyingDays(): Flow<List<LocalDate>> =
+            local.observeQualifyingDays(GameRules.QUALIFYING_PERCENT)
 
         override suspend fun save(game: FinishedGame): AppResult<SaveOutcome> =
             withContext(io) {

@@ -7,6 +7,7 @@ import sk.mpage.lumen.core.model.FinishedGame
 import sk.mpage.lumen.core.model.HistoryFilter
 import sk.mpage.lumen.core.model.QuizSession
 import sk.mpage.lumen.core.model.QuizSessionDetail
+import java.time.LocalDate
 
 public interface QuizHistoryRepository {
     public fun observeSessions(filter: HistoryFilter): Flow<List<QuizSession>>
@@ -14,6 +15,8 @@ public interface QuizHistoryRepository {
     public fun observePlayedCategories(): Flow<List<Category>>
 
     public fun observeSessionDetail(sessionId: Long): Flow<QuizSessionDetail?>
+
+    public fun observeQualifyingDays(): Flow<List<LocalDate>>
 
     public suspend fun save(game: FinishedGame): AppResult<SaveOutcome>
 }
