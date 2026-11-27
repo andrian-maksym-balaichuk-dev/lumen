@@ -65,4 +65,7 @@
     <string name="game_feedback_timeout_title">Čas vypršal</string>
     <string name="game_feedback_answer">Správna odpoveď: %1$s</string>
     <string name="result_every_question">Odpovedali ste na všetky otázky pre tieto nastavenia!</string>
+    <string name="result_first_record">Prvý rekord!</string>
+    <string name="result_new_best">Nový osobný rekord: %1$d (predtým %2$d)</string>
+    <string name="result_personal_best">Osobný rekord: %1$d</string>
 </resources>

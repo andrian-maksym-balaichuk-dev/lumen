@@ -38,6 +38,7 @@
         <item quantity="one">I answered %1$d question in a row in %2$s · %3$s in %4$s on Lumen.</item>
         <item quantity="other">I answered %1$d questions in a row in %2$s · %3$s in %4$s on Lumen.</item>
     </plurals>
+    <string name="share_new_best">New personal best!</string>
     <string name="share_closing">Can you beat me?</string>
     <string name="share_any_category">Any category</string>
     <string name="share_difficulty_any">Any difficulty</string>

@@ -40,6 +40,7 @@
         <item quantity="many">Výsledok v Lumen: %1$d správnej odpovede za sebou v kategórii %2$s · %3$s za %4$s.</item>
         <item quantity="other">Výsledok v Lumen: %1$d správnych odpovedí za sebou v kategórii %2$s · %3$s za %4$s.</item>
     </plurals>
+    <string name="share_new_best">Nový osobný rekord!</string>
     <string name="share_closing">Prekonáš ma?</string>
     <string name="share_any_category">Ľubovoľná</string>
     <string name="share_difficulty_any">Ľubovoľná</string>

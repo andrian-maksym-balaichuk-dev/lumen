@@ -22,6 +22,8 @@ public interface QuizHistoryRepository {
 
     public fun observeGameCount(): Flow<Int>
 
+    public suspend fun marathonBestBefore(sessionId: Long): Int?
+
     public suspend fun save(game: FinishedGame): AppResult<SaveOutcome>
 }
 

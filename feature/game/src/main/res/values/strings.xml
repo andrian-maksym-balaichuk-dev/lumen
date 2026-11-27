@@ -59,4 +59,7 @@
     <string name="game_feedback_timeout_title">Time\'s up</string>
     <string name="game_feedback_answer">Correct answer: %1$s</string>
     <string name="result_every_question">You answered every question for these settings!</string>
+    <string name="result_first_record">First record!</string>
+    <string name="result_new_best">New personal best: %1$d (previous %2$d)</string>
+    <string name="result_personal_best">Personal best: %1$d</string>
 </resources>

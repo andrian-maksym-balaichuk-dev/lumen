@@ -16,10 +16,18 @@ class BuildShareSummaryUseCaseTest {
     @Test
     fun `both modes carry score, category and duration`() {
         GameMode.entries.forEach { mode ->
-            val summary = BuildShareSummaryUseCase()(session(mode))
+            val summary = BuildShareSummaryUseCase()(session(mode), isNewBest = false)
 
             assertEquals(ShareSummary(mode, 8, 10, 80, "Science: Computers", Difficulty.MEDIUM, 102), summary)
         }
+    }
+
+    @Test
+    fun `only a marathon carries the new best`() {
+        val build = BuildShareSummaryUseCase()
+
+        assertEquals(true, build(session(GameMode.MARATHON), isNewBest = true).isNewBest)
+        assertEquals(false, build(session(GameMode.CLASSIC), isNewBest = true).isNewBest)
     }
 
     private fun session(mode: GameMode) =

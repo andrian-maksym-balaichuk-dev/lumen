@@ -20,5 +20,7 @@ internal sealed interface ResultUiState {
         val percent: Int,
         val durationSeconds: Long,
         val averageAnswerMs: Long,
+        val isNewBest: Boolean = false,
+        val previousBest: Int? = null,
     ) : ResultUiState
 }

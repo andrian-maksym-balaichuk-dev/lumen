@@ -10,6 +10,7 @@ import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.model.ShareSummary
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
 class ShareTextFormatterTest {
@@ -48,6 +49,28 @@ class ShareTextFormatterTest {
         assertEquals(
             "Výsledok v Lumen: 23 správnych odpovedí za sebou v kategórii Ľubovoľná · Ťažká za 3:05.\nPrekonáš ma?",
             ShareTextFormatter.format(MARATHON, resources),
+        )
+    }
+
+    @Test
+    @Config(qualifiers = "en")
+    fun `a new marathon best is announced`() {
+        assertEquals(
+            "I answered 23 questions in a row in Any category · Hard in 3:05 on Lumen. New personal best!\n" +
+                "Can you beat me?",
+            ShareTextFormatter.format(MARATHON.copy(isNewBest = true), resources),
+        )
+    }
+
+    @Test
+    @Config(qualifiers = "sk")
+    fun `a new marathon best in slovak`() {
+        assertTrue(
+            ShareTextFormatter
+                .format(
+                    MARATHON.copy(isNewBest = true),
+                    resources,
+                ).contains("za 3:05. Nový osobný rekord!"),
         )
     }
 

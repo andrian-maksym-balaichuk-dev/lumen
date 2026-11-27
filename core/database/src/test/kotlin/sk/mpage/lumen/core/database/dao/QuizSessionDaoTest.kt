@@ -125,6 +125,18 @@ class QuizSessionDaoTest {
         }
 
     @Test
+    fun `the best before a session ignores that session, later ones and other modes`() =
+        runTest {
+            val first = dao.insertFinishedGame(session("m1", mode = GameMode.MARATHON, correct = 12), attempts(1))
+            dao.insertFinishedGame(session("c1", mode = GameMode.CLASSIC, correct = 30), attempts(1))
+            val second = dao.insertFinishedGame(session("m2", mode = GameMode.MARATHON, correct = 20), attempts(1))
+            dao.insertFinishedGame(session("m3", mode = GameMode.MARATHON, correct = 25), attempts(1))
+
+            assertNull(dao.maxCorrectBefore(GameMode.MARATHON, first.sessionId))
+            assertEquals(12, dao.maxCorrectBefore(GameMode.MARATHON, second.sessionId))
+        }
+
+    @Test
     fun `qualifying days are distinct, newest first and include exactly 80 percent`() =
         runTest {
             val day1 = LocalDate.of(2026, 11, 10)

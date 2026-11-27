@@ -19,8 +19,13 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -31,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
+import sk.mpage.lumen.core.designsystem.component.Confetti
 import sk.mpage.lumen.core.designsystem.component.LumoraPrimaryButton
 import sk.mpage.lumen.core.designsystem.component.StatTile
 import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
@@ -75,6 +81,8 @@ internal fun ResultScreen(
 
             is ResultUiState.Content -> {
                 ResultContent(state, onPlayAgain, onShare, onReview)
+                var celebrated by rememberSaveable { mutableStateOf(false) }
+                if (state.isNewBest && !celebrated) Confetti(onFinished = { celebrated = true })
             }
         }
         IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).padding(Lumora.spacing.sm)) {
@@ -136,6 +144,7 @@ private fun ScoreBlock(state: ResultUiState.Content) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+        if (state.config.mode == GameMode.MARATHON) PersonalBest(state)
         if (state.answeredEveryQuestion) {
             Text(
                 text = stringResource(R.string.result_every_question),
@@ -153,6 +162,29 @@ private fun ScoreBlock(state: ResultUiState.Content) {
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+private fun PersonalBest(state: ResultUiState.Content) {
+    val text =
+        when {
+            state.isNewBest && state.previousBest == null -> stringResource(R.string.result_first_record)
+            state.isNewBest -> stringResource(R.string.result_new_best, state.correct, state.previousBest ?: 0)
+            state.previousBest != null -> stringResource(R.string.result_personal_best, state.previousBest)
+            else -> return
+        }
+    val scheme = MaterialTheme.colorScheme
+    Surface(
+        shape = MaterialTheme.shapes.extraLarge,
+        color = if (state.isNewBest) scheme.tertiaryContainer else scheme.surfaceVariant,
+        contentColor = if (state.isNewBest) scheme.onTertiaryContainer else scheme.onSurfaceVariant,
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(horizontal = Lumora.spacing.lg, vertical = Lumora.spacing.sm),
         )
     }
 }
@@ -276,6 +308,35 @@ private fun ResultPreview() {
                     percent = 80,
                     durationSeconds = 130,
                     averageAnswerMs = 10_200,
+                ),
+            onClose = {},
+            onPlayAgain = {},
+            onShare = {},
+            onReview = {},
+        )
+    }
+}
+
+@LumoraPreviews
+@Composable
+private fun ResultNewBestPreview() {
+    PreviewSurface {
+        ResultScreen(
+            state =
+                ResultUiState.Content(
+                    playerName = "Ada",
+                    avatar = Avatar.Preset("owl"),
+                    answeredEveryQuestion = false,
+                    config = QuizConfig(GameMode.MARATHON, null, "", Difficulty.HARD, QuestionType.MULTIPLE_CHOICE),
+                    correct = 23,
+                    total = 24,
+                    wrong = 1,
+                    timeouts = 0,
+                    percent = 95,
+                    durationSeconds = 185,
+                    averageAnswerMs = 7_400,
+                    isNewBest = true,
+                    previousBest = 17,
                 ),
             onClose = {},
             onPlayAgain = {},

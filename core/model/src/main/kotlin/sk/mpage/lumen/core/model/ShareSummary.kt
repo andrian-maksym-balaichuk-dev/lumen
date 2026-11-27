@@ -8,4 +8,5 @@ public data class ShareSummary(
     val categoryName: String,
     val difficulty: Difficulty,
     val durationSeconds: Long,
+    val isNewBest: Boolean = false,
 )

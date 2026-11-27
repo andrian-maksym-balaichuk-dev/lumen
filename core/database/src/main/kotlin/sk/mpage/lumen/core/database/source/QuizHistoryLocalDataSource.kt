@@ -37,6 +37,9 @@ public class QuizHistoryLocalDataSource
 
         public fun observeMarathonBest(): Flow<Int?> = dao.observeMaxCorrect(GameMode.MARATHON)
 
+        public suspend fun marathonBestBefore(sessionId: Long): Int? =
+            dao.maxCorrectBefore(GameMode.MARATHON, sessionId)
+
         public fun observeCount(): Flow<Int> = dao.observeCount()
 
         public fun observePlayedCategories(): Flow<List<PlayedCategory>> = dao.observePlayedCategories()

@@ -88,6 +88,12 @@ internal abstract class QuizSessionDao {
     @Query("SELECT MAX(correct_count) FROM quiz_session WHERE mode = :mode")
     abstract fun observeMaxCorrect(mode: GameMode): Flow<Int?>
 
+    @Query("SELECT MAX(correct_count) FROM quiz_session WHERE mode = :mode AND id < :sessionId")
+    abstract suspend fun maxCorrectBefore(
+        mode: GameMode,
+        sessionId: Long,
+    ): Int?
+
     @Query("SELECT COUNT(*) FROM quiz_session")
     abstract fun observeCount(): Flow<Int>
 

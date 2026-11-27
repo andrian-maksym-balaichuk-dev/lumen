@@ -47,6 +47,9 @@ internal class RoomQuizHistoryRepository
 
         override fun observeGameCount(): Flow<Int> = local.observeCount()
 
+        override suspend fun marathonBestBefore(sessionId: Long): Int? =
+            withContext(io) { local.marathonBestBefore(sessionId) }
+
         override suspend fun save(game: FinishedGame): AppResult<SaveOutcome> =
             withContext(io) {
                 try {

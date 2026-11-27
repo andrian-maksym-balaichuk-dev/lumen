@@ -10,6 +10,7 @@ import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
 import sk.mpage.lumen.core.domain.repository.SaveOutcome
 import sk.mpage.lumen.core.model.Category
 import sk.mpage.lumen.core.model.FinishedGame
+import sk.mpage.lumen.core.model.GameMode
 import sk.mpage.lumen.core.model.HistoryFilter
 import sk.mpage.lumen.core.model.QuizSession
 import sk.mpage.lumen.core.model.QuizSessionDetail
@@ -77,6 +78,11 @@ public class FakeQuizHistoryRepository : QuizHistoryRepository {
     override fun observeMarathonBest(): Flow<Int?> = marathonBest
 
     override fun observeGameCount(): Flow<Int> = sessions.map { it.size }
+
+    override suspend fun marathonBestBefore(sessionId: Long): Int? =
+        sessions.value
+            .filter { it.config.mode == GameMode.MARATHON && it.id < sessionId }
+            .maxOfOrNull { it.correctCount }
 
     override suspend fun save(game: FinishedGame): AppResult<SaveOutcome> {
         failures.removeFirstOrNull()?.let { return AppResult.Failure(it) }

@@ -46,6 +46,7 @@ public object ShareTextFormatter {
                     )
                 }
             }
-        return result + "\n" + resources.getString(R.string.share_closing)
+        val best = if (summary.isNewBest) " " + resources.getString(R.string.share_new_best) else ""
+        return result + best + "\n" + resources.getString(R.string.share_closing)
     }
 }
