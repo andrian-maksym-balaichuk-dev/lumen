@@ -1,0 +1,8 @@
+<resources>
+    <string name="channel_streak_name">Streak reminders</string>
+    <string name="channel_streak_description">A nudge in the evening when today\'s game is still missing.</string>
+    <string name="channel_inactivity_name">Come-back reminders</string>
+    <string name="channel_inactivity_description">A note when you have not played for a few days.</string>
+    <string name="channel_achievements_name">Achievements</string>
+    <string name="channel_achievements_description">New marathon records.</string>
+</resources>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="channel_streak_name">Pripomienky série</string>
+    <string name="channel_streak_description">Večerné pripomenutie, keď ti dnes ešte chýba hra.</string>
+    <string name="channel_inactivity_name">Pripomienky návratu</string>
+    <string name="channel_inactivity_description">Upozornenie po niekoľkých dňoch bez hry.</string>
+    <string name="channel_achievements_name">Úspechy</string>
+    <string name="channel_achievements_description">Nové rekordy v maratóne.</string>
+</resources>
