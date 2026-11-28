@@ -23,4 +23,8 @@ public object PreferenceKeys {
     public val SESSION_TOKEN_AT: Preferences.Key<Long> = longPreferencesKey("session_token_at")
     public val LAST_ACTIVE_AT: Preferences.Key<Long> = longPreferencesKey("last_active_at")
     public val FIRST_LAUNCHED_AT: Preferences.Key<Long> = longPreferencesKey("first_launched_at")
+    public val LAST_STREAK_REMINDER_DATE: Preferences.Key<String> =
+        stringPreferencesKey("last_streak_reminder_date")
+    public val LAST_INACTIVITY_REMINDER_AT: Preferences.Key<Long> =
+        longPreferencesKey("last_inactivity_reminder_at")
 }

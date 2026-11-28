@@ -9,6 +9,7 @@ import sk.mpage.lumen.core.datastore.UserPreferencesDataSource
 import sk.mpage.lumen.core.model.AppUsage
 import java.io.File
 import java.time.Instant
+import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -33,6 +34,20 @@ class DataStoreAppUsageRepositoryTest {
             repository.markActive(later)
 
             assertEquals(AppUsage(lastActiveAt = later, firstLaunchedAt = first), repository.usage())
+        }
+
+    @Test
+    fun `reminder bookkeeping is read back`() =
+        runTest {
+            val repository = repository()
+            val sent = Instant.parse("2026-11-26T12:00:00Z")
+
+            repository.markStreakReminderSent(LocalDate.of(2026, 11, 26))
+            repository.markInactivityReminderSent(sent)
+
+            val usage = repository.usage()
+            assertEquals(LocalDate.of(2026, 11, 26), usage.lastStreakReminderDate)
+            assertEquals(sent, usage.lastInactivityReminderAt)
         }
 
     private fun TestScope.repository() =

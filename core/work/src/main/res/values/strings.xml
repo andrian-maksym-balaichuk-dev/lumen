@@ -5,4 +5,13 @@
     <string name="channel_inactivity_description">A note when you have not played for a few days.</string>
     <string name="channel_achievements_name">Achievements</string>
     <string name="channel_achievements_description">New marathon records.</string>
+    <string name="reminder_streak_title">Keep your streak alive</string>
+    <plurals name="reminder_streak_text">
+        <item quantity="one">You are on a %d-day streak. One quiz at 80 %% or better keeps it going.</item>
+        <item quantity="other">You are on a %d-day streak. One quiz at 80 %% or better keeps it going.</item>
+    </plurals>
+    <string name="reminder_challenge_title">Start your 7-day challenge</string>
+    <string name="reminder_challenge_text" formatted="false">Score 80 % or better today and come back tomorrow.</string>
+    <string name="reminder_inactivity_title">New questions are waiting, %1$s</string>
+    <string name="reminder_inactivity_text">It has been a while. Ready for a quick round?</string>
 </resources>

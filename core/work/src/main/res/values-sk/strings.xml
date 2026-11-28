@@ -5,4 +5,15 @@
     <string name="channel_inactivity_description">Upozornenie po niekoľkých dňoch bez hry.</string>
     <string name="channel_achievements_name">Úspechy</string>
     <string name="channel_achievements_description">Nové rekordy v maratóne.</string>
+    <string name="reminder_streak_title">Udrž si sériu</string>
+    <plurals name="reminder_streak_text">
+        <item quantity="one">Máš sériu %d deň. Jeden kvíz na 80 %% a viac ju udrží.</item>
+        <item quantity="few">Máš sériu %d dni. Jeden kvíz na 80 %% a viac ju udrží.</item>
+        <item quantity="many">Máš sériu %d dňa. Jeden kvíz na 80 %% a viac ju udrží.</item>
+        <item quantity="other">Máš sériu %d dní. Jeden kvíz na 80 %% a viac ju udrží.</item>
+    </plurals>
+    <string name="reminder_challenge_title">Začni 7-dňovú výzvu</string>
+    <string name="reminder_challenge_text" formatted="false">Dosiahni dnes 80 % a viac a zajtra sa vráť.</string>
+    <string name="reminder_inactivity_title">Čakajú ťa nové otázky, %1$s</string>
+    <string name="reminder_inactivity_text">Je to už nejaký čas. Dáš si rýchle kolo?</string>
 </resources>

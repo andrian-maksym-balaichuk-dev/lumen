@@ -81,6 +81,14 @@ public class UserPreferencesDataSource
             }
         }
 
+        public suspend fun setLastStreakReminderDate(isoDate: String) {
+            dataStore.edit { it[PreferenceKeys.LAST_STREAK_REMINDER_DATE] = isoDate }
+        }
+
+        public suspend fun setLastInactivityReminderAt(epochMs: Long) {
+            dataStore.edit { it[PreferenceKeys.LAST_INACTIVITY_REMINDER_AT] = epochMs }
+        }
+
         public suspend fun clearSessionToken() {
             dataStore.edit {
                 it.remove(PreferenceKeys.SESSION_TOKEN)
