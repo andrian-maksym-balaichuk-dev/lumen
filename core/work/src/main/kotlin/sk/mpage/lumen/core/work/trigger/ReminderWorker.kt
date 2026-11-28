@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
@@ -14,6 +15,7 @@ import sk.mpage.lumen.core.domain.repository.UserProfileRepository
 import sk.mpage.lumen.core.domain.usecase.DecideReminderUseCase
 import sk.mpage.lumen.core.domain.usecase.ObserveStreakUseCase
 import sk.mpage.lumen.core.domain.usecase.ReminderInput
+import sk.mpage.lumen.core.model.ManualCheck
 import sk.mpage.lumen.core.model.ReminderDecision
 import java.time.Clock
 import java.time.ZonedDateTime
@@ -48,18 +50,22 @@ public class ReminderWorker
                         force = inputData.getBoolean(KEY_FORCE, false),
                     ),
                 )
-            if (decision == ReminderDecision.None) return Result.success()
-            val posted = notifier.showReminder(decision, profiles.observeProfile().first().name)
-            if (posted) {
-                when (decision) {
-                    ReminderDecision.Inactivity -> appUsage.markInactivityReminderSent(now.toInstant())
-                    else -> appUsage.markStreakReminderSent(now.toLocalDate())
-                }
+            if (!notifier.areNotificationsAllowed()) return finish(ManualCheck.NOT_ALLOWED)
+            if (decision == ReminderDecision.None) return finish(ManualCheck.NOTHING_TO_REMIND)
+            if (!notifier.showReminder(decision, profiles.observeProfile().first().name)) {
+                return finish(ManualCheck.NOT_ALLOWED)
             }
-            return Result.success()
+            when (decision) {
+                ReminderDecision.Inactivity -> appUsage.markInactivityReminderSent(now.toInstant())
+                else -> appUsage.markStreakReminderSent(now.toLocalDate())
+            }
+            return finish(ManualCheck.POSTED)
         }
+
+        private fun finish(outcome: ManualCheck): Result = Result.success(workDataOf(KEY_OUTCOME to outcome.name))
 
         public companion object {
             public const val KEY_FORCE: String = "force"
+            public const val KEY_OUTCOME: String = "outcome"
         }
     }

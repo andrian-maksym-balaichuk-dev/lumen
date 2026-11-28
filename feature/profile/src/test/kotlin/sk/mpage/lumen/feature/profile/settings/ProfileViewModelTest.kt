@@ -5,8 +5,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.model.Avatar
+import sk.mpage.lumen.core.model.ManualCheck
+import sk.mpage.lumen.core.model.ReminderStatus
 import sk.mpage.lumen.core.model.UserProfile
 import sk.mpage.lumen.core.testing.MainDispatcherRule
+import sk.mpage.lumen.core.testing.port.FakeReminderCheck
 import sk.mpage.lumen.core.testing.repository.FakeSettingsRepository
 import sk.mpage.lumen.core.testing.repository.FakeUserProfileRepository
 import sk.mpage.lumen.core.ui.UiText
@@ -20,7 +23,8 @@ class ProfileViewModelTest {
 
     private val profiles = FakeUserProfileRepository(UserProfile("Ada", Avatar.Preset("fox"), onboarded = true))
     private val settings = FakeSettingsRepository()
-    private val viewModel by lazy { ProfileViewModel(profiles, settings) }
+    private val reminderCheck = FakeReminderCheck()
+    private val viewModel by lazy { ProfileViewModel(profiles, settings, reminderCheck) }
 
     @Test
     fun `shows the stored profile`() =
@@ -28,6 +32,34 @@ class ProfileViewModelTest {
             viewModel.uiState.test {
                 assertEquals(ProfileUiState.Loading, awaitItem())
                 assertEquals(ProfileUiState.Content("Ada", Avatar.Preset("fox")), awaitItem())
+            }
+        }
+
+    @Test
+    fun `run now calls the reminder check and reports the result`() =
+        runTest {
+            viewModel.effects.test {
+                viewModel.onAction(ProfileAction.RunReminderCheck)
+                assertEquals(1, reminderCheck.runs)
+
+                reminderCheck.finishRun(ManualCheck.RUNNING)
+                reminderCheck.finishRun(ManualCheck.NOTHING_TO_REMIND)
+
+                assertEquals(
+                    ProfileEffect.ShowMessage(UiText.Resource(R.string.profile_reminder_nothing)),
+                    awaitItem(),
+                )
+            }
+        }
+
+    @Test
+    fun `the reminder check status is shown`() =
+        runTest {
+            reminderCheck.emit(ReminderStatus(manualCheck = ManualCheck.RUNNING))
+
+            viewModel.uiState.test {
+                skipItems(1)
+                assertEquals(ManualCheck.RUNNING, (awaitItem() as ProfileUiState.Content).reminderStatus.manualCheck)
             }
         }
 

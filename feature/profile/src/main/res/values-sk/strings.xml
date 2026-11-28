@@ -35,4 +35,11 @@
     <string name="profile_inactivity_reminders_subtitle">Po troch dňoch bez hry</string>
     <string name="profile_notifications_off">Upozornenia sú vypnuté</string>
     <string name="profile_notifications_off_subtitle">Zapni ich v nastaveniach systému</string>
+    <string name="profile_reminder_check">Skontrolovať pripomienky teraz</string>
+    <string name="profile_reminder_queued">Vo fronte…</string>
+    <string name="profile_reminder_running">Kontrolujem…</string>
+    <string name="profile_reminder_next">Naplánované, ďalšia kontrola okolo %1$s</string>
+    <string name="profile_reminder_not_scheduled">Zatiaľ nenaplánované</string>
+    <string name="profile_reminder_posted">Pripomienka odoslaná</string>
+    <string name="profile_reminder_nothing">Dnes ti nemáme čo pripomenúť</string>
 </resources>

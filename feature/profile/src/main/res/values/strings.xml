@@ -34,4 +34,11 @@
     <string name="profile_inactivity_reminders_subtitle">After three days without a game</string>
     <string name="profile_notifications_off">Notifications are off</string>
     <string name="profile_notifications_off_subtitle">Turn them on in system settings</string>
+    <string name="profile_reminder_check">Run reminder check now</string>
+    <string name="profile_reminder_queued">Queued…</string>
+    <string name="profile_reminder_running">Checking…</string>
+    <string name="profile_reminder_next">Scheduled, next check around %1$s</string>
+    <string name="profile_reminder_not_scheduled">Not scheduled yet</string>
+    <string name="profile_reminder_posted">Reminder sent</string>
+    <string name="profile_reminder_nothing">Nothing to remind you about today</string>
 </resources>

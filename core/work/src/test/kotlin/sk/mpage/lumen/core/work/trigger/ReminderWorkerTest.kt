@@ -15,6 +15,7 @@ import sk.mpage.lumen.core.domain.usecase.DecideReminderUseCase
 import sk.mpage.lumen.core.domain.usecase.ObserveStreakUseCase
 import sk.mpage.lumen.core.model.AppUsage
 import sk.mpage.lumen.core.model.Avatar
+import sk.mpage.lumen.core.model.ManualCheck
 import sk.mpage.lumen.core.model.ReminderDecision
 import sk.mpage.lumen.core.model.UserProfile
 import sk.mpage.lumen.core.testing.port.RecordingNotifier
@@ -46,7 +47,7 @@ class ReminderWorkerTest {
         runTest {
             history.emitQualifyingDays(listOf(today.minusDays(1), today.minusDays(2)))
 
-            assertEquals(ListenableWorker.Result.success(), worker(at(18, 0)).doWork())
+            assertEquals(outcome(ManualCheck.POSTED), worker(at(18, 0)).doWork())
             worker(at(19, 0)).doWork()
 
             assertEquals(listOf<ReminderDecision>(ReminderDecision.StreakAtRisk(2)), notifier.reminders)
@@ -73,11 +74,21 @@ class ReminderWorkerTest {
         }
 
     @Test
+    fun `the result says whether something was posted`() =
+        runTest {
+            assertEquals(outcome(ManualCheck.POSTED), worker(at(18, 0)).doWork())
+            assertEquals(outcome(ManualCheck.NOTHING_TO_REMIND), worker(at(19, 0)).doWork())
+
+            notifier.allowed = false
+            assertEquals(outcome(ManualCheck.NOT_ALLOWED), worker(at(19, 0), force = true).doWork())
+        }
+
+    @Test
     fun `a reminder that could not be posted is not recorded`() =
         runTest {
             notifier.posts = false
 
-            assertEquals(ListenableWorker.Result.success(), worker(at(18, 0)).doWork())
+            assertEquals(outcome(ManualCheck.NOT_ALLOWED), worker(at(18, 0)).doWork())
 
             assertNull(usage.current.lastStreakReminderDate)
         }
@@ -92,6 +103,9 @@ class ReminderWorkerTest {
             assertEquals(listOf<ReminderDecision>(ReminderDecision.Inactivity), notifier.reminders)
             assertEquals(at(12, 0).toInstant(), usage.current.lastInactivityReminderAt)
         }
+
+    private fun outcome(check: ManualCheck) =
+        ListenableWorker.Result.success(workDataOf(ReminderWorker.KEY_OUTCOME to check.name))
 
     private fun at(
         hour: Int,

@@ -1,6 +1,7 @@
 package sk.mpage.lumen.feature.profile.settings
 
 import sk.mpage.lumen.core.model.Avatar
+import sk.mpage.lumen.core.model.ReminderStatus
 import sk.mpage.lumen.core.ui.UiText
 
 internal sealed interface ProfileUiState {
@@ -12,6 +13,7 @@ internal sealed interface ProfileUiState {
         val isImportingPhoto: Boolean = false,
         val streakReminders: Boolean = true,
         val inactivityReminders: Boolean = true,
+        val reminderStatus: ReminderStatus = ReminderStatus(),
     ) : ProfileUiState
 }
 
@@ -35,6 +37,8 @@ internal sealed interface ProfileAction {
     data class InactivityRemindersChanged(
         val enabled: Boolean,
     ) : ProfileAction
+
+    data object RunReminderCheck : ProfileAction
 }
 
 internal sealed interface ProfileEffect {

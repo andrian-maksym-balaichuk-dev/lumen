@@ -47,6 +47,8 @@ import sk.mpage.lumen.core.designsystem.preview.LumoraPreviews
 import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
 import sk.mpage.lumen.core.designsystem.theme.Lumora
 import sk.mpage.lumen.core.model.Avatar
+import sk.mpage.lumen.core.model.ManualCheck
+import sk.mpage.lumen.core.model.ReminderStatus
 import sk.mpage.lumen.core.ui.ProfileAvatar
 import sk.mpage.lumen.core.ui.rememberNotificationPermissionState
 import sk.mpage.lumen.feature.profile.R
@@ -54,6 +56,9 @@ import sk.mpage.lumen.feature.profile.component.AvatarPicker
 import sk.mpage.lumen.feature.profile.component.RenameDialog
 import sk.mpage.lumen.feature.profile.component.SettingsCard
 import sk.mpage.lumen.feature.profile.component.SwitchItem
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -180,6 +185,13 @@ private fun NotificationsCard(
             checked = state.inactivityReminders && permission.isGranted,
             onCheckedChange = { setReminder(it, ProfileAction::InactivityRemindersChanged) },
         )
+        ListItem(
+            headlineContent = { Text(stringResource(R.string.profile_reminder_check)) },
+            supportingContent = { Text(reminderStatusText(state.reminderStatus)) },
+            trailingContent = { Icon(painterResource(LumoraIcons.ArrowForward), contentDescription = null) },
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+            modifier = Modifier.clickable { onAction(ProfileAction.RunReminderCheck) },
+        )
         if (permission.isBlocked) {
             ListItem(
                 headlineContent = { Text(stringResource(R.string.profile_notifications_off)) },
@@ -191,6 +203,29 @@ private fun NotificationsCard(
         }
     }
 }
+
+@Composable
+private fun reminderStatusText(status: ReminderStatus): String =
+    when (status.manualCheck) {
+        ManualCheck.QUEUED -> {
+            stringResource(R.string.profile_reminder_queued)
+        }
+
+        ManualCheck.RUNNING -> {
+            stringResource(R.string.profile_reminder_running)
+        }
+
+        else -> {
+            status.nextCheckAt?.let {
+                stringResource(
+                    R.string.profile_reminder_next,
+                    DateTimeFormatter
+                        .ofLocalizedTime(FormatStyle.SHORT)
+                        .format(it.atZone(ZoneId.systemDefault())),
+                )
+            } ?: stringResource(R.string.profile_reminder_not_scheduled)
+        }
+    }
 
 @LumoraPreviews
 @Composable
