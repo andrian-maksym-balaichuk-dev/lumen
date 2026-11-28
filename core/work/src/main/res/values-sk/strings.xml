@@ -16,4 +16,6 @@
     <string name="reminder_challenge_text" formatted="false">Dosiahni dnes 80 % a viac a zajtra sa vráť.</string>
     <string name="reminder_inactivity_title">Čakajú ťa nové otázky, %1$s</string>
     <string name="reminder_inactivity_text">Je to už nejaký čas. Dáš si rýchle kolo?</string>
+    <string name="record_title">Nový rekord v maratóne</string>
+    <string name="record_text">%1$d za sebou, predchádzajúci rekord bol %2$d.</string>
 </resources>

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +18,7 @@ import sk.mpage.lumen.core.designsystem.component.LocalHazeState
 import sk.mpage.lumen.core.designsystem.component.LumoraDock
 import sk.mpage.lumen.core.designsystem.component.LumoraDockItem
 import sk.mpage.lumen.core.designsystem.modifier.hazeBackground
+import sk.mpage.lumen.feature.game.navigation.ResultKey
 import sk.mpage.lumen.ui.navigation.LumenNavDisplay
 import sk.mpage.lumen.ui.navigation.Navigator
 
@@ -24,10 +26,18 @@ import sk.mpage.lumen.ui.navigation.Navigator
 internal fun LumenRoot(
     startKey: NavKey,
     streakAtRisk: Boolean,
+    sessionToOpen: Long?,
+    onSessionOpened: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val backStack = rememberNavBackStack(startKey)
     val navigator = remember(backStack) { Navigator(backStack) }
+    LaunchedEffect(sessionToOpen) {
+        if (sessionToOpen != null) {
+            navigator.push(ResultKey(sessionToOpen))
+            onSessionOpened()
+        }
+    }
     val current = navigator.currentTopLevel
     val hazeState = rememberHazeState()
 

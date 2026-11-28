@@ -62,6 +62,17 @@ class MainActivityViewModelTest {
             assertTrue(viewModel.streakAtRisk.value)
         }
 
+    @Test
+    fun `a notification link opens the session once`() {
+        val viewModel = MainActivityViewModel(FakeUserProfileRepository(), streak())
+
+        viewModel.onSessionLink(42)
+        assertEquals(42L, viewModel.sessionToOpen.value)
+
+        viewModel.onSessionOpened()
+        assertEquals(null, viewModel.sessionToOpen.value)
+    }
+
     private val history = FakeQuizHistoryRepository()
 
     private fun streak() = ObserveStreakUseCase(history, FakeTodayProvider(TODAY), CalculateStreakUseCase())

@@ -3,8 +3,10 @@ package sk.mpage.lumen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -33,6 +35,17 @@ internal class MainActivityViewModel
                 val onboarded = profiles.observeProfile().first().onboarded
                 emit(if (onboarded) StartupUiState.Ready else StartupUiState.NeedsOnboarding)
             }.stateIn(viewModelScope, SharingStarted.Eagerly, StartupUiState.Loading)
+
+        private val openSession = MutableStateFlow<Long?>(null)
+        val sessionToOpen: StateFlow<Long?> = openSession.asStateFlow()
+
+        fun onSessionLink(sessionId: Long) {
+            openSession.value = sessionId
+        }
+
+        fun onSessionOpened() {
+            openSession.value = null
+        }
 
         val streakAtRisk: StateFlow<Boolean> =
             observeStreak()

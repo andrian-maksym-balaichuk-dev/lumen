@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import sk.mpage.lumen.core.common.result.AppResult
 import sk.mpage.lumen.core.common.result.DataError
+import sk.mpage.lumen.core.domain.port.AchievementNotifier
 import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
 import sk.mpage.lumen.core.domain.repository.SaveOutcome
 import sk.mpage.lumen.core.model.Category
@@ -24,10 +25,46 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SaveQuizResultUseCaseTest {
+    private val posted = mutableListOf<Triple<Long, Int, Int>>()
+
+    private val records =
+        object : AchievementNotifier {
+            override fun showMarathonRecord(
+                sessionId: Long,
+                correct: Int,
+                previousBest: Int,
+            ) {
+                posted += Triple(sessionId, correct, previousBest)
+            }
+        }
+
+    @Test
+    fun `a beaten marathon record is notified`() =
+        runTest {
+            SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(7, 17, false))), records)(
+                marathon(correct = 23),
+            )
+
+            assertEquals(listOf(Triple(7L, 23, 17)), posted)
+        }
+
+    @Test
+    fun `a first record or an equalled best is not notified`() =
+        runTest {
+            SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(1, null, false))), records)(
+                marathon(correct = 3),
+            )
+            SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(2, 23, false))), records)(
+                marathon(correct = 23),
+            )
+
+            assertEquals(emptyList(), posted)
+        }
+
     @Test
     fun `maps the outcome to the session id`() =
         runTest {
-            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(42, null, false))))
+            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(42, null, false))), records)
 
             assertEquals(AppResult.Success(SaveResult(42, isNewBest = false, previousBest = null)), useCase(GAME))
         }
@@ -35,7 +72,7 @@ class SaveQuizResultUseCaseTest {
     @Test
     fun `a marathon above the previous best is a new best`() =
         runTest {
-            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(7, 17, false))))
+            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(7, 17, false))), records)
 
             assertEquals(
                 AppResult.Success(SaveResult(7, isNewBest = true, previousBest = 17)),
@@ -46,7 +83,7 @@ class SaveQuizResultUseCaseTest {
     @Test
     fun `equalling the previous best is not a new best`() =
         runTest {
-            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(7, 23, false))))
+            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(7, 23, false))), records)
 
             assertEquals(false, (useCase(marathon(correct = 23)) as AppResult.Success).value.isNewBest)
         }
@@ -54,7 +91,7 @@ class SaveQuizResultUseCaseTest {
     @Test
     fun `the first marathon with a correct answer is the first record`() =
         runTest {
-            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(1, null, false))))
+            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(1, null, false))), records)
 
             assertEquals(
                 AppResult.Success(SaveResult(1, isNewBest = true, previousBest = null)),
@@ -65,7 +102,7 @@ class SaveQuizResultUseCaseTest {
     @Test
     fun `a classic game is never a personal best`() =
         runTest {
-            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(1, null, false))))
+            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(1, null, false))), records)
 
             assertEquals(false, (useCase(GAME.copy(attempts = attempts(10))) as AppResult.Success).value.isNewBest)
         }
@@ -73,7 +110,7 @@ class SaveQuizResultUseCaseTest {
     @Test
     fun `saving the same game again does not celebrate twice`() =
         runTest {
-            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(7, null, true))))
+            val useCase = SaveQuizResultUseCase(repository(AppResult.Success(SaveOutcome(7, null, true))), records)
 
             assertEquals(false, (useCase(marathon(correct = 23)) as AppResult.Success).value.isNewBest)
         }
@@ -110,7 +147,7 @@ class SaveQuizResultUseCaseTest {
     @Test
     fun `passes a storage failure through`() =
         runTest {
-            val useCase = SaveQuizResultUseCase(repository(AppResult.Failure(DataError.Storage)))
+            val useCase = SaveQuizResultUseCase(repository(AppResult.Failure(DataError.Storage)), records)
 
             assertEquals(AppResult.Failure(DataError.Storage), useCase(GAME))
         }

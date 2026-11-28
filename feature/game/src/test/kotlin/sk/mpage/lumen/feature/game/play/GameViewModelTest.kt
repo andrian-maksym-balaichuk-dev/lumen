@@ -14,6 +14,7 @@ import sk.mpage.lumen.core.testing.MainDispatcherRule
 import sk.mpage.lumen.core.testing.TestMonotonicClock
 import sk.mpage.lumen.core.testing.data.TestData
 import sk.mpage.lumen.core.testing.feed.FakeQuestionFeed
+import sk.mpage.lumen.core.testing.port.RecordingNotifier
 import sk.mpage.lumen.core.testing.repository.FakeQuestionRepository
 import sk.mpage.lumen.core.testing.repository.FakeQuizHistoryRepository
 import java.time.Clock
@@ -36,7 +37,7 @@ class GameViewModelTest {
         GameViewModel(
             config = TestData.classicConfig,
             questions = FakeQuestionRepository(feed),
-            saveResult = SaveQuizResultUseCase(history),
+            saveResult = SaveQuizResultUseCase(history, RecordingNotifier()),
             monotonicClock = TestMonotonicClock(testScheduler),
             clock = Clock.fixed(Instant.parse("2026-11-26T12:00:00Z"), ZoneOffset.UTC),
         ).also { runCurrent() }
@@ -215,7 +216,7 @@ class GameViewModelTest {
                 GameViewModel(
                     config = TestData.classicConfig.copy(mode = GameMode.MARATHON),
                     questions = FakeQuestionRepository(marathonFeed),
-                    saveResult = SaveQuizResultUseCase(history),
+                    saveResult = SaveQuizResultUseCase(history, RecordingNotifier()),
                     monotonicClock = TestMonotonicClock(testScheduler),
                     clock = Clock.fixed(Instant.parse("2026-11-26T12:00:00Z"), ZoneOffset.UTC),
                 )
@@ -245,7 +246,7 @@ class GameViewModelTest {
                 GameViewModel(
                     config = TestData.classicConfig.copy(mode = GameMode.MARATHON),
                     questions = FakeQuestionRepository(marathonFeed),
-                    saveResult = SaveQuizResultUseCase(history),
+                    saveResult = SaveQuizResultUseCase(history, RecordingNotifier()),
                     monotonicClock = TestMonotonicClock(testScheduler),
                     clock = Clock.fixed(Instant.parse("2026-11-26T12:00:00Z"), ZoneOffset.UTC),
                 )

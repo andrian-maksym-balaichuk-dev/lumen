@@ -8,12 +8,16 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import sk.mpage.lumen.core.domain.port.AchievementNotifier
 import sk.mpage.lumen.core.domain.port.ReminderNotifier
 import sk.mpage.lumen.core.work.notification.SystemTrayNotifier
 
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class WorkModule {
+    @Binds
+    abstract fun achievementNotifier(notifier: SystemTrayNotifier): AchievementNotifier
+
     @Binds
     abstract fun reminderNotifier(notifier: SystemTrayNotifier): ReminderNotifier
 

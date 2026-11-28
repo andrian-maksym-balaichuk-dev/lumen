@@ -14,4 +14,6 @@
     <string name="reminder_challenge_text" formatted="false">Score 80 % or better today and come back tomorrow.</string>
     <string name="reminder_inactivity_title">New questions are waiting, %1$s</string>
     <string name="reminder_inactivity_text">It has been a while. Ready for a quick round?</string>
+    <string name="record_title">New marathon record</string>
+    <string name="record_text">%1$d in a row, beating your previous best of %2$d.</string>
 </resources>
