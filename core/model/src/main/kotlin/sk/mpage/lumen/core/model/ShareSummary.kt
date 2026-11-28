@@ -9,4 +9,5 @@ public data class ShareSummary(
     val difficulty: Difficulty,
     val durationSeconds: Long,
     val isNewBest: Boolean = false,
+    val streakDays: Int? = null,
 )

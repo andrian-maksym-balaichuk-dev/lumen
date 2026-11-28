@@ -8,6 +8,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import sk.mpage.lumen.core.domain.usecase.BuildShareSummaryUseCase
+import sk.mpage.lumen.core.domain.usecase.CalculateStreakUseCase
+import sk.mpage.lumen.core.domain.usecase.ObserveStreakUseCase
 import sk.mpage.lumen.core.model.Difficulty
 import sk.mpage.lumen.core.model.EndReason
 import sk.mpage.lumen.core.model.GameMode
@@ -18,6 +20,7 @@ import sk.mpage.lumen.core.model.QuizSessionDetail
 import sk.mpage.lumen.core.testing.MainDispatcherRule
 import sk.mpage.lumen.core.testing.repository.FakeQuizHistoryRepository
 import sk.mpage.lumen.core.testing.repository.FakeUserProfileRepository
+import sk.mpage.lumen.core.testing.time.FakeTodayProvider
 import java.time.Instant
 import java.time.LocalDate
 import kotlin.test.Test
@@ -88,13 +91,33 @@ class ResultViewModelTest {
             }
         }
 
+    @Test
+    fun `sharing carries the current streak`() =
+        runTest {
+            history.emitQualifyingDays((0L..3L).map { TODAY.minusDays(it) })
+            show(session(1, GameMode.CLASSIC, correct = 9))
+            val viewModel = started(sessionId = 1)
+
+            viewModel.effects.test {
+                viewModel.onShareTapped()
+                assertEquals(4, assertIs<ResultEffect.ShareText>(awaitItem()).summary.streakDays)
+            }
+        }
+
     private fun show(vararg sessions: QuizSession) {
         history.emitSessions(sessions.toList())
         sessions.forEach { history.emitDetail(QuizSessionDetail(it, emptyList())) }
     }
 
     private fun kotlinx.coroutines.test.TestScope.started(sessionId: Long): ResultViewModel {
-        val viewModel = ResultViewModel(sessionId, history, FakeUserProfileRepository(), BuildShareSummaryUseCase())
+        val viewModel =
+            ResultViewModel(
+                sessionId,
+                history,
+                FakeUserProfileRepository(),
+                BuildShareSummaryUseCase(),
+                ObserveStreakUseCase(history, FakeTodayProvider(TODAY), CalculateStreakUseCase()),
+            )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect() }
         advanceUntilIdle()
         return viewModel
@@ -102,6 +125,10 @@ class ResultViewModelTest {
 
     private fun kotlinx.coroutines.test.TestScope.content(sessionId: Long): ResultUiState.Content =
         assertIs(started(sessionId).uiState.value)
+
+    private companion object {
+        val TODAY: LocalDate = LocalDate.of(2026, 11, 25)
+    }
 
     private fun session(
         id: Long,

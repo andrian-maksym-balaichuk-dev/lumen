@@ -75,6 +75,27 @@ class ShareTextFormatterTest {
     }
 
     @Test
+    @Config(qualifiers = "en")
+    fun `a streak line comes before the closing`() {
+        assertTrue(
+            ShareTextFormatter
+                .format(CLASSIC.copy(streakDays = 4), resources)
+                .endsWith("on Lumen.\nStreak: 4 days. Can you beat me?"),
+        )
+    }
+
+    @Test
+    @Config(qualifiers = "sk")
+    fun `the slovak streak line uses the plural form`() {
+        assertTrue(
+            ShareTextFormatter.format(CLASSIC.copy(streakDays = 4), resources).endsWith("Séria: 4 dni. Prekonáš ma?"),
+        )
+        assertTrue(
+            ShareTextFormatter.format(CLASSIC.copy(streakDays = 5), resources).endsWith("Séria: 5 dní. Prekonáš ma?"),
+        )
+    }
+
+    @Test
     fun `durations over an hour show hours`() {
         assertEquals("1:02:05", formatDuration(3_725))
         assertEquals("0:09", formatDuration(9))

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -21,6 +22,7 @@ import sk.mpage.lumen.core.domain.game.GameRules
 import sk.mpage.lumen.core.domain.repository.QuizHistoryRepository
 import sk.mpage.lumen.core.domain.repository.UserProfileRepository
 import sk.mpage.lumen.core.domain.usecase.BuildShareSummaryUseCase
+import sk.mpage.lumen.core.domain.usecase.ObserveStreakUseCase
 import sk.mpage.lumen.core.model.EndReason
 import sk.mpage.lumen.core.model.GameMode
 
@@ -32,7 +34,10 @@ internal class ResultViewModel
         history: QuizHistoryRepository,
         profiles: UserProfileRepository,
         private val buildShareSummary: BuildShareSummaryUseCase,
+        observeStreak: ObserveStreakUseCase,
     ) : ViewModel() {
+        private val streak = observeStreak().stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
         private val session = history.observeSessionDetail(sessionId).map { it?.session }
 
         private val previousBest = flow { emit(history.marathonBestBefore(sessionId)) }
@@ -65,7 +70,8 @@ internal class ResultViewModel
             viewModelScope.launch {
                 val current = session.first() ?: return@launch
                 val isNewBest = (uiState.value as? ResultUiState.Content)?.isNewBest == true
-                effectChannel.send(ResultEffect.ShareText(buildShareSummary(current, isNewBest)))
+                val streak = streak.filterNotNull().first()
+                effectChannel.send(ResultEffect.ShareText(buildShareSummary(current, isNewBest, streak)))
             }
         }
 

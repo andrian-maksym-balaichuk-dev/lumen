@@ -47,6 +47,8 @@ public object ShareTextFormatter {
                 }
             }
         val best = if (summary.isNewBest) " " + resources.getString(R.string.share_new_best) else ""
-        return result + best + "\n" + resources.getString(R.string.share_closing)
+        val streak =
+            summary.streakDays?.let { resources.getQuantityString(R.plurals.share_streak, it, it) + " " }.orEmpty()
+        return result + best + "\n" + streak + resources.getString(R.string.share_closing)
     }
 }
