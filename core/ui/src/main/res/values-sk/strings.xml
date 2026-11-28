@@ -2,7 +2,7 @@
     <string name="error_no_internet">Ste offline. Skontrolujte pripojenie a skúste to znova.</string>
     <string name="error_timeout">Kvízový server neodpovedal včas. Skúste to znova.</string>
     <string name="error_rate_limited">Príliš veľa požiadaviek. Počkajte pár sekúnd a skúste to znova.</string>
-    <string name="error_no_results">Kvízový server nevrátil žiadne výsledky.</string>
+    <string name="error_no_results">Pre túto kategóriu, obtiažnosť a typ nie je dosť otázok. Skúste iné nastavenia.</string>
     <string name="error_token_invalid">Kvízová relácia vypršala. Skúste to znova.</string>
     <string name="error_invalid_request">Kvízový server požiadavku odmietol.</string>
     <string name="error_http">Kvízový server má problémy. Skúste to neskôr.</string>

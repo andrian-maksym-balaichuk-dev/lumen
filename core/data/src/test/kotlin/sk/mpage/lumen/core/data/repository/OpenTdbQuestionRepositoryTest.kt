@@ -124,6 +124,18 @@ class OpenTdbQuestionRepositoryTest {
         }
 
     @Test
+    fun `a token still exhausted after a reset is no results`() =
+        runTest {
+            storeToken("t1")
+            server.enqueue(questions(code = 4))
+            server.enqueue(token("t1"))
+            server.enqueue(questions(code = 4))
+
+            assertEquals(FeedResult.Failed(DataError.NoResults), feed().next())
+            assertEquals(3, server.requestCount)
+        }
+
+    @Test
     fun `too few questions is no results`() =
         runTest {
             storeToken("t1")

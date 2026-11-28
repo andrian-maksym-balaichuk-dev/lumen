@@ -46,6 +46,7 @@ internal class OpenTdbQuestionRepository
             amount: Int,
         ): AppResult<List<Question>> {
             var token = tokens.current()
+            var reset = false
             repeat(TOKEN_ATTEMPTS) {
                 val result =
                     remote.questions(
@@ -72,6 +73,8 @@ internal class OpenTdbQuestionRepository
                     }
 
                     RemoteQuestions.TokenExhausted -> {
+                        if (reset) return AppResult.Failure(DataError.NoResults)
+                        reset = true
                         token = tokens.reset()
                     }
                 }
