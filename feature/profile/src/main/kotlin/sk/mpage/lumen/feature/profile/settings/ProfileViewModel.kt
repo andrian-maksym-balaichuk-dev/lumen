@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import sk.mpage.lumen.core.common.result.AppResult
+import sk.mpage.lumen.core.domain.repository.SettingsRepository
 import sk.mpage.lumen.core.domain.repository.UserProfileRepository
 import sk.mpage.lumen.core.model.AvatarInput
 import sk.mpage.lumen.core.ui.UiText
@@ -25,12 +26,23 @@ internal class ProfileViewModel
     @Inject
     constructor(
         private val profiles: UserProfileRepository,
+        private val settings: SettingsRepository,
     ) : ViewModel() {
         private val importingPhoto = MutableStateFlow(false)
 
         val uiState: StateFlow<ProfileUiState> =
-            combine(profiles.observeProfile(), importingPhoto) { profile, importing ->
-                ProfileUiState.Content(name = profile.name, avatar = profile.avatar, isImportingPhoto = importing)
+            combine(
+                profiles.observeProfile(),
+                settings.observeSettings(),
+                importingPhoto,
+            ) { profile, prefs, importing ->
+                ProfileUiState.Content(
+                    name = profile.name,
+                    avatar = profile.avatar,
+                    isImportingPhoto = importing,
+                    streakReminders = prefs.streakReminders,
+                    inactivityReminders = prefs.inactivityReminders,
+                )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ProfileUiState.Loading)
 
         private val effectChannel = Channel<ProfileEffect>(Channel.BUFFERED)
@@ -51,6 +63,14 @@ internal class ProfileViewModel
 
                 is ProfileAction.PhotoPicked -> {
                     importPhoto(action.uriString)
+                }
+
+                is ProfileAction.StreakRemindersChanged -> {
+                    viewModelScope.launch { settings.setStreakReminders(action.enabled) }
+                }
+
+                is ProfileAction.InactivityRemindersChanged -> {
+                    viewModelScope.launch { settings.setInactivityReminders(action.enabled) }
                 }
             }
         }

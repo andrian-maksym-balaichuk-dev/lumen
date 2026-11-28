@@ -1,5 +1,6 @@
 package sk.mpage.lumen.feature.profile.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -30,11 +34,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import sk.mpage.lumen.core.designsystem.component.GlassSurface
 import sk.mpage.lumen.core.designsystem.component.LocalHazeState
 import sk.mpage.lumen.core.designsystem.component.LumoraDockClearance
 import sk.mpage.lumen.core.designsystem.component.LumoraLargeTopBar
+import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
 import sk.mpage.lumen.core.designsystem.layout.LumoraFlex
 import sk.mpage.lumen.core.designsystem.modifier.hazeContent
 import sk.mpage.lumen.core.designsystem.preview.LumoraPreviews
@@ -42,9 +48,12 @@ import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
 import sk.mpage.lumen.core.designsystem.theme.Lumora
 import sk.mpage.lumen.core.model.Avatar
 import sk.mpage.lumen.core.ui.ProfileAvatar
+import sk.mpage.lumen.core.ui.rememberNotificationPermissionState
 import sk.mpage.lumen.feature.profile.R
 import sk.mpage.lumen.feature.profile.component.AvatarPicker
 import sk.mpage.lumen.feature.profile.component.RenameDialog
+import sk.mpage.lumen.feature.profile.component.SettingsCard
+import sk.mpage.lumen.feature.profile.component.SwitchItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +78,7 @@ internal fun ProfileScreen(
 
                 is ProfileUiState.Content -> {
                     LumoraFlex(
-                        items = listOf { IdentityCard(state, onAction) },
+                        items = listOf({ IdentityCard(state, onAction) }, { NotificationsCard(state, onAction) }),
                         modifier =
                             Modifier
                                 .fillMaxSize()
@@ -140,6 +149,44 @@ private fun IdentityCard(
                 onPresetSelected = { onAction(ProfileAction.PresetSelected(it)) },
                 onPhotoPicked = { onAction(ProfileAction.PhotoPicked(it)) },
                 modifier = Modifier.padding(Lumora.spacing.xl).safeDrawingPadding(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun NotificationsCard(
+    state: ProfileUiState.Content,
+    onAction: (ProfileAction) -> Unit,
+) {
+    val permission = rememberNotificationPermissionState()
+    val setReminder = { enabled: Boolean, action: (Boolean) -> ProfileAction ->
+        if (enabled) {
+            permission.request { granted -> if (granted) onAction(action(true)) }
+        } else {
+            onAction(action(false))
+        }
+    }
+    SettingsCard(title = stringResource(R.string.profile_notifications)) {
+        SwitchItem(
+            title = stringResource(R.string.profile_streak_reminders),
+            subtitle = stringResource(R.string.profile_streak_reminders_subtitle),
+            checked = state.streakReminders && permission.isGranted,
+            onCheckedChange = { setReminder(it, ProfileAction::StreakRemindersChanged) },
+        )
+        SwitchItem(
+            title = stringResource(R.string.profile_inactivity_reminders),
+            subtitle = stringResource(R.string.profile_inactivity_reminders_subtitle),
+            checked = state.inactivityReminders && permission.isGranted,
+            onCheckedChange = { setReminder(it, ProfileAction::InactivityRemindersChanged) },
+        )
+        if (permission.isBlocked) {
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.profile_notifications_off)) },
+                supportingContent = { Text(stringResource(R.string.profile_notifications_off_subtitle)) },
+                trailingContent = { Icon(painterResource(LumoraIcons.ArrowForward), contentDescription = null) },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                modifier = Modifier.clickable(onClick = permission::openSettings),
             )
         }
     }

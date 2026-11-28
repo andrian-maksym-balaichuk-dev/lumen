@@ -7,6 +7,7 @@ import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.model.Avatar
 import sk.mpage.lumen.core.model.UserProfile
 import sk.mpage.lumen.core.testing.MainDispatcherRule
+import sk.mpage.lumen.core.testing.repository.FakeSettingsRepository
 import sk.mpage.lumen.core.testing.repository.FakeUserProfileRepository
 import sk.mpage.lumen.core.ui.UiText
 import sk.mpage.lumen.feature.profile.R
@@ -22,7 +23,8 @@ class OnboardingViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val profiles = FakeUserProfileRepository()
-    private val viewModel by lazy { OnboardingViewModel(profiles) }
+    private val settings = FakeSettingsRepository()
+    private val viewModel by lazy { OnboardingViewModel(profiles, settings) }
 
     @Test
     fun `a fresh form shows no error and cannot be submitted`() {
@@ -72,12 +74,32 @@ class OnboardingViewModelTest {
             viewModel.onAction(OnboardingAction.PresetSelected("owl"))
             assertEquals(Avatar.Preset("owl"), viewModel.uiState.value.avatar)
 
-            viewModel.effects.test {
-                viewModel.onAction(OnboardingAction.Submit)
+            viewModel.onAction(OnboardingAction.Submit)
+            mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
+            assertEquals(OnboardingStep.REMINDERS, viewModel.uiState.value.step)
+            assertEquals(UserProfile("Ada", Avatar.Preset("owl"), onboarded = true), profiles.current)
+        }
 
+    @Test
+    fun `allowing reminders keeps them on and finishes`() =
+        runTest {
+            viewModel.effects.test {
+                viewModel.onAction(OnboardingAction.RemindersAnswered(allowed = true))
                 assertEquals(OnboardingEffect.Finished, awaitItem())
             }
-            assertEquals(UserProfile("Ada", Avatar.Preset("owl"), onboarded = true), profiles.current)
+            assertTrue(settings.current.streakReminders)
+            assertTrue(settings.current.inactivityReminders)
+        }
+
+    @Test
+    fun `not now turns reminders off and finishes`() =
+        runTest {
+            viewModel.effects.test {
+                viewModel.onAction(OnboardingAction.RemindersAnswered(allowed = false))
+                assertEquals(OnboardingEffect.Finished, awaitItem())
+            }
+            assertFalse(settings.current.streakReminders)
+            assertFalse(settings.current.inactivityReminders)
         }
 
     @Test
@@ -91,10 +113,9 @@ class OnboardingViewModelTest {
             mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
             assertEquals(Avatar.Custom("42"), viewModel.uiState.value.avatar)
 
-            viewModel.effects.test {
-                viewModel.onAction(OnboardingAction.Submit)
-                assertEquals(OnboardingEffect.Finished, awaitItem())
-            }
+            viewModel.onAction(OnboardingAction.Submit)
+            mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
+            assertEquals(OnboardingStep.REMINDERS, viewModel.uiState.value.step)
             assertEquals(UserProfile("Ada", Avatar.Custom("42"), onboarded = true), profiles.current)
         }
 

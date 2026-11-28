@@ -10,6 +10,8 @@ internal sealed interface ProfileUiState {
         val name: String,
         val avatar: Avatar,
         val isImportingPhoto: Boolean = false,
+        val streakReminders: Boolean = true,
+        val inactivityReminders: Boolean = true,
     ) : ProfileUiState
 }
 
@@ -24,6 +26,14 @@ internal sealed interface ProfileAction {
 
     data class PhotoPicked(
         val uriString: String,
+    ) : ProfileAction
+
+    data class StreakRemindersChanged(
+        val enabled: Boolean,
+    ) : ProfileAction
+
+    data class InactivityRemindersChanged(
+        val enabled: Boolean,
     ) : ProfileAction
 }
 

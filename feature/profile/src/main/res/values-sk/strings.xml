@@ -24,4 +24,15 @@
         <item quantity="other">Použi najviac %1$d znakov</item>
     </plurals>
     <string name="profile_name_counter">%1$d/%2$d</string>
+    <string name="reminders_explainer_title">Udrž si sériu</string>
+    <string name="reminders_explainer_body">Večer ti pripomenieme, ak ti dnes ešte chýba hra, a dáme vedieť, keď čakajú nové otázky. Zmeniť to môžeš v Profile.</string>
+    <string name="reminders_allow">Povoliť</string>
+    <string name="reminders_not_now">Teraz nie</string>
+    <string name="profile_notifications">Upozornenia</string>
+    <string name="profile_streak_reminders">Pripomienky série</string>
+    <string name="profile_streak_reminders_subtitle">Večer, keď ti dnes chýba hra</string>
+    <string name="profile_inactivity_reminders">Pripomienky návratu</string>
+    <string name="profile_inactivity_reminders_subtitle">Po troch dňoch bez hry</string>
+    <string name="profile_notifications_off">Upozornenia sú vypnuté</string>
+    <string name="profile_notifications_off_subtitle">Zapni ich v nastaveniach systému</string>
 </resources>

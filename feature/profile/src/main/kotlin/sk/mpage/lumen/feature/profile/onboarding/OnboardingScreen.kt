@@ -34,10 +34,12 @@ import sk.mpage.lumen.core.designsystem.preview.LumoraPreviews
 import sk.mpage.lumen.core.designsystem.preview.PreviewSurface
 import sk.mpage.lumen.core.designsystem.theme.Lumora
 import sk.mpage.lumen.core.model.Avatar
+import sk.mpage.lumen.core.ui.rememberNotificationPermissionState
 import sk.mpage.lumen.feature.profile.R
 import sk.mpage.lumen.feature.profile.component.AvatarPicker
 import sk.mpage.lumen.feature.profile.component.NameError
 import sk.mpage.lumen.feature.profile.component.NameField
+import sk.mpage.lumen.feature.profile.component.ReminderExplainer
 
 @Composable
 internal fun OnboardingScreen(
@@ -47,6 +49,42 @@ internal fun OnboardingScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     Box(modifier.fillMaxSize()) {
+        if (state.step == OnboardingStep.REMINDERS) {
+            Reminders(onAction)
+        } else {
+            ProfileStep(state, onAction)
+        }
+        SnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter).safeDrawingPadding())
+    }
+}
+
+@Composable
+private fun Reminders(onAction: (OnboardingAction) -> Unit) {
+    val permission = rememberNotificationPermissionState()
+    LumoraFlex(
+        items =
+            listOf {
+                ReminderExplainer(
+                    onAllow = { permission.request { onAction(OnboardingAction.RemindersAnswered(it)) } },
+                    onNotNow = { onAction(OnboardingAction.RemindersAnswered(allowed = false)) },
+                )
+            },
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .safeDrawingPadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = Lumora.spacing.gutterCompact, vertical = Lumora.spacing.lg),
+        contentAlignment = Alignment.Center,
+    )
+}
+
+@Composable
+private fun ProfileStep(
+    state: OnboardingUiState,
+    onAction: (OnboardingAction) -> Unit,
+) {
+    Box(Modifier.fillMaxSize()) {
         BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding().imePadding()) {
             val previewSize = (maxHeight * 0.2f).coerceIn(Lumora.sizes.xxl, Lumora.sizes.huge)
             LumoraFlex(
@@ -88,7 +126,6 @@ internal fun OnboardingScreen(
                 },
             )
         }
-        SnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter).safeDrawingPadding())
     }
 }
 
@@ -216,4 +253,10 @@ private fun OnboardingImportingPreview() {
 @Composable
 private fun OnboardingSavingPreview() {
     PreviewSurface { OnboardingScreen(OnboardingUiState(name = "Ada", isSaving = true), onAction = {}) }
+}
+
+@LumoraPreviews
+@Composable
+private fun OnboardingRemindersPreview() {
+    PreviewSurface { OnboardingScreen(OnboardingUiState(step = OnboardingStep.REMINDERS), onAction = {}) }
 }

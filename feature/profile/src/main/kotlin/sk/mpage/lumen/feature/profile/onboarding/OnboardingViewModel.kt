@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import sk.mpage.lumen.core.common.result.AppResult
+import sk.mpage.lumen.core.domain.repository.SettingsRepository
 import sk.mpage.lumen.core.domain.repository.UserProfileRepository
 import sk.mpage.lumen.core.model.Avatar
 import sk.mpage.lumen.core.model.AvatarInput
@@ -25,6 +26,7 @@ internal class OnboardingViewModel
     @Inject
     constructor(
         private val profiles: UserProfileRepository,
+        private val settings: SettingsRepository,
     ) : ViewModel() {
         private val state = MutableStateFlow(OnboardingUiState())
         val uiState: StateFlow<OnboardingUiState> = state.asStateFlow()
@@ -49,6 +51,10 @@ internal class OnboardingViewModel
                 OnboardingAction.Submit -> {
                     submit()
                 }
+
+                is OnboardingAction.RemindersAnswered -> {
+                    finish(action.allowed)
+                }
             }
         }
 
@@ -69,6 +75,16 @@ internal class OnboardingViewModel
             }
         }
 
+        private fun finish(remindersAllowed: Boolean) {
+            viewModelScope.launch {
+                if (!remindersAllowed) {
+                    settings.setStreakReminders(false)
+                    settings.setInactivityReminders(false)
+                }
+                effectChannel.send(OnboardingEffect.Finished)
+            }
+        }
+
         private fun submit() {
             val current = state.value
             if (current.isSaving || current.isImportingPhoto) return
@@ -81,7 +97,7 @@ internal class OnboardingViewModel
             viewModelScope.launch {
                 when (profiles.completeOnboarding(current.name.trim(), current.avatar)) {
                     is AppResult.Success -> {
-                        effectChannel.send(OnboardingEffect.Finished)
+                        state.update { it.copy(isSaving = false, step = OnboardingStep.REMINDERS) }
                     }
 
                     is AppResult.Failure -> {

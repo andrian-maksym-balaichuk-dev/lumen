@@ -7,6 +7,7 @@ import sk.mpage.lumen.core.common.result.DataError
 import sk.mpage.lumen.core.model.Avatar
 import sk.mpage.lumen.core.model.UserProfile
 import sk.mpage.lumen.core.testing.MainDispatcherRule
+import sk.mpage.lumen.core.testing.repository.FakeSettingsRepository
 import sk.mpage.lumen.core.testing.repository.FakeUserProfileRepository
 import sk.mpage.lumen.core.ui.UiText
 import sk.mpage.lumen.feature.profile.R
@@ -18,7 +19,8 @@ class ProfileViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val profiles = FakeUserProfileRepository(UserProfile("Ada", Avatar.Preset("fox"), onboarded = true))
-    private val viewModel by lazy { ProfileViewModel(profiles) }
+    private val settings = FakeSettingsRepository()
+    private val viewModel by lazy { ProfileViewModel(profiles, settings) }
 
     @Test
     fun `shows the stored profile`() =
@@ -27,6 +29,22 @@ class ProfileViewModelTest {
                 assertEquals(ProfileUiState.Loading, awaitItem())
                 assertEquals(ProfileUiState.Content("Ada", Avatar.Preset("fox")), awaitItem())
             }
+        }
+
+    @Test
+    fun `reminder switches are saved`() =
+        runTest {
+            viewModel.uiState.test {
+                skipItems(2)
+
+                viewModel.onAction(ProfileAction.StreakRemindersChanged(false))
+                assertEquals(false, (awaitItem() as ProfileUiState.Content).streakReminders)
+
+                viewModel.onAction(ProfileAction.InactivityRemindersChanged(false))
+                assertEquals(false, (awaitItem() as ProfileUiState.Content).inactivityReminders)
+            }
+            assertEquals(false, settings.current.streakReminders)
+            assertEquals(false, settings.current.inactivityReminders)
         }
 
     @Test

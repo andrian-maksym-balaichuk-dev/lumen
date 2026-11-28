@@ -6,7 +6,10 @@ import sk.mpage.lumen.core.ui.UiText
 import sk.mpage.lumen.feature.profile.component.NameError
 import sk.mpage.lumen.feature.profile.component.PlayerName
 
+internal enum class OnboardingStep { PROFILE, REMINDERS }
+
 internal data class OnboardingUiState(
+    val step: OnboardingStep = OnboardingStep.PROFILE,
     val name: String = "",
     val nameError: NameError? = null,
     val avatar: Avatar = Avatar.Preset(LumoraAvatars.Default.key),
@@ -30,6 +33,10 @@ internal sealed interface OnboardingAction {
     ) : OnboardingAction
 
     data object Submit : OnboardingAction
+
+    data class RemindersAnswered(
+        val allowed: Boolean,
+    ) : OnboardingAction
 }
 
 internal sealed interface OnboardingEffect {
