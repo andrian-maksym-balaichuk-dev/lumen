@@ -74,6 +74,13 @@ public class UserPreferencesDataSource
             }
         }
 
+        public suspend fun markActive(epochMs: Long) {
+            dataStore.edit {
+                it[PreferenceKeys.LAST_ACTIVE_AT] = epochMs
+                if (PreferenceKeys.FIRST_LAUNCHED_AT !in it) it[PreferenceKeys.FIRST_LAUNCHED_AT] = epochMs
+            }
+        }
+
         public suspend fun clearSessionToken() {
             dataStore.edit {
                 it.remove(PreferenceKeys.SESSION_TOKEN)

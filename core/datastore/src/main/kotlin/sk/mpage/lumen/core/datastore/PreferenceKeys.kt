@@ -21,4 +21,6 @@ public object PreferenceKeys {
         stringPreferencesKey("last_quiz_config")
     public val SESSION_TOKEN: Preferences.Key<String> = stringPreferencesKey("session_token")
     public val SESSION_TOKEN_AT: Preferences.Key<Long> = longPreferencesKey("session_token_at")
+    public val LAST_ACTIVE_AT: Preferences.Key<Long> = longPreferencesKey("last_active_at")
+    public val FIRST_LAUNCHED_AT: Preferences.Key<Long> = longPreferencesKey("first_launched_at")
 }
