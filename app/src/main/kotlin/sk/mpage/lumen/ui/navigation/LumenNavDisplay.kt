@@ -61,11 +61,6 @@ internal fun LumenNavDisplay(
                     onBack = navigator::back,
                 )
                 awardsEntries()
-                TopLevelDestination.entries
-                    .filter { it == TopLevelDestination.PROFILE }
-                    .forEach { destination ->
-                        entry(destination.key) { PlaceholderScreen(destination) }
-                    }
             },
     )
 }

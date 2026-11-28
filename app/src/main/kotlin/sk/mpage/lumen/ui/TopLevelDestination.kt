@@ -8,7 +8,7 @@ import sk.mpage.lumen.core.designsystem.icon.LumoraIcons
 import sk.mpage.lumen.feature.awards.navigation.AwardsKey
 import sk.mpage.lumen.feature.history.navigation.HistoryKey
 import sk.mpage.lumen.feature.lobby.navigation.LobbyKey
-import sk.mpage.lumen.ui.navigation.ProfileKey
+import sk.mpage.lumen.feature.profile.navigation.ProfileKey
 
 internal enum class TopLevelDestination(
     val key: NavKey,

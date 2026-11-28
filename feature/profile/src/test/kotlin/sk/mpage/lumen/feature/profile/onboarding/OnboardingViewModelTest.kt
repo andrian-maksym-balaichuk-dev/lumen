@@ -22,7 +22,7 @@ class OnboardingViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val profiles = FakeUserProfileRepository()
-    private val viewModel = OnboardingViewModel(profiles)
+    private val viewModel by lazy { OnboardingViewModel(profiles) }
 
     @Test
     fun `a fresh form shows no error and cannot be submitted`() {

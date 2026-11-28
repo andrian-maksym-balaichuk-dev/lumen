@@ -7,6 +7,15 @@
     <string name="profile_choose_photo">Choose from photos</string>
     <string name="profile_photo_failed">Couldn\'t use this photo. Try another one.</string>
     <string name="profile_avatar_photo">Your photo</string>
+    <string name="profile_title">Profile</string>
+    <string name="profile_avatar_description">Avatar of %1$s</string>
+    <string name="profile_change_avatar">Change avatar</string>
+    <string name="profile_avatar_failed">Couldn\'t change the avatar. Try again.</string>
+    <string name="profile_rename">Rename</string>
+    <string name="profile_rename_title">Your name</string>
+    <string name="profile_rename_save">Save</string>
+    <string name="profile_rename_cancel">Cancel</string>
+    <string name="profile_rename_failed">Couldn\'t save the name. Try again.</string>
     <string name="profile_name_label">Your name</string>
     <string name="profile_name_error_blank">Enter your name</string>
     <plurals name="profile_name_error_too_long">

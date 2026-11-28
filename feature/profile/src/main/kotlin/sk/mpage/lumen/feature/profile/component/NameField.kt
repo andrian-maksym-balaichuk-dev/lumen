@@ -11,6 +11,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.TextFieldValue
 import sk.mpage.lumen.feature.profile.R
 
 internal enum class NameError {
@@ -48,32 +49,58 @@ internal fun NameField(
         label = { Text(stringResource(R.string.profile_name_label)) },
         singleLine = true,
         isError = error != null,
-        supportingText = {
-            Text(
-                when (error) {
-                    NameError.BLANK -> {
-                        stringResource(R.string.profile_name_error_blank)
-                    }
-
-                    NameError.TOO_LONG -> {
-                        pluralStringResource(
-                            R.plurals.profile_name_error_too_long,
-                            PlayerName.MAX_LENGTH,
-                            PlayerName.MAX_LENGTH,
-                        )
-                    }
-
-                    null -> {
-                        stringResource(
-                            R.string.profile_name_counter,
-                            PlayerName.length(value),
-                            PlayerName.MAX_LENGTH,
-                        )
-                    }
-                },
-            )
-        },
-        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Done),
+        supportingText = { NameSupportingText(value, error) },
+        keyboardOptions = NameKeyboardOptions,
         keyboardActions = KeyboardActions(onDone = { onDone() }),
     )
 }
+
+@Composable
+internal fun NameField(
+    value: TextFieldValue,
+    error: NameError?,
+    onValueChange: (TextFieldValue) -> Unit,
+    onDone: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier.fillMaxWidth(),
+        label = { Text(stringResource(R.string.profile_name_label)) },
+        singleLine = true,
+        isError = error != null,
+        supportingText = { NameSupportingText(value.text, error) },
+        keyboardOptions = NameKeyboardOptions,
+        keyboardActions = KeyboardActions(onDone = { onDone() }),
+    )
+}
+
+@Composable
+private fun NameSupportingText(
+    value: String,
+    error: NameError?,
+) {
+    Text(
+        when (error) {
+            NameError.BLANK -> {
+                stringResource(R.string.profile_name_error_blank)
+            }
+
+            NameError.TOO_LONG -> {
+                pluralStringResource(
+                    R.plurals.profile_name_error_too_long,
+                    PlayerName.MAX_LENGTH,
+                    PlayerName.MAX_LENGTH,
+                )
+            }
+
+            null -> {
+                stringResource(R.string.profile_name_counter, PlayerName.length(value), PlayerName.MAX_LENGTH)
+            }
+        },
+    )
+}
+
+private val NameKeyboardOptions =
+    KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Done)
